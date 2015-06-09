@@ -1,0 +1,403 @@
+[
+  {
+    "name": "Scenario",
+    "collectionName": "Scenarios",
+    "urlRoot": "/api_scenarios",
+    "deps": [
+    ]
+  },
+  {
+    "name": "Categoria",
+    "collectionName": "Categorias",
+    "urlRoot": "/api_categorias",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Atributo",
+    "collectionName": "Atributos",
+    "urlRoot": "/api_atributos",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Atributo_Sala",
+    "collectionName": "Atributos_Sala",
+    "urlRoot": "/api_atributos?tipo_id=2",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Atributo_Bloque",
+    "collectionName": "Atributos_Bloque",
+    "urlRoot": "/api_atributos?tipo_id=3",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Sede",
+    "collectionName": "Sedes",
+    "urlRoot": "/api_sedes",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Edificio",
+    "collectionName": "Edificios",
+    "urlRoot": "/api_edificios",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      }
+    ]
+  },
+  {
+    "name": "Sala",
+    "collectionName": "Salas",
+    "urlRoot": "/api_salas",
+    "deps": [
+      {
+        "model": "Edificio",
+        "lookup": "edificio_id",
+        "key": "edificio"
+      }
+    ]
+  },
+  {
+    "name": "Profesor",
+    "collectionName": "Profesors",
+    "urlRoot": "/api_profesors",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede",
+        "title": "Sede",
+        "filterKey": "codigo_cliente",
+        "filterDisplay": ["codigo_cliente", "nombre"]
+      },
+      {
+        "model": "Bloque",
+        "lookup": "bloques_ids",
+        "nested": "array",
+        "key": "bloques"
+      }
+    ],
+    "schema": [
+      {
+        "key": "codigo",
+        "type": "string",
+        "default": "",
+        "title": "Código"
+      },
+      {
+        "key": "nombre",
+        "type": "string",
+        "default": "",
+        "title": "Nombre"
+      },
+      {
+        "key": "min_horas",
+        "type": "number",
+        "default": 1,
+        "title": "Mín. Horas"
+      },
+      {
+        "key": "max_horas",
+        "type": "number",
+        "default": 1,
+        "title": "Máx. Horas"
+      }
+    ]
+  },
+  {
+    "name": "Facultad",
+    "collectionName": "Facultads",
+    "urlRoot": "/api_facultads",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Escuela",
+    "collectionName": "Escuelas",
+    "urlRoot": "/api_escuelas",
+    "deps": [
+      {
+        "model": "Facultad",
+        "lookup": "facultad_id",
+        "key": "facultad"
+      }
+    ]
+  },
+  {
+    "name": "Carrera",
+    "collectionName": "Carreras",
+    "urlRoot": "/api_carreras",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      },
+      {
+        "model": "Regimen",
+        "lookup": "regimen_id",
+        "key": "regimen"
+      },
+      {
+        "model": "Jornada",
+        "lookup": "jornada_id",
+        "key": "jornada"
+      }
+    ]
+  },
+  {
+    "name": "Curso",
+    "collectionName": "Cursos",
+    "urlRoot": "/api_cursos",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      },
+      {
+        "model": "Regimen",
+        "lookup": "regimen_id",
+        "key": "regimen"
+      },
+      {
+        "model": "Jornada",
+        "lookup": "jornada_id",
+        "key": "jornada"
+      },
+      {
+        "model": "Escuela",
+        "lookup": "escuela_id",
+        "key": "escuela"
+      },
+      {
+        "model": "Carrera",
+        "lookup": "carrera_id",
+        "key": "carrera"
+      }
+    ]
+  },
+  {
+    "name": "CategoriasCurso",
+    "collectionName": "CategoriasCurso",
+    "urlRoot": "/api_categorias_cursos",
+    "deps": [
+      {
+        "model": "Categoria",
+        "lookup": "categoria_id",
+        "key": "categoria"
+      },
+      {
+        "model": "Curso",
+        "lookup": "curso_id",
+        "key": "curso"
+      }
+    ]
+  },
+  {
+    "name": "Asignatura",
+    "collectionName": "Asignatura",
+    "urlRoot": "/api_asignaturas",
+    "saveNested": true,
+    "deps": [
+      {
+        "model": "Categoria",
+        "lookup": "categoria_id",
+        "key": "categoria"
+      },
+      {
+        "model": "Curso",
+        "lookup": "curso_id",
+        "key": "curso"
+      },
+      {
+        "model": "Semana",
+        "lookup": "semanas_ids",
+        "nested": "array",
+        "key": "semanas"
+      },
+      {
+        "model": "Atributo_Sala",
+        "lookup": "atributos_sala_ids",
+        "nested": "dictionary_array",
+        "key": "atributos_sala"
+      },
+      {
+        "model": "Atributo_Bloque",
+        "lookup": "atributos_bloque_ids",
+        "nested": "dictionary_array",
+        "key": "atributos_bloque"
+      }
+    ]
+  },
+  {
+    "name": "Periodo",
+    "collectionName": "Periodos",
+    "urlRoot": "/api_periodos",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Semana",
+    "collectionName": "Semanas",
+    "urlRoot": "/api_semanas/active",
+    "deps": [
+      {
+        "model": "Periodo",
+        "lookup": "periodo_id",
+        "key": "periodo"
+      }
+    ]
+  },
+  {
+    "name": "Regimen",
+    "collectionName": "Regimens",
+    "urlRoot": "/api_regimens",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Jornada",
+    "collectionName": "Jornadas",
+    "urlRoot": "/api_jornadas",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Dia",
+    "collectionName": "Dias",
+    "urlRoot": "/api_dias",
+    "deps": [
+
+    ]
+  },
+  {
+    "name": "Bloque",
+    "collectionName": "Bloques",
+    "urlRoot": "/api_bloques",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      },
+      {
+        "model": "Regimen",
+        "lookup": "regimen_id",
+        "key": "regimen"
+      },
+      {
+        "model": "Jornada",
+        "lookup": "jornada_id",
+        "key": "jornada"
+      },
+      {
+        "model": "Dia",
+        "lookup": "dia_id",
+        "key": "dia"
+      }
+    ]
+  },
+  {
+    "name": "Schedule",
+    "collectionName": "Schedules",
+    "urlRoot": "/api_schedules",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      }
+    ]
+  },
+  {
+    "name": "Franja",
+    "collectionName": "Franjas",
+    "urlRoot": "/api_franjas",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      }
+    ]
+  },
+  {
+    "name": "Proceso",
+    "collectionName": "Procesos",
+    "urlRoot": "/api_procesos",
+    "deps": [
+      {
+        "model": "Sede",
+        "lookup": "sede_id",
+        "key": "sede"
+      },
+      {
+        "model": "Periodo",
+        "lookup": "periodo_id",
+        "key": "periodo"
+      },
+      {
+        "model": "Jornada",
+        "lookup": "jornada_id",
+        "key": "jornada"
+      },
+      {
+        "model": "Regimen",
+        "lookup": "regimen_id",
+        "key": "regimen"
+      }
+    ]
+  },
+  {
+    "name": "Demanda",
+    "collectionName": "Demanda",
+    "urlRoot": "/api_demandas",
+    "deps": [
+      {
+        "model": "Curso",
+        "lookup": "curso_id",
+        "key": "curso"
+      },
+      {
+        "model": "Periodo",
+        "lookup": "periodo_id",
+        "key": "periodo"
+      }
+    ]
+  },
+  {
+    "name": "Sala_Atributo",
+    "collectionName": "Sala_Atributo",
+    "urlRoot": "/api_atributos_salas",
+    "deps": [
+      {
+        "model": "Sala",
+        "lookup": "sala_id",
+        "key": "sala"
+      },
+      {
+        "model": "Atributo",
+        "lookup": "atributo_id",
+        "key": "atributo"
+      }
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+<span>
+    <span><%-title%></span>
+    <select>
+        <option data-value="">...</option>
+        <% _.each(options, function(option){ %>
+            <% var value = option.get(filterKey); %>
+            <% if( data != null && data != "") { %>
+            	<% if( value == data.get(filterKey)) { %>
+            		<option data-value="<%-value%>" selected><%-caption(option)%></option>
+            	<% } else { %>
+            		<option data-value="<%-value%>"><%-caption(option)%></option>
+            	<% } %>
+            <% } else { %>
+                <option data-value="<%-value%>"><%-caption(option)%></option>
+            <% } %>
+        <% }); %>
+    </select>
+</span>

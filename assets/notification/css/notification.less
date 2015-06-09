@@ -1,0 +1,126 @@
+//// setting custom class ////
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+
+//////// STYLE ///////
+
+
+.notifications
+{
+  position: fixed;
+  width: 25%;
+  bottom: 34px;
+  right: 35px;
+  z-index: 999999;
+
+
+  .notification
+  {
+    position: relative;
+    width: 100%;
+
+
+    > div
+    {
+      > .close
+      {
+        color: #fff;
+        opacity: 1;
+        position: absolute;
+        right: 20px;
+        top: 6px;
+        font-weight: 300 !important;
+        font-size: 16px;
+        border: none;
+        background: none;
+        cursor: pointer;
+      }
+
+    }
+
+    > .succes
+    {
+      padding: 10px;
+      background: #00a232 !important;
+      color: #fff;
+      font-size: 12px;
+      margin-bottom: 4px;
+
+      .border-radius(8px);
+    }
+
+    > .error
+    {
+      padding: 10px;
+      background: #fe0000 !important;
+      color: #fff;
+      font-size: 12px;
+      margin-bottom: 4px;
+
+      .border-radius(8px);
+    }
+
+    > .warning
+    {
+      padding: 10px;
+      background: #FCFF00 !important;
+      color: #000;
+      font-size: 12px;
+      margin-bottom: 4px;
+
+      .border-radius(8px);
+
+      > button
+      {
+        color: #000 !important;
+      }
+    }
+
+    > .info
+    {
+      padding: 10px;
+      background: #000 !important;
+      color: #fff !important;
+      font-size: 12px;
+      margin-bottom: 4px;
+
+      .border-radius(8px);
+
+      > button
+      {
+        color: #fff !important;
+      }
+    }
+
+  }
+
+}
+
+
+
