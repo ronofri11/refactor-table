@@ -2,12 +2,12 @@ define([
     "backbone.marionette",
     "backbone.radio",
     "radio.shim",
-    "../../assets/selector/js/selector",
+    "../../assets/table/js/table",
     "../../assets/schedule/js/schedule",
     "../../assets/cardsform/js/cardsform",
     "../../assets/simpleform/js/simpleform",
     "text!component/templates/componentTemplate.html"
-], function (Marionette, Radio, Shim, TypeAhead, Schedule, CardsForm, SimpleForm, ComponentTemplate) {
+], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, ComponentTemplate) {
 
 var ComponentConstructor = function(dataComponent){
         var Component = new Marionette.Application();
@@ -168,8 +168,8 @@ var ComponentConstructor = function(dataComponent){
 
         Component.getAsset = function(){
             switch(Component.Model.get("asset").class){
-                case "typeahead":
-                    return TypeAhead;
+                case "table":
+                    return Table;
                 case "schedule":
                     return Schedule;
                 case "cardsform":
@@ -177,7 +177,7 @@ var ComponentConstructor = function(dataComponent){
                 case "simpleform":
                     return SimpleForm;
                 default:
-                    return TypeAhead;
+                    return Table;
                 //to be continued...
             }
         };
