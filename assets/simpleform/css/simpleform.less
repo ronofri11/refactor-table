@@ -1,0 +1,100 @@
+//// setting custom class ////
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+
+//////// STYLE ///////
+
+.simpleform
+{
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: block;
+    box-sizing: border-box;
+    padding: 10px;
+
+    > .editor
+    {
+        float: left;
+        height: 100%;
+        position: relative;
+        width: 20%;
+        box-sizing: border-box;
+        padding: 12px;
+
+        > span
+        {
+            width: 100%;
+
+            > span
+            {
+                width: 100%;
+                font-weight: 100;
+                font-size: 14px;
+                color: #8197ae;
+                display: block;
+
+                &::after {
+                    content: ":";
+                }
+            }
+
+            > select
+            {
+                width: 100%;
+                color: #286186;
+                background: #fff;
+                border: 1px solid #ccc;
+                height: 25px;
+                padding: 0 5px;
+                font-size: 11px;
+                -webkit-appearance: none;
+                -webkit-border-radius: 0;
+                box-sizing: border-box;
+            }
+
+            > input
+            {
+                width: 100%;
+                color: #286186;
+                background: #fff;
+                border: 1px solid #ccc;
+                height: 25px;
+                padding: 0 5px;
+                font-size: 11px;
+                -webkit-appearance: none;
+                -webkit-border-radius: 0;
+                box-sizing: border-box;
+            }
+        }
+    }
+
+    .modify
+    {
+        background: #f2ff1a !important;
+    }
+
+    .error
+    {
+        background: rgb(233, 53, 53) !important;
+        color: #FFF;
+    }
+}
