@@ -1,1 +1,1 @@
-# maintainer-grid
+# maintainer-table
