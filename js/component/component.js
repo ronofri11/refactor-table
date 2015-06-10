@@ -169,6 +169,7 @@ var ComponentConstructor = function(dataComponent){
         Component.getAsset = function(){
             switch(Component.Model.get("asset").class){
                 case "table":
+                    console.log("table class!");
                     return Table;
                 case "schedule":
                     return Schedule;

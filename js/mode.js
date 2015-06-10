@@ -93,9 +93,9 @@ define([
         }
 
         Mode.on("start", function(options){
-            var selectorChannel = Mode.components["selector"].Channel;
+            var tableChannel = Mode.components["table"].Channel;
 
-            Mode.Channel.listenTo(selectorChannel, "notify", function(args){
+            Mode.Channel.listenTo(tableChannel, "notify", function(args){
                 Mode.Channel.trigger("notify", args);
             });
 
@@ -112,7 +112,7 @@ define([
         });
 
         Mode.setHandlers = function(){
-            var selectorChannel = Mode.components["selector"].Channel;
+            var tableChannel = Mode.components["table"].Channel;
 
             Mode.Channel.reply("get:mode:root", function(){
                 return Mode.RootView;
@@ -127,11 +127,11 @@ define([
                 }
             });
 
-            Mode.Channel.listenTo(selectorChannel, "custom:control:one", function(args){
+            Mode.Channel.listenTo(tableChannel, "custom:control:one", function(args){
                 Mode.Channel.trigger("create:new:model", args);
             });
 
-            Mode.Channel.listenTo(selectorChannel, "custom:control:two", function(){
+            Mode.Channel.listenTo(tableChannel, "custom:control:two", function(){
                 if(Mode.Selection.length > 0){
                     Mode.Channel.trigger("delete:model", {
                         model: Mode.Selection.at(0)
@@ -140,7 +140,7 @@ define([
             });
 
             Mode.Channel.comply("add:empty:model", function(args){
-                selectorChannel.command("add:model", args);
+                tableChannel.command("add:model", args);
                 console.log("added new model");
             });
 
@@ -154,11 +154,11 @@ define([
             $(document).on("keyup", function(event){
                 switch(event.which){
                     case 38: //UP
-                        selectorChannel.trigger("option:prev");
+                        tableChannel.trigger("option:prev");
                         event.preventDefault();
                         break;
                     case 40: //DOWN
-                        selectorChannel.trigger("option:next");
+                        tableChannel.trigger("option:next");
                         event.preventDefault();
                         break;
                 }

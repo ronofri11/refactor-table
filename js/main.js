@@ -35,8 +35,8 @@ define([
     var store = new Store("store");
     var storeChannel = store.Channel;
 
-    store.start({url: "/darwined/backbreakers/"});
-    // store.start({url: "/clients/darwined"});
+    // store.start({url: "/darwined/backbreakers/"});
+    store.start({url: "/clients/darwined"});
     // store.start({url: "/clients/testing"});
 
     var asignaturas;
@@ -58,17 +58,16 @@ define([
     App.Channel.on("request:complete", function(args){
         if(asignaturas !== undefined){
             var schema = storeChannel.request("get:schema:for", {
-                modelName: modelName,
-                mode: "edit"
+                modelName: modelName
             });
             var dataMode = {
                 name:"edit1",
                 layout: "fullpage",
                 channelName: "mode1",
                 components: {
-                    selector: {
+                    table: {
                         title: modelName,
-                        channelName: "selector",
+                        channelName: "table",
                         region: "main",
                         controls: [
                             {
@@ -159,12 +158,12 @@ define([
                             }
                         ],
                         asset: {
-                            class: "selector",
+                            class: "table",
                             initOptions: {},
                             startOptions:{
-                                displayKeys: ["codigo_cliente", "nombre"],
-                                models: asignaturas,
-                                newDisplay: "Nuevo Curso"
+                                separator: ".",
+                                pages: 33,
+                                rows: asignaturas
                             }
                         }
                     }

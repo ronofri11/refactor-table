@@ -84,6 +84,9 @@ define([
         });
 
         Table.on("before:start", function(options){
+
+            console.log("table config:", options);
+
             if(options.pages === undefined){
                 //default number when it is not provided
                 Table.pageNumber = 100;
@@ -99,13 +102,19 @@ define([
             else{
                 Table.separator = options.separator;
             }
+
+            if(options.startingPage === undefined){
+
+            }
+
+            Table.firstIndex = 0;
         });
 
         Table.on("start", function(options){
 
             var RowCollection = Backbone.Collection.extend();
 
-            Table.rows = options.models;
+            Table.rows = options.rows;
             Table.allowedSet = new RowCollection();
             Table.workingSet = new RowCollection();
 
@@ -135,6 +144,10 @@ define([
             Table.Channel.on("row:contextmenu", function(){
                 console.log("contextmenu row");
             });
+
+            Table.Channel.command("update:indexes", function(){});
+            Table.Channel.command("change:page", function(args){});
+            Table.Channel.request("update:indexes", function(){});
         });
 
         return Table;
