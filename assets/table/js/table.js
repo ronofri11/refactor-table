@@ -77,7 +77,25 @@ define([
             },
             childEvents: {
                 // "optionClicked": "optionClicked"
-            },
+            }
+        });
+
+        Table.on("before:start", function(options){
+            if(options.pages === undefined){
+                //default number when it is not provided
+                Table.pageNumber = 100;
+            }
+            else{
+                Table.pageNumber = options.pages;
+            }
+
+            if(options.separator === undefined){
+                //default property separator double underscore
+                Table.separator = "__";
+            }
+            else{
+                Table.separator = options.separator;
+            }
         });
 
         Table.on("start", function(options){

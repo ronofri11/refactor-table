@@ -1,0 +1,136 @@
+// setting custom class
+
+.box-sizing(@box: border-box)
+{
+    -webkit-box-sizing: @box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: @box;    /* Firefox, other Gecko */
+    box-sizing: @box;         /* Opera/IE 8+ */
+}
+
+.noSelectText
+{
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+// CSS
+body
+{
+    background-color: #eff9fa !important;
+    background-repeat-x: initial;
+    font-family: 'Open sans';
+    background-size: cover;
+}
+
+.maintainer
+{
+    width: 98%;
+    background-color: #fff;
+    margin: 1%;
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 0 17px;
+
+    .box-sizing();
+
+    > .header
+    {
+        position: relative;
+        z-index: 99;
+        width: 100%;
+        display: inline-block;
+        height: 56px;
+        border-bottom: 4px solid #f1f8fa;
+        margin-bottom: -5px;
+
+        > .left
+        {
+            width: 50%;
+            float: left;
+            margin: 0;
+            padding: 0;
+        }
+
+        > .right
+        {
+            float: right;
+
+            > .impexp
+            {
+                padding-bottom: 10px;
+                text-transform: uppercase;
+                font-size: 27px;
+                color: #286181;
+                font-weight: 700;
+                margin-top: 10px;
+
+
+                > li
+                {
+                    list-style: none;
+
+                    > object
+                    {
+                        width: 40px;
+                    }
+                }
+
+
+
+            }
+        }
+
+        h1
+        {
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 27px;
+            color: #286181;
+            font-weight: 700;
+            margin-top: 10px;
+            float: left;
+        }
+
+        .add
+        {
+            float: left;
+            margin: 17px 10px;
+            padding: 4px 8px;
+            background: #a1bdc4;
+            line-height: 14px;
+            font-weight: 400;
+            color: #fff;
+            font-size: 15px;
+            height: 15px;
+            cursor: pointer;
+
+            .border-radius(4px);
+            .noSelectText;
+
+
+            &:hover
+            {
+                background: #8197ad;
+            }
+        }
+    }
+
+    > .content
+    {
+        display: inline-block;
+        width: 100%;
+        border-bottom: 10px solid #f1f8fa;
+    }
+}
+
