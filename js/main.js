@@ -35,8 +35,8 @@ define([
     var store = new Store("store");
     var storeChannel = store.Channel;
 
-    store.start({url: "/darwined/backbreakers/"});
-    // store.start({url: "/clients/darwined"});
+    // store.start({url: "/darwined/backbreakers/"});
+    store.start({url: "/clients/darwined"});
     // store.start({url: "/clients/testing"});
 
     var asignaturas;
@@ -162,8 +162,9 @@ define([
                             initOptions: {},
                             startOptions:{
                                 separator: ".",
-                                pages: 33,
-                                rows: asignaturas
+                                recordsPerPage: 33,
+                                rows: asignaturas,
+                                columns:{}
                             }
                         }
                     }

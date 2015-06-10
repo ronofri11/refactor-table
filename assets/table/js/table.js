@@ -2,9 +2,10 @@ define([
     "backbone.marionette",
     "backbone.radio",
     "radio.shim",
+    "assets/table/js/paging.js",
     "text!./../templates/table.html",
     "text!./../templates/row.html"
-], function (Marionette, Radio, Shim, TableTemplate, RowTemplate) {
+], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -87,12 +88,12 @@ define([
 
             console.log("table config:", options);
 
-            if(options.pages === undefined){
+            if(options.recordsPerPage === undefined){
                 //default number when it is not provided
-                Table.pageNumber = 100;
+                Table.recordsPerPage = 100;
             }
             else{
-                Table.pageNumber = options.pages;
+                Table.recordsPerPage = options.recordsPerPage;
             }
 
             if(options.separator === undefined){
@@ -103,14 +104,12 @@ define([
                 Table.separator = options.separator;
             }
 
-            if(options.startingPage === undefined){
-
-            }
-
             Table.firstIndex = 0;
         });
 
         Table.on("start", function(options){
+
+            console.log("table rows number:", options.rows.length);
 
             var RowCollection = Backbone.Collection.extend();
 
@@ -146,8 +145,13 @@ define([
             });
 
             Table.Channel.command("update:indexes", function(){});
-            Table.Channel.command("change:page", function(args){});
-            Table.Channel.request("update:indexes", function(){});
+            Table.Channel.command("change:page", function(args){
+                var newPage = args.page;
+            });
+            Table.Channel.request("change:records:per:page", function(args){
+                Table.recordsPerPage = args.recordsPerPage;
+                Table.pageNumber = Math.ceil(Table.workingSet.length / Table.recordsPerPage);
+            });
         });
 
         return Table;
