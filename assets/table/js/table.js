@@ -59,12 +59,15 @@ define([
         // });
 
         Table.LayoutView = Marionette.LayoutView.extend({
-            className: "canvastable",
+            className: "tablecomponent",
             template: _.template(TableTemplate),
             regions:{
                 "thead": "div.thead",
                 "tbody": "div.tbody",
                 "paging": "div.paging"
+            },
+            onRender: function(){
+
             }
         });
 

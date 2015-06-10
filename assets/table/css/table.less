@@ -61,13 +61,20 @@
 }
 
 //////// STYLE ///////
+.tablecomponent
+{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
 
 .canvastable
 {
     width: 100%;
+    height: 95%;
     overflow-x: scroll;
     overflow-y: scroll;
-    height: 700px;  /* suma altos thead + tbody */
+    // height: 700px;  /* suma altos thead + tbody */
     -moz-box-shadow: inset 0 1px 15px -2px rgba(0,0,0,0.3);
     -webkit-box-shadow: inset 0 1px 15px -2px rgba(0,0,0,0.3);
     box-shadow: inset 0 1px 15px -2px rgba(0,0,0,0.3);
@@ -84,7 +91,7 @@
         position: relative;
         font-family: 'Open Sans', sans-serif;
         -webkit-font-smoothing: antialiased;
-        table-layout: fixed;
+        // table-layout: fixed;
         z-index: 2;
 
         .thead
@@ -203,7 +210,8 @@
 
         > div
         {
-            padding: 3px;
+            // padding: 3px;
+
             // -webkit-transition: width 1s ease-in-out;
             // -moz-transition: width 1s ease-in-out;
             // -o-transition: width 1s ease-in-out;
@@ -233,9 +241,9 @@
 
         .rows // tbody
         {
-            height: 620px; /* altura definida css - esta es la altura que se modifica responsive!!!! */
-            position: absolute;
-            top: 60px; /* altura del thead */
+            // height: 620px; /* altura definida css - esta es la altura que se modifica responsive!!!! */
+            // position: absolute;
+            // top: 60px; /* altura del thead */
 
             .modify
                 {
@@ -352,7 +360,7 @@
 
             > .row
             {
-                width: 100%;
+                // width: 100%;
 
                 &:nth-child(odd)
                 {
@@ -562,8 +570,14 @@
 
 .paging
 {
+    width: 100%;
+    display: block;
+    background-color: #f5f5f5;
+    box-sizing: border-box;
+    height: 5%;
+
     padding: 10px 0px;
-    height: 24px;
+
     float: left;
 
     .noSelectText;
