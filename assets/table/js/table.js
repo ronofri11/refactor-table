@@ -4,8 +4,9 @@ define([
     "radio.shim",
     "assets/table/js/paging.js",
     "text!./../templates/table.html",
-    "text!./../templates/row.html"
-], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate) {
+    "text!./../templates/row.html",
+    "text!./../templates/paging.html"
+], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate, PagingTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -84,27 +85,23 @@ define([
             }
         });
 
+        Table.PagingView = Marionette.ItemView.extend({
+            tagName: "div",
+            className: "pages",
+            template: _.template(PagingTemplate),
+            templateHelpers: function(){
+                var first = 1;//Table.currentPageStart;
+                var last = Table.totalPages;//Table.currentPageEnd;
+                console.log("first:", first, "last:", last);
+                return {
+                    first: first,
+                    last: last
+                };
+            }
+        });
+
         Table.on("before:start", function(options){
-
-            console.log("table config:", options);
-
-            if(options.recordsPerPage === undefined){
-                //default number when it is not provided
-                Table.recordsPerPage = 100;
-            }
-            else{
-                Table.recordsPerPage = options.recordsPerPage;
-            }
-
-            if(options.separator === undefined){
-                //default property separator double underscore
-                Table.separator = "__";
-            }
-            else{
-                Table.separator = options.separator;
-            }
-
-            Table.firstIndex = 0;
+            Table.initPaging(options);
         });
 
         Table.on("start", function(options){
@@ -116,20 +113,28 @@ define([
             Table.rows = options.rows;
             Table.allowedSet = new RowCollection();
             Table.workingSet = new RowCollection();
+            Table.windowSet = new RowCollection();
 
             Table.allowedSet.reset(Table.rows.toArray());
             Table.workingSet.reset(Table.allowedSet.toArray());
 
+            Table.changeRecordsPerPage(Table.recordsPerPage);
+
+
             var Rows = new Table.TableView({
-                collection: Table.workingSet
+                collection: Table.windowSet
             });
 
-            Table.RootView = new Table.LayoutView();
+            var Paging = new Table.PagingView();
 
+            console.log("table in window rows:", Table.windowSet.length);
+
+            Table.RootView = new Table.LayoutView();
 
             //when the LayoutView is shown...
             Table.RootView.on("show", function(){
                 Table.RootView.getRegion("tbody").show(Rows);
+                Table.RootView.getRegion("paging").show(Paging);
             });
 
             Table.Channel.reply("get:root", function(){
@@ -153,6 +158,78 @@ define([
                 Table.pageNumber = Math.ceil(Table.workingSet.length / Table.recordsPerPage);
             });
         });
+
+        Table.rowsBetween = function(firstIndex, lastIndex){
+            //firsIndex and lastIndex go from 0 to workingSet.length - 1
+            var relevantArray = [];
+            for(var i = firstIndex; i < lastIndex; i++){
+                relevantArray.push(Table.workingSet.at(i));
+            }
+
+            Table.windowSet.reset(relevantArray);
+        };
+
+        Table.goToPage = function(pageNumber){
+            Table.setIndexes(pageNumber);
+            Table.rowsBetween(Table.firstIndex, Table.lastIndex);
+        };
+
+        Table.changeRecordsPerPage = function(recordsPerPage){
+            var totalPages = parseInt(Table.workingSet.length / recordsPerPage);
+            var remainder = Table.workingSet.length % recordsPerPage;
+            if(remainder > 0){
+                totalPages = totalPages + 1;
+            }
+
+            Table.totalPages = totalPages;
+            Table.goToPage(1);
+        };
+
+        Table.setIndexes = function(pageNumber){
+            var firstIndex = Table.recordsPerPage * (pageNumber - 1);
+            var lastIndex = firstIndex + Table.recordsPerPage;
+
+            if(lastIndex > Table.workingSet.length){
+                lastIndex = Table.workingSet.length;
+            }
+
+            Table.firstIndex = firstIndex;
+            Table.lastIndex = lastIndex;
+        };
+
+        Table.initPaging = function(options){
+            console.log("table config:", options);
+
+            if(options.recordsPerPage === undefined){
+                //default number when it is not provided
+                Table.recordsPerPage = 100;
+            }
+            else{
+                Table.recordsPerPage = options.recordsPerPage;
+            }
+
+            if(options.separator === undefined){
+                //default property separator double underscore
+                Table.separator = "__";
+            }
+            else{
+                Table.separator = options.separator;
+            }
+
+            if(options.firstIndex === undefined){
+                Table.firstIndex = 0;
+            }
+            else{
+                Table.firstIndex = options.firstIndex;
+            }
+
+            if(options.lastIndex === undefined){
+                Table.lastIndex = Table.firstIndex + Table.recordsPerPage;
+            }
+            else{
+                Table.lastIndex = options.lastIndex;
+            }
+        };
 
         return Table;
     };

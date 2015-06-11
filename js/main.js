@@ -162,7 +162,7 @@ define([
                             initOptions: {},
                             startOptions:{
                                 separator: ".",
-                                recordsPerPage: 33,
+                                recordsPerPage: 100,
                                 rows: asignaturas,
                                 columns:{}
                             }
