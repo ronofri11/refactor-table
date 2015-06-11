@@ -43,6 +43,7 @@ var ComponentConstructor = function(dataComponent){
             },
             onShow: function(){
                 this.$el.addClass(this.model.get("class"));
+                this.$el.attr("title", this.model.get("title"));
             },
             clickActiveState: function(){
                 this.stateEvents[this.activeState]();

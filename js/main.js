@@ -35,8 +35,8 @@ define([
     var store = new Store("store");
     var storeChannel = store.Channel;
 
-    // store.start({url: "/darwined/backbreakers/"});
-    store.start({url: "/clients/darwined"});
+    store.start({url: "/darwined/backbreakers/"});
+    // store.start({url: "/clients/darwined"});
     // store.start({url: "/clients/testing"});
 
     var asignaturas;
@@ -79,7 +79,8 @@ define([
                                         args: {modelName: modelName},
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Agregar nuevo curso"
                             },
                             {
                                 align: "left",
@@ -89,7 +90,8 @@ define([
                                         event: "custom:control:two",
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Eliminar curso seleccionado"
                             },
                             {
                                 align: "left",
@@ -99,7 +101,8 @@ define([
                                         event: "custom:control:three",
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Deshacer"
                             },
                             {
                                 align: "right",
@@ -109,7 +112,8 @@ define([
                                         event: "remove:active:filters",
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Limpiar filtros"
                             },
                             {
                                 align: "right",
@@ -124,7 +128,8 @@ define([
                                         class: "press",
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Filtrar cursos modificados"
                             },
                             {
                                 align: "right",
@@ -139,7 +144,8 @@ define([
                                         class: "press",
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Filtrar cursos agregados"
                             },
                             {
                                 align: "right",
@@ -154,7 +160,8 @@ define([
                                         class: "press",
                                         transition: "default"
                                     }
-                                }
+                                },
+                                title: "Filtrar cursos eliminados"
                             }
                         ],
                         asset: {
