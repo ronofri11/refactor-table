@@ -18,8 +18,12 @@ define([
             className: "row",
             template: _.template(RowTemplate),
             templateHelpers: function(){
-                var cap = "placeholder";
-                return {caption: cap};
+                var anchoCell = 400;
+                var index = Table.workingSet.indexOf(this.model) + 1;
+                return {
+                    anchoCell: anchoCell,
+                    index: index
+                };
             },
             events: {
                 "click": "broadcastEvent",
@@ -82,6 +86,23 @@ define([
             },
             childEvents: {
                 // "optionClicked": "optionClicked"
+            },
+            onShow: function(){
+                this.setDimension();
+            },
+            setDimension: function(){
+                var canvas = this.$el.parent().parent();
+                var totalCell = this.$el.find(".row:first-child() div").size();
+                var totalWidth = 0;
+
+                for(var i=0; i < totalCell; i++){
+                    var cellWidth = this.$el.find(".row:first-child() div:eq(" + i + ")").width();
+                    totalWidth = totalWidth + cellWidth;
+                }
+
+                if( totalWidth > canvas.width() ){
+                    canvas.width(totalWidth);
+                }
             }
         });
 

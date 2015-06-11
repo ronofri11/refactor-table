@@ -1,15 +1,15 @@
 <div class="firstpage">
-    <object type="image/svg+xml;base64" data="img/svg/first.svg"></object>
+    <object type="image/svg+xml;base64" data="assets/table/img/first.svg"></object>
 </div>
 <div class="prevpage">
-    <object type="image/svg+xml;base64" data="img/svg/prev.svg"></object>
+    <object type="image/svg+xml;base64" data="assets/table/img/prev.svg"></object>
 </div>
 <% for(var i = first; i <= last; i++){ %>
-    <div class="page" data-index="<%-i%>"><%-i+1%></div>
+    <div class="page" data-index="<%- i%>"><%- i%></div>
 <%}%>
 <div class="nextpage">
-    <object type="image/svg+xml;base64" data="img/svg/next.svg"></object>
+    <object type="image/svg+xml;base64" data="assets/table/img/next.svg"></object>
 </div>
 <div class="lastpage">
-    <object type="image/svg+xml;base64" data="img/svg/last.svg"></object>
+    <object type="image/svg+xml;base64" data="assets/table/img/last.svg"></object>
 </div>
