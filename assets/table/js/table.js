@@ -13,7 +13,7 @@ define([
         var Table = new Marionette.Application();
         Table.Channel = Radio.channel(channelName);
 
-        Table.RowView = Marionette.ItemView.extend({
+        var RowView = Marionette.ItemView.extend({
             tagName: "div",
             className: "row",
             template: _.template(RowTemplate),
@@ -64,7 +64,7 @@ define([
         //     }
         // });
 
-        Table.LayoutView = Marionette.LayoutView.extend({
+        var LayoutView = Marionette.LayoutView.extend({
             className: "tablecomponent",
             template: _.template(TableTemplate),
             regions:{
@@ -77,10 +77,10 @@ define([
             }
         });
 
-        Table.TableView = Marionette.CollectionView.extend({
+        var TableView = Marionette.CollectionView.extend({
             tagName: "div",
             className: "rows",
-            childView: Table.RowView,
+            childView: RowView,
             template: _.template(''),
             events: {
             },
@@ -106,10 +106,13 @@ define([
             }
         });
 
-        Table.PagingView = Marionette.ItemView.extend({
+        var PagingView = Marionette.ItemView.extend({
             tagName: "div",
             className: "pages",
             template: _.template(PagingTemplate),
+            events: {
+                "click .page": "broadcastEvent"
+            },
             templateHelpers: function(){
                 var first = 1;//Table.currentPageStart;
                 var last = Table.totalPages;//Table.currentPageEnd;
@@ -118,6 +121,17 @@ define([
                     first: first,
                     last: last
                 };
+            },
+            broadcastEvent: function(event){
+                event.stopPropagation();
+                event.preventDefault();
+                var eventName = "paging:" + event.type;
+                var page = $(event.target).data("index");
+                console.log("page clicked", page);
+                Table.Channel.trigger(eventName, {
+                    eventName: eventName, 
+                    page: page
+                });
             }
         });
 
@@ -139,23 +153,23 @@ define([
             Table.allowedSet.reset(Table.rows.toArray());
             Table.workingSet.reset(Table.allowedSet.toArray());
 
-            Table.changeRecordsPerPage(Table.recordsPerPage);
 
 
-            var Rows = new Table.TableView({
+            Table.TableView = new TableView({
                 collection: Table.windowSet
             });
 
-            var Paging = new Table.PagingView();
+            Table.PagingView = new PagingView();
 
+            Table.changeRecordsPerPage(Table.recordsPerPage);
             console.log("table in window rows:", Table.windowSet.length);
 
-            Table.RootView = new Table.LayoutView();
+            Table.RootView = new LayoutView();
 
             //when the LayoutView is shown...
             Table.RootView.on("show", function(){
-                Table.RootView.getRegion("tbody").show(Rows);
-                Table.RootView.getRegion("paging").show(Paging);
+                Table.RootView.getRegion("tbody").show(Table.TableView);
+                Table.RootView.getRegion("paging").show(Table.PagingView);
             });
 
             Table.Channel.reply("get:root", function(){
@@ -170,13 +184,15 @@ define([
                 console.log("contextmenu row");
             });
 
-            Table.Channel.command("update:indexes", function(){});
+            Table.Channel.on("paging:click", function(args){
+                var pageNumber = args.page;
+                Table.goToPage(pageNumber);
+            });
             Table.Channel.command("change:page", function(args){
                 var newPage = args.page;
             });
-            Table.Channel.request("change:records:per:page", function(args){
-                Table.recordsPerPage = args.recordsPerPage;
-                Table.pageNumber = Math.ceil(Table.workingSet.length / Table.recordsPerPage);
+            Table.Channel.on("change:records:per:page", function(args){
+                Table.changeRecordsPerPage(args.recordsPerPage);
             });
         });
 
@@ -196,13 +212,11 @@ define([
         };
 
         Table.changeRecordsPerPage = function(recordsPerPage){
-            var totalPages = parseInt(Table.workingSet.length / recordsPerPage);
-            var remainder = Table.workingSet.length % recordsPerPage;
-            if(remainder > 0){
-                totalPages = totalPages + 1;
-            }
-
+            var totalPages = Math.ceil(Table.workingSet.length / recordsPerPage);
             Table.totalPages = totalPages;
+            Table.PagingView.render();
+            // Table.currentPageStart = 1;
+            // Table.currentPageEnd
             Table.goToPage(1);
         };
 
