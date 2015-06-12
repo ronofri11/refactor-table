@@ -111,7 +111,7 @@ define([
             className: "pages",
             template: _.template(PagingTemplate),
             events: {
-                "click .page": "broadcastEvent"
+                "click .page": "pageSelected"
             },
             templateHelpers: function(){
                 var first = 1;//Table.currentPageStart;
@@ -122,16 +122,23 @@ define([
                     last: last
                 };
             },
-            broadcastEvent: function(event){
+            pageSelected: function(event){
                 event.stopPropagation();
                 event.preventDefault();
-                var eventName = "paging:" + event.type;
-                var page = $(event.target).data("index");
-                console.log("page clicked", page);
-                Table.Channel.trigger(eventName, {
-                    eventName: eventName, 
-                    page: page
-                });
+                var page = $(event.target);
+                var pageIndex = page.data("index");
+                var currentPage = this.$el.find(".page.selected");
+                var currentPageIndex = currentPage.data("index");
+
+                if(currentPageIndex !== pageIndex){
+                    console.log("page clicked", page);
+
+                    currentPage.removeClass("selected");
+                    page.addClass("selected");
+                    Table.Channel.trigger("paging:click", {
+                        page: pageIndex
+                    });
+                }
             }
         });
 
@@ -212,7 +219,8 @@ define([
         };
 
         Table.changeRecordsPerPage = function(recordsPerPage){
-            var totalPages = Math.ceil(Table.workingSet.length / recordsPerPage);
+            Table.recordsPerPage = recordsPerPage;
+            var totalPages = Math.ceil(Table.workingSet.length / Table.recordsPerPage);
             Table.totalPages = totalPages;
             Table.PagingView.render();
             // Table.currentPageStart = 1;
