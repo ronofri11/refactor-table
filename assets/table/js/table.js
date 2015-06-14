@@ -4,9 +4,8 @@ define([
     "radio.shim",
     "assets/table/js/paging.js",
     "text!./../templates/table.html",
-    "text!./../templates/row.html",
-    "text!./../templates/paging.html"
-], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate, PagingTemplate) {
+    "text!./../templates/row.html"
+], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -52,18 +51,6 @@ define([
             }
         });
 
-        // var AppendableRegion = Marionette.Region.extend({
-        //     attachHtml: function(view){
-        //         this.$el.append(view.el);
-        //     }
-        // });
-
-        // var PrependableRegion = Marionette.Region.extend({
-        //     attachHtml: function(view){
-        //         this.$el.prepend(view.el);
-        //     }
-        // });
-
         var LayoutView = Marionette.LayoutView.extend({
             className: "tablecomponent",
             template: _.template(TableTemplate),
@@ -106,44 +93,9 @@ define([
             }
         });
 
-        var PagingView = Marionette.ItemView.extend({
-            tagName: "div",
-            className: "pages",
-            template: _.template(PagingTemplate),
-            events: {
-                "click .page": "pageSelected"
-            },
-            templateHelpers: function(){
-                var first = 1;//Table.currentPageStart;
-                var last = Table.totalPages;//Table.currentPageEnd;
-                console.log("first:", first, "last:", last);
-                return {
-                    first: first,
-                    last: last
-                };
-            },
-            pageSelected: function(event){
-                event.stopPropagation();
-                event.preventDefault();
-                var page = $(event.target);
-                var pageIndex = page.data("index");
-                var currentPage = this.$el.find(".page.selected");
-                var currentPageIndex = currentPage.data("index");
-
-                if(currentPageIndex !== pageIndex){
-                    console.log("page clicked", page);
-
-                    currentPage.removeClass("selected");
-                    page.addClass("selected");
-                    Table.Channel.trigger("paging:click", {
-                        page: pageIndex
-                    });
-                }
-            }
-        });
-
         Table.on("before:start", function(options){
-            Table.initPaging(options);
+            Table.initValues(options);
+            Table.Paging = new Paging(channelName + "_paging");
         });
 
         Table.on("start", function(options){
@@ -160,15 +112,17 @@ define([
             Table.allowedSet.reset(Table.rows.toArray());
             Table.workingSet.reset(Table.allowedSet.toArray());
 
-
-
             Table.TableView = new TableView({
                 collection: Table.windowSet
             });
 
-            Table.PagingView = new PagingView();
+            var pager = Table.getPagingOptions(options);
+            Table.Paging.start({
+                pager: pager,
+                workingSet: Table.workingSet,
+                windowSet: Table.windowSet
+            });
 
-            Table.changeRecordsPerPage(Table.recordsPerPage);
             console.log("table in window rows:", Table.windowSet.length);
 
             Table.RootView = new LayoutView();
@@ -176,7 +130,7 @@ define([
             //when the LayoutView is shown...
             Table.RootView.on("show", function(){
                 Table.RootView.getRegion("tbody").show(Table.TableView);
-                Table.RootView.getRegion("paging").show(Table.PagingView);
+                Table.RootView.getRegion("paging").show(Table.Paging.Channel.request("get:root"));
             });
 
             Table.Channel.reply("get:root", function(){
@@ -190,67 +144,10 @@ define([
             Table.Channel.on("row:contextmenu", function(){
                 console.log("contextmenu row");
             });
-
-            Table.Channel.on("paging:click", function(args){
-                var pageNumber = args.page;
-                Table.goToPage(pageNumber);
-            });
-            Table.Channel.command("change:page", function(args){
-                var newPage = args.page;
-            });
-            Table.Channel.on("change:records:per:page", function(args){
-                Table.changeRecordsPerPage(args.recordsPerPage);
-            });
         });
 
-        Table.rowsBetween = function(firstIndex, lastIndex){
-            //firsIndex and lastIndex go from 0 to workingSet.length - 1
-            var relevantArray = [];
-            for(var i = firstIndex; i < lastIndex; i++){
-                relevantArray.push(Table.workingSet.at(i));
-            }
-
-            Table.windowSet.reset(relevantArray);
-        };
-
-        Table.goToPage = function(pageNumber){
-            Table.setIndexes(pageNumber);
-            Table.rowsBetween(Table.firstIndex, Table.lastIndex);
-        };
-
-        Table.changeRecordsPerPage = function(recordsPerPage){
-            Table.recordsPerPage = recordsPerPage;
-            var totalPages = Math.ceil(Table.workingSet.length / Table.recordsPerPage);
-            Table.totalPages = totalPages;
-            Table.PagingView.render();
-            // Table.currentPageStart = 1;
-            // Table.currentPageEnd
-            Table.goToPage(1);
-        };
-
-        Table.setIndexes = function(pageNumber){
-            var firstIndex = Table.recordsPerPage * (pageNumber - 1);
-            var lastIndex = firstIndex + Table.recordsPerPage;
-
-            if(lastIndex > Table.workingSet.length){
-                lastIndex = Table.workingSet.length;
-            }
-
-            Table.firstIndex = firstIndex;
-            Table.lastIndex = lastIndex;
-        };
-
-        Table.initPaging = function(options){
+        Table.initValues = function(options){
             console.log("table config:", options);
-
-            if(options.recordsPerPage === undefined){
-                //default number when it is not provided
-                Table.recordsPerPage = 100;
-            }
-            else{
-                Table.recordsPerPage = options.recordsPerPage;
-            }
-
             if(options.separator === undefined){
                 //default property separator double underscore
                 Table.separator = "__";
@@ -258,20 +155,26 @@ define([
             else{
                 Table.separator = options.separator;
             }
+        };
 
-            if(options.firstIndex === undefined){
-                Table.firstIndex = 0;
+        Table.getPagingOptions = function(options){
+            var pager = {};
+            if(options.recordsPerPage === undefined){
+                //default number when it is not provided
+                pager["recordsPerPage"] = 100;
             }
             else{
-                Table.firstIndex = options.firstIndex;
+                pager["recordsPerPage"] = options.recordsPerPage;
             }
-
-            if(options.lastIndex === undefined){
-                Table.lastIndex = Table.firstIndex + Table.recordsPerPage;
+            if(options.pagesPerSheet === undefined){
+                //default number when it is not provided
+                pager["pagesPerSheet"] = 10;
             }
             else{
-                Table.lastIndex = options.lastIndex;
+                pager["pagesPerSheet"] = options.pagesPerSheet;
             }
+
+            return pager;
         };
 
         return Table;
