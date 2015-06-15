@@ -193,6 +193,9 @@ define([
                 }
                 else{
                     var leftover = totalPages % this.model.get("pagesPerSheet");
+                    if(leftover === 0){
+                        leftover = this.model.get("pagesPerSheet");
+                    }
                     this.model.set({"currentPage": lastIndex}, {silent: true});
                     this.model.set({"firstPage": totalPages - leftover + 1}, {silent: true});
                     this.model.set({"lastPage": totalPages});
@@ -219,7 +222,7 @@ define([
                 return Paging.RootView;
             });
 
-            Paging.Channel.on("page:click", function(args){
+            Paging.Channel.on("go:to:page", function(args){
                 var pageNumber = args.page;
                 Paging.RootView.goToPage(pageNumber);
             });
