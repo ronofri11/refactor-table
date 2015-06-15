@@ -26,13 +26,19 @@ define([
 
                 this.calculateLimits();
             },
-
             calculateLimits: function(){
                 var recordsPerPage = this.get("recordsPerPage");
                 var totalPages = Math.ceil(Paging.workingSet.length / recordsPerPage);
+                var lastPage;
+                if(this.get("pagesPerSheet") > totalPages){
+                    lastPage = totalPages;
+                }
+                else{
+                    lastPage = this.get("pagesPerSheet");
+                }
                 this.set({
                     "firstPage": 1,
-                    "lastPage": totalPages
+                    "lastPage": lastPage
                 });
             }
         });
@@ -75,7 +81,11 @@ define([
                 currentPage.addClass("selected");
             },
             goToPage: function(pageNumber){
-                this.$el.find('[data-index=' + pageNumber + ']').trigger("click");
+                var totalPages = Math.ceil(Paging.workingSet.length / this.model.get("recordsPerPage"));
+                if(pageNumber >= 1 && pageNumber <= totalPages){
+                    this.model.set({"currentPage": pageNumber});
+                }
+                this.resetWindowSet();
             },
             pageSelected: function(event){
                 event.stopPropagation();
@@ -85,12 +95,7 @@ define([
                 var currentPageIndex = this.model.get("currentPage");
 
                 if(currentPageIndex !== pageIndex){
-                    console.log("page clicked", page);
-                    this.model.set({"currentPage": pageIndex});
-                    // Paging.Channel.trigger("page:click", {
-                    //     page: pageIndex
-                    // });
-                    this.resetWindowSet();
+                    this.goToPage(pageIndex);
                 }
             },
             resetWindowSet: function(){
@@ -122,24 +127,77 @@ define([
             },
             onResetPaging: function(){
                 this.model.calculateLimits();
-                this.model.set({"currentPage":1});
-                this.resetWindowSet();
+                this.goToPage(1);
             },
             changeRecordsPerPage: function(recordsPerPage){
                 this.model.set({recordsPerPage: recordsPerPage});
             },
             firstPage: function(){
-                console.log("go to first page");
-                this.onResetPaging();
+                // console.log("go to first page");
+                if(this.model.get("firstPage") !== 1){
+                    this.onResetPaging();
+                }
+                else{
+                    this.goToPage(1);
+                }
             },
             prevPage: function(){
-                console.log("go to previous page");
+                // console.log("go to previous page");
+                var currentIndex = this.model.get("currentPage");
+                if(currentIndex > 1){
+                    var newIndex = currentIndex - 1;
+                    if(newIndex < this.model.get("firstPage")){
+                        this.model.set({"currentPage": newIndex}, {silent: true});
+
+                        var newFirst = currentIndex - this.model.get("pagesPerSheet");
+                        this.model.set({"lastPage": newIndex}, {silent: true});
+                        this.model.set({"firstPage": newFirst});
+                    }
+                    else{
+                        this.model.set({"currentPage": newIndex});
+                    }
+                    this.goToPage(newIndex);
+                }
             },
             nextPage: function(){
-                console.log("go to next page");
+                // console.log("go to next page");
+                var totalPages = Math.ceil(Paging.workingSet.length / this.model.get("recordsPerPage"));
+
+                var currentIndex = this.model.get("currentPage");
+                if(currentIndex < totalPages){
+                    var newIndex = currentIndex + 1;
+
+                    if(newIndex > this.model.get("lastPage")){
+                        this.model.set({"currentPage": newIndex}, {silent: true});
+
+                        var newLast = newIndex + (this.model.get("pagesPerSheet") - 1);
+                        if(newLast > totalPages){
+                            newLast = totalPages;
+                        }
+                        this.model.set({"firstPage": newIndex}, {silent: true});
+                        this.model.set({"lastPage": newLast});
+                    }
+                    else{
+                        this.model.set({"currentPage": newIndex});
+                    }
+                    this.goToPage(newIndex);
+                }
             },
             lastPage: function(){
-                console.log("go to last page");
+                // console.log("go to last page");
+                var totalPages = Math.ceil(Paging.workingSet.length / this.model.get("recordsPerPage"));
+                var lastIndex = totalPages;
+
+                if(this.model.get("lastPage") === totalPages){
+                    this.model.set({"currentPage": lastIndex});
+                }
+                else{
+                    var leftover = totalPages % this.model.get("pagesPerSheet");
+                    this.model.set({"currentPage": lastIndex}, {silent: true});
+                    this.model.set({"firstPage": totalPages - leftover + 1}, {silent: true});
+                    this.model.set({"lastPage": totalPages});
+                }
+                this.goToPage(lastIndex);
             }
         });
 
