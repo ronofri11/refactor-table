@@ -6,7 +6,7 @@ define([
 ], function(Marionette, Radio, Shim, PagingTemplate){
 
     var PagingConstructor = function(channelName){
-        
+
         var Paging = new Marionette.Application();
 
         Paging.Channel = Radio.channel(channelName);
@@ -55,20 +55,25 @@ define([
                 "click .lastpage": "lastPage"
             },
             initialize: function(){
-                this.listenTo(this.model, "change:currentPage", this.styling);
+                this.listenTo(this.model, "change:currentPage", this.render);
                 this.listenTo(this.model, "change:firstPage", this.render);
                 this.listenTo(this.model, "change:lastPage", this.render);
-
                 this.listenTo(this.model, "change:recordsPerPage", this.onResetPaging);
                 this.listenTo(Paging.workingSet, "reset", this.onResetPaging);
             },
             templateHelpers: function(){
                 var first = this.model.get("firstPage");
                 var last = this.model.get("lastPage");
+                var indexes = this.getWindowIndexes();
+                var total = Paging.workingSet.length;
                 return {
                     first: first,
-                    last: last
+                    last: last,
+                    firstIndex: indexes.firstIndex,
+                    lastIndex: indexes.lastIndex,
+                    total: total
                 };
+
             },
             onRender: function(){
                 this.styling();
@@ -121,7 +126,7 @@ define([
                 }
 
                 return {
-                    firstIndex: firstIndex, 
+                    firstIndex: firstIndex,
                     lastIndex: lastIndex
                 };
             },

@@ -35,9 +35,9 @@ define([
     var store = new Store("store");
     var storeChannel = store.Channel;
 
-    // store.start({url: "/darwined/backbreakers/"});
+    store.start({url: "/darwined/backbreakers/"});
     // store.start({url: "/clients/darwined"});
-    store.start({url: "/clients/testing"});
+    // store.start({url: "/clients/testing"});
 
     var asignaturas;
     var modelName = "Curso";
