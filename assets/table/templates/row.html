@@ -1,9 +1,10 @@
-<div class="cell index" data-key="codigo_cliente" style="width:40px"><%= index%></div>
-
-<div class="cell" data-key="codigo_cliente" style="width:<%= anchoCell %>px"><%= codigo_cliente%></div>
-<div class="cell" data-key="nombre" style="width:<%= anchoCell %>px" ><%= nombre%></div>
-<div class="cell" data-key="codigo_cliente" style="width:<%= anchoCell %>px"><%= codigo_cliente%></div>
-<div class="cell" data-key="nombre" style="width:<%= anchoCell %>px" ><%= nombre%></div>
-<div class="cell" data-key="codigo_cliente" style="width:<%= anchoCell %>px"><%= codigo_cliente%></div>
-
-
+<div class="cell index" data-key="index" style="width:40px"><%= index%></div>
+<% _.each(columns, function(col){ %>
+	<% var property = col.get('property'); %>
+	<% var display = col.get('display'); %>
+	<% if(display !== undefined) {%>
+		<div class="cell" data-key="<%= property%>" style="width:<%= anchoCell %>px"><%= model.get(property).get(display)%></div>
+	<% } else { %>
+		<div class="cell" data-key="<%= property%>" style="width:<%= anchoCell %>px"><%= model.get(property)%></div>
+	<% } %>
+<% }); %>

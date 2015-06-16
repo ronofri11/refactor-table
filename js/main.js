@@ -36,8 +36,8 @@ define([
     var storeChannel = store.Channel;
 
     // store.start({url: "/darwined/backbreakers/"});
-    store.start({url: "/clients/darwined"});
-    // store.start({url: "/clients/testing"});
+    // store.start({url: "/clients/darwined"});
+    store.start({url: "/clients/testing"});
 
     var asignaturas;
     var modelName = "Curso";
@@ -170,9 +170,25 @@ define([
                             startOptions:{
                                 separator: ".",
                                 recordsPerPage: 100,
+                                pagesPerSheet: 10,
                                 rows: asignaturas,
-                                columns:{}
+                                columns:[
+                                    {
+                                        property: "sede",
+                                        display: "codigo_cliente"
+                                    },
+                                    {
+                                        property: "codigo_cliente"
+                                    },
+                                    {
+                                        property: "nombre"
+                                    },
+                                    {
+                                        property: "semestre"
+                                    }
+                                ]
                             }
+
                         }
                     }
                 }

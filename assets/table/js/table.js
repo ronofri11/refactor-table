@@ -19,9 +19,12 @@ define([
             templateHelpers: function(){
                 var anchoCell = 400;
                 var index = Table.workingSet.indexOf(this.model) + 1;
+                var columns = Table.columns.toArray();
                 return {
                     anchoCell: anchoCell,
-                    index: index
+                    index: index,
+                    columns: columns,
+                    model: this.model
                 };
             },
             events: {
@@ -96,6 +99,7 @@ define([
         Table.on("before:start", function(options){
             Table.initValues(options);
             Table.Paging = new Paging(channelName + "_paging");
+            console.log(Table.columns);
         });
 
         Table.on("start", function(options){
@@ -155,6 +159,9 @@ define([
             else{
                 Table.separator = options.separator;
             }
+
+            var ColumnCollection = Backbone.Collection.extend();
+            Table.columns = new ColumnCollection(options.columns);
         };
 
         Table.getPagingOptions = function(options){
