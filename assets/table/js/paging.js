@@ -60,6 +60,7 @@ define([
                 this.listenTo(this.model, "change:lastPage", this.render);
                 this.listenTo(this.model, "change:recordsPerPage", this.onResetPaging);
                 this.listenTo(Paging.workingSet, "reset", this.onResetPaging);
+                this.listenTo(Paging.windowSet, "reset", this.render);
             },
             templateHelpers: function(){
                 var first = this.model.get("firstPage");

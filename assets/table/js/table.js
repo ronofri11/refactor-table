@@ -78,24 +78,91 @@ define([
             }
         });
 
-        
-
         var HeaderView = Marionette.ItemView.extend({
             tagName: "div",
             className: "header",
             template: _.template(HeaderTemplate),
             events: {
-                "click": "broadcastEvent",
-                contextmenu: "broadcastEvent"
+                "click": "sortWorkingSet"
             },
+
+            initialize: function(){
+                this.model.set({"sort": null});
+                this.listenTo(this.model, "change:sort", this.styling);
+            },
+
             onRender: function(){
                 this.$el.width(this.model.get("width") + "px");
+                this.styling();
             },
-            broadcastEvent: function(event){
-                event.stopPropagation();
-                event.preventDefault();
-                var eventName = "header:" + event.type;
-                Table.Channel.trigger(eventName, {eventName: eventName, model: this.model});
+
+            styling: function(){
+                var arrow = this.$el.find(".arrow");
+
+                arrow.removeClass("upArrow");
+                arrow.removeClass("downArrow");
+                arrow.removeClass("noArrow");
+
+                switch(this.model.get("sort")){
+                    case null:
+                        arrow.addClass("noArrow");
+                        break;
+                    case "ASC":
+                        arrow.addClass("upArrow");
+                        break;
+                    case "DESC":
+                        arrow.addClass("downArrow");
+                        break;
+                }
+            },
+
+            nextState: function(){
+                var nextState;
+
+                switch(this.model.get("sort")){
+                    case null:
+                        nextState = "ASC";
+                        break;
+                    case "ASC":
+                        nextState = "DESC";
+                        break;
+                    case "DESC":
+                        nextState = null;
+                        break;
+                }
+
+                this.model.set({"sort": nextState});
+            },
+
+            sortWorkingSet: function(){
+                this.nextState();
+
+                var self = this;
+
+                if(this.model.get("sort") !== null){
+                    if(this.model.get("sorterCallback") === undefined){
+                        var callback = function(row){
+
+                            var str = "" + row.get(key);
+                            str = str.toLowerCase();
+
+                            if(self.model.get("sort") === "DESC"){
+                                str = str.split("");
+                                str = _.map(str, function(letter) {
+                                    return String.fromCharCode(-(letter.charCodeAt(0)));
+                                });
+                            }
+                            
+                            return str;
+                        };
+                        self.model.set({
+                            "sorterCallback": callback
+                        });
+                    }
+
+                    Table.sortWorkingSet(this.model);
+                }
+
             }
         });
 
@@ -110,14 +177,37 @@ define([
             className: "filter",
             template: _.template(FilterTemplate),
             events: {
-                "click": "broadcastEvent",
-                contextmenu: "broadcastEvent"
+                "input input": "filterWorkingSet"
             },
-            broadcastEvent: function(event){
-                event.stopPropagation();
-                event.preventDefault();
-                var eventName = "filter:" + event.type;
-                Table.Channel.trigger(eventName, {eventName: eventName, model: this.model});
+
+            filterWorkingSet: function(event){
+                var filterQuery = $(event.target).val().toLowerCase();
+                var self = this;
+
+                if(this.model.get("filterCallback") === undefined){
+                    var callback = function(row, query){
+                        if(query === ""){
+                            return true;
+                        }
+                        switch(self.model.get("type")){
+                            case "model":
+                                var key = self.model.get("key");
+                                var nestedProperty = self.model.get("filterKey");
+                                var rowProperty = "" + row.get(key).get(nestedProperty);
+                                return rowProperty.toLowerCase().indexOf(query) > -1;
+                            default:
+                                var key = self.model.get("key");
+                                var rowProperty = "" + row.get(key);
+                                return rowProperty.toLowerCase().indexOf(query) > -1;
+                        }
+                    };
+                    self.model.set({
+                        "filterCallback": callback
+                    });
+                }
+
+                this.model.set({"query": filterQuery});
+                Table.filterWorkingSet(this.model);
             }
         });
 
@@ -280,7 +370,7 @@ define([
         Table.buildHeadersAndFilters = function(){
             var headers = [{
                 "title": "#",
-                "key": "index",
+                "key": null,
                 "width": 40
             }];
             var filters = [{
@@ -367,6 +457,19 @@ define([
             }
 
             return pager;
+        };
+
+        Table.filterWorkingSet = function(filter){
+            var newWorkingSet = Table.allowedSet.filter(function(row){
+                return filter.get("filterCallback")(row, filter.get("query"));
+            });
+
+            Table.workingSet.reset(newWorkingSet);
+        };
+
+        Table.sortWorkingSet = function(sorter){
+            Table.workingSet.comparator = sorter.get("sorterCallback");
+            Table.workingSet.sort();
         };
 
         return Table;

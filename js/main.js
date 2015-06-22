@@ -179,6 +179,10 @@ define([
                                         nested: true
                                     },
                                     {
+                                        property: "carrera",
+                                        nested: true
+                                    },
+                                    {
                                         property: "codigo_cliente"
                                     },
                                     {
