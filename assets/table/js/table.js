@@ -5,8 +5,9 @@ define([
     "assets/table/js/paging.js",
     "text!./../templates/table.html",
     "text!./../templates/row.html",
-    "text!./../templates/header.html"
-], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate, HeaderTemplate) {
+    "text!./../templates/header.html",
+    "text!./../templates/filter.html"
+], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate, HeaderTemplate, FilterTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -87,6 +88,9 @@ define([
                 "click": "broadcastEvent",
                 contextmenu: "broadcastEvent"
             },
+            onRender: function(){
+                this.$el.width(this.model.get("width") + "px");
+            },
             broadcastEvent: function(event){
                 event.stopPropagation();
                 event.preventDefault();
@@ -96,8 +100,30 @@ define([
         });
 
         var HeadersView = Marionette.CollectionView.extend({
-            childView: HeaderView,
             className: "headers",
+            childView: HeaderView,
+            template: _.template('')
+        });
+
+        var FilterView = Marionette.ItemView.extend({
+            tagName: "div",
+            className: "filter",
+            template: _.template(FilterTemplate),
+            events: {
+                "click": "broadcastEvent",
+                contextmenu: "broadcastEvent"
+            },
+            broadcastEvent: function(event){
+                event.stopPropagation();
+                event.preventDefault();
+                var eventName = "filter:" + event.type;
+                Table.Channel.trigger(eventName, {eventName: eventName, model: this.model});
+            }
+        });
+
+        var FiltersView = Marionette.CollectionView.extend({
+            className: "filters",
+            childView: FilterView,
             template: _.template('')
         });
 
@@ -105,12 +131,10 @@ define([
             className: "tablecomponent",
             template: _.template(TableTemplate),
             regions:{
-                "thead": "div.thead",
+                "headers": "div.thead .theaders",
+                "filters": "div.thead .tfilters",
                 "tbody": "div.tbody",
                 "paging": "div.paging"
-            },
-            onRender: function(){
-
             }
         });
 
@@ -169,8 +193,17 @@ define([
                 collection: Table.windowSet
             });
 
+            var headersAndFilters = Table.buildHeadersAndFilters();
+
+            Table.headers = new Collection(headersAndFilters.headers);
+            Table.filters = new Collection(headersAndFilters.filters);
+
             Table.HeadersView = new HeadersView({
-                collection: Table.columns
+                collection: Table.headers
+            });
+
+            Table.FiltersView = new FiltersView({
+                collection: Table.filters
             });
 
             var pager = Table.getPagingOptions(options);
@@ -186,7 +219,9 @@ define([
 
             //when the LayoutView is shown...
             Table.RootView.on("show", function(){
-                Table.RootView.getRegion("thead").show(Table.HeadersView);
+                Table.RootView.getRegion("headers").show(Table.HeadersView);
+                Table.RootView.getRegion("filters").show(Table.FiltersView);
+
                 Table.RootView.getRegion("tbody").show(Table.TableView);
                 Table.RootView.getRegion("paging").show(Table.Paging.Channel.request("get:root"));
             });
@@ -240,6 +275,49 @@ define([
             });
 
             return activeColumns;
+        };
+
+        Table.buildHeadersAndFilters = function(){
+            var headers = [{
+                "title": "#",
+                "key": "index",
+                "width": 40
+            }];
+            var filters = [{
+                "type": null,
+                "width": 40
+            }];
+
+            Table.columns.each(function(col){
+                var header = {};
+                var filter = {};
+
+                header["title"] = col.get("title");
+                filter["type"] = col.get("type");
+ 
+                if(filter["type"] === "model"){
+                    filter["filterKey"] = col.get("filterKey");
+                    filter["filterDisplay"] = col.get("filterDisplay");
+                }
+                else{
+                    filter["filterKey"] = col.get("key");
+                    filter["filterDisplay"] = col.get("filterDisplay");
+                }
+
+                header["key"] = col.get("key");
+                header["width"] = col.get("max_text_width");
+                
+                filter["key"] = col.get("key");
+                filter["width"] = col.get("max_text_width");
+
+                headers.push(header);
+                filters.push(filter);
+            });
+
+            return {
+                headers: headers,
+                filters: filters
+            };
         };
 
         Table.getColumnWidth = function(schemaCounterpart){
