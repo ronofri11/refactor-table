@@ -172,10 +172,11 @@ define([
                                 recordsPerPage: 100,
                                 pagesPerSheet: 10,
                                 rows: asignaturas,
+                                schema: schema,
                                 columns:[
                                     {
                                         property: "sede",
-                                        display: "codigo_cliente"
+                                        nested: true
                                     },
                                     {
                                         property: "codigo_cliente"

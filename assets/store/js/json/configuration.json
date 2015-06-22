@@ -167,27 +167,62 @@
       {
         "model": "Sede",
         "lookup": "sede_id",
-        "key": "sede"
+        "key": "sede",
+        "title": "Sede",
+        "filterKey": "codigo_cliente",
+        "filterDisplay": ["codigo_cliente", "nombre"]
       },
       {
         "model": "Regimen",
         "lookup": "regimen_id",
-        "key": "regimen"
+        "key": "regimen",
+        "title": "Sede",
+        "filterKey": "codigo_cliente",
+        "filterDisplay": ["codigo_cliente", "nombre"]
       },
       {
         "model": "Jornada",
         "lookup": "jornada_id",
-        "key": "jornada"
+        "key": "jornada",
+        "title": "Jornada",
+        "filterKey": "codigo",
+        "filterDisplay": ["codigo", "nombre"]
       },
       {
         "model": "Escuela",
         "lookup": "escuela_id",
-        "key": "escuela"
+        "key": "escuela",
+        "title": "Escuela",
+        "filterKey": "codigo_cliente",
+        "filterDisplay": ["codigo_cliente", "nombre"]
       },
       {
         "model": "Carrera",
         "lookup": "carrera_id",
-        "key": "carrera"
+        "key": "carrera",
+        "title": "Carrera",
+        "filterKey": "codigo_cliente",
+        "filterDisplay": ["codigo_cliente", "nombre"]
+      }
+    ],
+    "schema": [
+      {
+        "key": "codigo_cliente",
+        "type": "string",
+        "default": "",
+        "title": "Código"
+      },
+      {
+        "key": "nombre",
+        "type": "string",
+        "default": "",
+        "title": "Nombre"
+      },
+      {
+        "key": "semestre",
+        "type": "number",
+        "default": 1,
+        "title": "Nivel"
       }
     ]
   },

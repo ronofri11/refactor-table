@@ -4,8 +4,9 @@ define([
     "radio.shim",
     "assets/table/js/paging.js",
     "text!./../templates/table.html",
-    "text!./../templates/row.html"
-], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate) {
+    "text!./../templates/row.html",
+    "text!./../templates/header.html"
+], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate, HeaderTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -17,14 +18,11 @@ define([
             className: "row",
             template: _.template(RowTemplate),
             templateHelpers: function(){
-                var anchoCell = 400;
                 var index = Table.workingSet.indexOf(this.model) + 1;
-                var columns = Table.columns.toArray();
+                var cells = this.extractCells();
                 return {
-                    anchoCell: anchoCell,
                     index: index,
-                    columns: columns,
-                    model: this.model
+                    cells: cells
                 };
             },
             events: {
@@ -51,7 +49,56 @@ define([
                 event.preventDefault();
                 var eventName = "row:" + event.type;
                 Table.Channel.trigger(eventName, {eventName: eventName, model: this.model});
+            },
+
+            extractCells: function(){
+                var cells = [];
+                Table.columns.each(function(column){
+                    var type = column.get("type");
+                    
+                    var cell = {};
+                    
+                    if(type === "model"){
+                        cell["key"] = column.get("key");
+                        var filterKey = column.get("filterKey");
+                        cell["display"] = this.model.get(cell["key"]).get(filterKey); 
+                    }
+                    else{
+                        cell["key"] = column.get("key");
+                        cell["display"] = this.model.get(cell["key"]);
+                    }
+
+                    cell["width"] = column.get("max_text_width");
+
+                    cells.push(cell);
+                }, this);
+
+                return cells;
             }
+        });
+
+        
+
+        var HeaderView = Marionette.ItemView.extend({
+            tagName: "div",
+            className: "header",
+            template: _.template(HeaderTemplate),
+            events: {
+                "click": "broadcastEvent",
+                contextmenu: "broadcastEvent"
+            },
+            broadcastEvent: function(event){
+                event.stopPropagation();
+                event.preventDefault();
+                var eventName = "header:" + event.type;
+                Table.Channel.trigger(eventName, {eventName: eventName, model: this.model});
+            }
+        });
+
+        var HeadersView = Marionette.CollectionView.extend({
+            childView: HeaderView,
+            className: "headers",
+            template: _.template('')
         });
 
         var LayoutView = Marionette.LayoutView.extend({
@@ -99,25 +146,31 @@ define([
         Table.on("before:start", function(options){
             Table.initValues(options);
             Table.Paging = new Paging(channelName + "_paging");
-            console.log(Table.columns);
         });
 
         Table.on("start", function(options){
 
             console.log("table rows number:", options.rows.length);
 
-            var RowCollection = Backbone.Collection.extend();
+            var Collection = Backbone.Collection.extend();
 
             Table.rows = options.rows;
-            Table.allowedSet = new RowCollection();
-            Table.workingSet = new RowCollection();
-            Table.windowSet = new RowCollection();
+            Table.allowedSet = new Collection();
+            Table.workingSet = new Collection();
+            Table.windowSet = new Collection();
 
             Table.allowedSet.reset(Table.rows.toArray());
             Table.workingSet.reset(Table.allowedSet.toArray());
 
+            Table.schema = new Collection(options.schema);
+            Table.columns = new Collection(Table.overrideSchema(options.columns));
+
             Table.TableView = new TableView({
                 collection: Table.windowSet
+            });
+
+            Table.HeadersView = new HeadersView({
+                collection: Table.columns
             });
 
             var pager = Table.getPagingOptions(options);
@@ -133,6 +186,7 @@ define([
 
             //when the LayoutView is shown...
             Table.RootView.on("show", function(){
+                Table.RootView.getRegion("thead").show(Table.HeadersView);
                 Table.RootView.getRegion("tbody").show(Table.TableView);
                 Table.RootView.getRegion("paging").show(Table.Paging.Channel.request("get:root"));
             });
@@ -151,7 +205,6 @@ define([
         });
 
         Table.initValues = function(options){
-            console.log("table config:", options);
             if(options.separator === undefined){
                 //default property separator double underscore
                 Table.separator = "__";
@@ -159,9 +212,63 @@ define([
             else{
                 Table.separator = options.separator;
             }
+        };
 
-            var ColumnCollection = Backbone.Collection.extend();
-            Table.columns = new ColumnCollection(options.columns);
+        Table.overrideSchema = function(columns){
+            var activeColumns = [];
+            _.each(columns, function(col){
+                var key;
+                var schemaCounterpart;
+
+                if(col.nested){
+                    schemaCounterpart = Table.schema.findWhere({
+                        "key": col.property
+                    });
+                }
+                else{
+                    schemaCounterpart = Table.schema.findWhere({
+                        "originalKey": col.property
+                    });
+                }
+                 
+                if(schemaCounterpart !== undefined){
+                    schemaCounterpart.set({
+                        "max_text_width": Table.getColumnWidth(schemaCounterpart)
+                    });
+                    activeColumns.push(schemaCounterpart.clone());
+                }
+            });
+
+            return activeColumns;
+        };
+
+        Table.getColumnWidth = function(schemaCounterpart){
+            var displayExtractor;
+            if(schemaCounterpart.get("type") === "model"){
+                var nestedModel = schemaCounterpart.get("key");
+                var key = schemaCounterpart.get("filterKey");
+                displayExtractor = function(row){
+                    return row.get(nestedModel).get(key);
+                };
+            }
+            else{
+                var key = schemaCounterpart.get("key");
+                displayExtractor = function(row){
+                    return row.get(key);
+                };
+            }
+
+            var max_text_width = 10;
+            Table.rows.each(function(row){
+                var text = displayExtractor(row);
+                var width = text.length;
+
+                if(width > max_text_width){
+                    max_text_width = width;
+                }
+            });
+
+            return Math.ceil(10 * max_text_width);
         };
 
         Table.getPagingOptions = function(options){
