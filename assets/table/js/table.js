@@ -56,13 +56,13 @@ define([
                 var cells = [];
                 Table.columns.each(function(column){
                     var type = column.get("type");
-                    
+
                     var cell = {};
-                    
+
                     if(type === "model"){
                         cell["key"] = column.get("key");
                         var filterKey = column.get("filterKey");
-                        cell["display"] = this.model.get(cell["key"]).get(filterKey); 
+                        cell["display"] = this.model.get(cell["key"]).get(filterKey);
                     }
                     else{
                         cell["key"] = column.get("key");
@@ -176,7 +176,9 @@ define([
             className: "filter",
             template: _.template(FilterTemplate),
             events: {
-                "input input": "filterWorkingSet"
+                "input input": "filterWorkingSet",
+                "focusin input": "hideMglass",
+                "focusout input": "showMglass"
             },
 
             filterWorkingSet: function(event){
@@ -207,6 +209,17 @@ define([
 
                 this.model.set({"query": filterQuery});
                 Table.filterWorkingSet(this.model);
+            },
+            hideMglass: function(event){
+                $(event.target).removeClass("mglass");
+            },
+            showMglass: function(){
+                var self = $(event.target);
+                if(self.val().length > 0){
+
+                }else{
+                    self.addClass("mglass");
+                }
             }
         });
 
@@ -224,6 +237,17 @@ define([
                 "filters": "div.thead .tfilters",
                 "tbody": "div.tbody",
                 "paging": "div.paging"
+            },
+            onShow: function(){
+                this.headersAutoTop();
+            },
+            headersAutoTop: function(){
+                var self = this;
+                this.$el.find(".canvastable").on("scroll", function(){
+                    var marginTop = $(this).scrollTop();
+                    self.$el.find(".thead").css("top", marginTop + "px");
+                });
+
             }
         });
 
@@ -232,8 +256,6 @@ define([
             className: "rows",
             childView: RowView,
             template: _.template(''),
-            events: {
-            },
             childEvents: {
                 // "optionClicked": "optionClicked"
             },
@@ -354,7 +376,7 @@ define([
                         "originalKey": col.property
                     });
                 }
-                 
+
                 if(schemaCounterpart !== undefined){
                     schemaCounterpart.set({
                         "max_text_width": Table.getColumnWidth(schemaCounterpart)
@@ -385,7 +407,7 @@ define([
 
                 header["type"] = col.get("type");
                 filter["type"] = col.get("type");
- 
+
                 if(filter["type"] === "model"){
                     header["nestedKey"] = col.get("filterKey");
                     filter["filterKey"] = col.get("filterKey");
@@ -398,7 +420,7 @@ define([
 
                 header["key"] = col.get("key");
                 header["width"] = col.get("max_text_width");
-                
+
                 filter["key"] = col.get("key");
                 filter["width"] = col.get("max_text_width");
 

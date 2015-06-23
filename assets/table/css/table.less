@@ -98,114 +98,155 @@
         {
             position: absolute;
             z-index: 99;
+            width: 100%;
 
-            // .legends
-            // {
-            //     height: 21px;
-            //     background: #8197ad !important;
-            //     cursor: pointer;
-            //     -moz-user-select: none;
-            //     -khtml-user-select: none;
-            //     -webkit-user-select: none;
-            //     user-select: none;
+            > .theaders
+            {
+                > .headers
+                {
+                    width: 100%;
+                    height: 21px;
+                    background: #B3C1D0 !important;
+                    -moz-user-select: none;
+                    -khtml-user-select: none;
+                    -webkit-user-select: none;
+                    user-select: none;
 
-            //     td
-            //     {
-            //         color: #fff;
-            //         font-size: 11px;
-            //         font-weight: 400;
-            //         letter-spacing: 1px;
-            //         letter-spacing: .5px;
-            //         text-transform: uppercase;
-            //         text-align: center;
-            //         border: 2px solid #8197ad;
-            //         position: relative;
-            //         -webkit-font-smoothing: auto;
-            //         box-sizing: border-box;
+                    > .header
+                    {
+                        float: left;
+                        color: #fff;
+                        font-size: 11px;
+                        font-weight: 400;
+                        letter-spacing: 1px;
+                        letter-spacing: .5px;
+                        text-transform: uppercase;
+                        text-align: center;
+                        background: #8197ad !important;
+                        border: 2px solid #8197ad;
+                        height: 21px;
+                        padding: 1px;
+                        position: relative;
+                        -webkit-font-smoothing: auto;
+                        box-sizing: border-box;
+                        cursor: pointer;
 
-            //         > .upArrow
-            //         {
-            //             width: 0;
-            //             height: 0;
-            //             border-style: solid;
-            //             border-width: 0 3px 5px 3px;
-            //             border-color: transparent transparent #ffffff transparent;
-            //             right: 2px;
+                        &:first-child
+                        {
+                            text-align: left !important;
 
-            //             .centerVertical;
-            //         }
+                            .noArrow
+                            {
+                                display: none !important;
+                            }
+                        }
 
-            //         > .downArrow
-            //         {
-            //             width: 0;
-            //             height: 0;
-            //             border-style: solid;
-            //             border-width: 5px 3px 0 3px;
-            //             border-color: #ffffff transparent transparent transparent;
-            //             right: 2px;
+                        > .upArrow
+                        {
+                            width: 0;
+                            height: 0;
+                            border-style: solid;
+                            border-width: 0 3px 5px 3px;
+                            border-color: transparent transparent #ffffff transparent;
+                            right: 2px;
 
-            //             .centerVertical;
-            //         }
+                            .centerVertical;
+                        }
 
-            //         > .noArrow
-            //         {
-            //             width: 2px;
-            //             height: 2px;
-            //             right: 2px;
-            //             background: #fff;
+                        > .downArrow
+                        {
+                            width: 0;
+                            height: 0;
+                            border-style: solid;
+                            border-width: 5px 3px 0 3px;
+                            border-color: #ffffff transparent transparent transparent;
+                            right: 2px;
 
-            //             .border-radius(2px);
+                            .centerVertical;
+                        }
 
-            //             .centerVertical;
-            //         }
-            //     }
-            // }
+                        > .noArrow
+                        {
+                            width: 2px;
+                            height: 2px;
+                            right: 2px;
+                            background: #fff;
 
-            // .filters
-            // {
-            //     box-sizing: border-box;
+                            .border-radius(2px);
 
-            //     > td
-            //     {
-            //         color: #4f4f4f;
-            //         background: #fafbfe;
-            //         padding: 0;
-            //         box-sizing: border-box;
+                            .centerVertical;
+                        }
+                    }
 
-            //         > input
-            //         {
-            //             text-align: center;
-            //             background-color: #fafbfe;
-            //             color: #7899af;
-            //             outline: none;
-            //             font-size: 14px;
-            //             width: 100%;
-            //             border: none;
-            //             padding: 9px 6px;
-            //             box-sizing: border-box;
+                }
+            }
 
-            //             &:hover
-            //             {
-            //                 background-color: #eff9fa;
-            //             }
+            > .tfilters
+            {
+                .filters
+                {
+                    box-sizing: border-box;
+                    width: 100%;
+                    height: 35px;
+                    background: #FAFBFA;
 
-            //             &.selected
-            //             {
-            //                 background-color: #DEF5F6;
-            //             }
-            //         }
+                    > .filter
+                    {
+                        color: #4f4f4f;
+                        background: #fafbfe;
+                        padding: 0;
+                        box-sizing: border-box;
+                        float: left;
 
-            //         .mglass
-            //         {
-            //             background-image: url(../img/svg/mglass.svg);
-            //             background-size: 10px 10px;
-            //             background-position: center center;
-            //             background-repeat: no-repeat;
-            //         }
-            //     }
+                        > .nofilter
+                        {
+                            text-align: center;
+                            background: #fafbfa;
+                            color: #7899af;
+                            outline: none;
+                            font-size: 14px;
+                            border: none;
+                            padding: 9px 6px;
+                            box-sizing: border-box;
+                            height: 35px;
+                        }
+
+                        > input
+                        {
+                            text-align: center;
+                            background-color: #fafbfe;
+                            color: #7899af;
+                            outline: none;
+                            font-size: 14px;
+                            width: 100%;
+                            border: none;
+                            padding: 9px 6px;
+                            box-sizing: border-box;
+
+                            &:hover
+                            {
+                                background-color: #eff9fa;
+                            }
+
+                            &.selected
+                            {
+                                background-color: #DEF5F6;
+                            }
+                        }
+
+                        .mglass
+                        {
+                            background-image: url(../img/mglass.svg);
+                            background-size: 10px 10px;
+                            background-position: center center;
+                            background-repeat: no-repeat;
+                        }
+                    }
 
 
-            // }
+                }
+
+            }
         }
 
         > div
@@ -241,9 +282,8 @@
 
         .rows // tbody
         {
-            // height: 620px; /* altura definida css - esta es la altura que se modifica responsive!!!! */
-            // position: absolute;
-            // top: 60px; /* altura del thead */
+            position: relative;
+            top: 56px;
 
             .modify
                 {
