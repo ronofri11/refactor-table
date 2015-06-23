@@ -127,7 +127,7 @@ define([
                         nextState = "DESC";
                         break;
                     case "DESC":
-                        nextState = null;
+                        nextState = "ASC";
                         break;
                 }
 
@@ -136,33 +136,32 @@ define([
 
             sortWorkingSet: function(){
                 this.nextState();
-
                 var self = this;
-
                 if(this.model.get("sort") !== null){
                     if(this.model.get("sorterCallback") === undefined){
                         var callback = function(row){
-
-                            var str = "" + row.get(key);
+                            var str;
+                            if(self.model.get("type") === "model"){
+                                str = "" + row.get(self.model.get("key")).get(self.model.get("nestedKey"));
+                            }
+                            else{
+                                str = "" + row.get(self.model.get("key"));
+                            }
                             str = str.toLowerCase();
-
                             if(self.model.get("sort") === "DESC"){
                                 str = str.split("");
                                 str = _.map(str, function(letter) {
                                     return String.fromCharCode(-(letter.charCodeAt(0)));
                                 });
                             }
-                            
                             return str;
                         };
                         self.model.set({
                             "sorterCallback": callback
                         });
                     }
-
                     Table.sortWorkingSet(this.model);
                 }
-
             }
         });
 
@@ -383,9 +382,12 @@ define([
                 var filter = {};
 
                 header["title"] = col.get("title");
+
+                header["type"] = col.get("type");
                 filter["type"] = col.get("type");
  
                 if(filter["type"] === "model"){
+                    header["nestedKey"] = col.get("filterKey");
                     filter["filterKey"] = col.get("filterKey");
                     filter["filterDisplay"] = col.get("filterDisplay");
                 }
@@ -468,8 +470,8 @@ define([
         };
 
         Table.sortWorkingSet = function(sorter){
-            Table.workingSet.comparator = sorter.get("sorterCallback");
-            Table.workingSet.sort();
+            var sortedSet = Table.allowedSet.sortBy(sorter.get("sorterCallback"));
+            Table.workingSet.reset(sortedSet);
         };
 
         return Table;
