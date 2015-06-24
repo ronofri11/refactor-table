@@ -139,6 +139,7 @@ define([
                 var self = this;
                 if(this.model.get("sort") !== null){
                     if(this.model.get("sorterCallback") === undefined){
+                        console.log("creating callback", self.model.get("key"));
                         var callback = function(row){
                             var str;
                             if(self.model.get("type") === "model"){
@@ -160,7 +161,9 @@ define([
                             "sorterCallback": callback
                         });
                     }
-                    Table.sortWorkingSet(this.model);
+                    Table.Channel.trigger("sort:column", {
+                        sorter: this.model
+                    });
                 }
             }
         });
@@ -180,9 +183,18 @@ define([
                 "focusin input": "hideMglass",
                 "focusout input": "showMglass"
             },
+            modelEvents: {
+                "filter:working:set": "filterWorkingSet"
+            },
 
-            filterWorkingSet: function(event){
-                var filterQuery = $(event.target).val().toLowerCase();
+            initialize: function(){
+                if(this.model.get("query") === undefined){
+                    this.model.set({"query": ""});
+                }
+            },
+
+            filterWorkingSet: function(){
+                var filterQuery = this.$el.find("input").val().toLowerCase();
                 var self = this;
 
                 if(this.model.get("filterCallback") === undefined){
@@ -226,7 +238,15 @@ define([
         var FiltersView = Marionette.CollectionView.extend({
             className: "filters",
             childView: FilterView,
-            template: _.template('')
+            template: _.template(''),
+            runFilters: function(){
+                this.collection.each(function(filter){
+                    console.log("filter query", filter.get("query"));
+                    if(filter.get("type") !== null){
+                        filter.trigger("filter:working:set");
+                    }
+                });
+            }
         });
 
         var LayoutView = Marionette.LayoutView.extend({
@@ -347,6 +367,12 @@ define([
 
             Table.Channel.on("row:contextmenu", function(){
                 console.log("contextmenu row");
+            });
+
+            Table.Channel.on("sort:column", function(args){
+                console.log("sorting by:", args.sorter.get("key"));
+                Table.sortWorkingSet(args.sorter);
+                Table.FiltersView.runFilters();
             });
         });
 
@@ -492,8 +518,10 @@ define([
         };
 
         Table.sortWorkingSet = function(sorter){
+            console.log("sorting working set");
+            // console.log("sorter callback", sorter.get("sorterCallback"));
             var sortedSet = Table.allowedSet.sortBy(sorter.get("sorterCallback"));
-            Table.workingSet.reset(sortedSet);
+            Table.allowedSet.reset(sortedSet);
         };
 
         return Table;
