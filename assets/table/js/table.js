@@ -325,18 +325,11 @@ define([
                     totalWidth += col.get("max_text_width");
                 });
 
-                totalWidth += 40;
-
-                // for(var i=0; i < totalCell; i++){
-                //     var cellWidth = this.$el.find(".row:first-child() div:eq(" + i + ")").width();
-                //     totalWidth = totalWidth + cellWidth;
-                // }
+                totalWidth += 40; // index width
 
                 if( totalWidth > canvas.width() ){
                     canvas.width(totalWidth);
                 }
-
-                //
 
             }
         });
