@@ -54,6 +54,8 @@ define([
 
             extractCells: function(){
                 var cells = [];
+                var self = this;
+
                 Table.columns.each(function(column){
                     var type = column.get("type");
 
@@ -62,7 +64,17 @@ define([
                     if(type === "model"){
                         cell["key"] = column.get("key");
                         var filterKey = column.get("filterKey");
-                        cell["display"] = this.model.get(cell["key"]).get(filterKey);
+                        var filterDisplay = column.get("filterDisplay");
+                        if(filterDisplay !== undefined){
+                            cell["display"] = Table.getNested({
+                                row: self.model,
+                                filterDisplay: filterDisplay,
+                                key: cell["key"]
+                            });
+                        }
+                        else{
+                            cell["display"] = this.model.get(cell["key"]).get(filterKey);                        
+                        }
                     }
                     else{
                         cell["key"] = column.get("key");
@@ -193,7 +205,14 @@ define([
                 }
             },
 
-            filterWorkingSet: function(){
+            filterWorkingSet: function(args){
+                var silent;
+                if(args !== undefined){
+                    silent = args.silent;
+                }
+                else{
+                    silent = false;
+                }
                 var filterQuery = this.$el.find("input").val().toLowerCase();
                 var self = this;
 
@@ -220,7 +239,10 @@ define([
                 }
 
                 this.model.set({"query": filterQuery});
-                Table.filterWorkingSet(this.model);
+                Table.filterWorkingSet({
+                    filter: this.model, 
+                    silent: silent
+                });
             },
             hideMglass: function(event){
                 $(event.target).removeClass("mglass");
@@ -240,12 +262,24 @@ define([
             childView: FilterView,
             template: _.template(''),
             runFilters: function(){
-                this.collection.each(function(filter){
-                    console.log("filter query", filter.get("query"));
-                    if(filter.get("type") !== null){
-                        filter.trigger("filter:working:set");
-                    }
+                var activeFilters = this.collection.filter(function(filter){
+                     return filter.get("type") !== null && filter.get("query") != "";
                 });
+
+                var totalActiveFilters = activeFilters.length;
+                if(totalActiveFilters !== 0){
+                    var f = 1;
+                    _.each(activeFilters, function(filter){
+                        console.log(filter, f);
+                        var silent = (f !== totalActiveFilters);
+                        filter.trigger("filter:working:set", {silent: silent});
+                        f += 1;
+                    });
+                }
+                else{
+                    Table.workingSet.reset(Table.allowedSet.toArray());
+                }
+
             }
         });
 
@@ -475,7 +509,11 @@ define([
                 var nestedModel = schemaCounterpart.get("key");
                 var key = schemaCounterpart.get("filterKey");
                 displayExtractor = function(row){
-                    return row.get(nestedModel).get(key);
+                    return Table.getNested({
+                        row: row,
+                        filterDisplay: schemaCounterpart.get("filterDisplay"),
+                        key: nestedModel
+                    });
                 };
             }
             else{
@@ -518,19 +556,39 @@ define([
             return pager;
         };
 
-        Table.filterWorkingSet = function(filter){
+        Table.filterWorkingSet = function(args){
+            var filter = args.filter;
+            var silent = args.silent;
             var newWorkingSet = Table.allowedSet.filter(function(row){
                 return filter.get("filterCallback")(row, filter.get("query"));
             });
 
-            Table.workingSet.reset(newWorkingSet);
+            Table.workingSet.reset(newWorkingSet, {silent: silent});
         };
 
         Table.sortWorkingSet = function(sorter){
-            console.log("sorting working set");
             // console.log("sorter callback", sorter.get("sorterCallback"));
             var sortedSet = Table.allowedSet.sortBy(sorter.get("sorterCallback"));
-            Table.allowedSet.reset(sortedSet);
+            Table.allowedSet.reset(sortedSet, {silent: true});
+        };
+
+        Table.getNested = function(args){
+            var row = args.row;
+            var filterDisplay = args.filterDisplay;
+            var key = args.key;
+
+            var display = "";
+            var fdCount = 1;
+            _.each(filterDisplay, function(fd){
+                if(fdCount === filterDisplay.length){
+                    display += row.get(key).get(fd);
+                }
+                else{
+                    display += (row.get(key).get(fd) + " - ");
+                }
+                fdCount += 1;
+            });
+            return display;
         };
 
         return Table;
