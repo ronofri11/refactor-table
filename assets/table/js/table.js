@@ -287,14 +287,23 @@ define([
                 var totalCell = this.$el.find(".row:first-child() div").size();
                 var totalWidth = 0;
 
-                for(var i=0; i < totalCell; i++){
-                    var cellWidth = this.$el.find(".row:first-child() div:eq(" + i + ")").width();
-                    totalWidth = totalWidth + cellWidth;
-                }
+                Table.columns.each(function(col){
+                    totalWidth += col.get("max_text_width");
+                });
+
+                totalWidth += 40;
+
+                // for(var i=0; i < totalCell; i++){
+                //     var cellWidth = this.$el.find(".row:first-child() div:eq(" + i + ")").width();
+                //     totalWidth = totalWidth + cellWidth;
+                // }
 
                 if( totalWidth > canvas.width() ){
                     canvas.width(totalWidth);
                 }
+
+                //
+
             }
         });
 

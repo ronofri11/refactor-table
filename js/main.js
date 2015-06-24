@@ -35,8 +35,8 @@ define([
     var store = new Store("store");
     var storeChannel = store.Channel;
 
-    // store.start({url: "/darwined/backbreakers/"});
-    store.start({url: "/clients/darwined"});
+    store.start({url: "/darwined/backbreakers/"});
+    // store.start({url: "/clients/darwined"});
     // store.start({url: "/clients/testing"});
 
     var asignaturas;
@@ -189,6 +189,19 @@ define([
                                     {
                                         property: "jornada",
                                         nested: true
+                                    },
+                                    {
+                                        property: "carrera",
+                                        nested: true
+                                    },
+                                    {
+                                        property: "codigo_cliente"
+                                    },
+                                    {
+                                        property: "nombre"
+                                    },
+                                    {
+                                        property: "semestre"
                                     },
                                     {
                                         property: "carrera",
