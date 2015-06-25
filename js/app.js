@@ -2,11 +2,12 @@ define([
 	"backbone.marionette",
 	"backbone.radio",
 	"radio.shim",
+    "assets/store/js/store",
     "assets/menu/js/menu",
     "assets/appbar/js/appbar",
     "maintainer",
     "text!templates/apptemplate.html"
-], function (Marionette, Radio, Shim, Menu, AppBar, Maintainer, AppTemplate) {
+], function (Marionette, Radio, Shim, Store, Menu, AppBar, Maintainer, AppTemplate) {
 
 	var AppConstructor = function(channelName){
         var App = new Marionette.Application();
@@ -22,6 +23,192 @@ define([
                 "outer": ".outer"
             }
         });
+
+        App.startStore = function(url){
+            var store = new Store("store");
+            var storeChannel = store.Channel;
+
+            store.start({url: url});
+
+            var rows;
+            var modelName = "Curso";
+
+            App.Channel.listenTo(storeChannel, "end:configuration", function(){
+                storeChannel.command("fetch:chain:for", {modelName: modelName});
+            });
+
+            App.Channel.listenTo(storeChannel, "store:model:loaded", function(args){
+                switch(args.modelName){
+                    case modelName:
+                        rows = storeChannel.request("get:models", {modelName: modelName});
+                        App.Channel.trigger("request:complete", args);
+                        break;
+                }
+            });
+
+            App.Channel.on("request:complete", function(args){
+                if(rows !== undefined){
+                    var schema = storeChannel.request("get:schema:for", {
+                        modelName: modelName
+                    });
+
+                    App.modesDict = {
+                        edit: {
+                            name:"edit1",
+                            layout: "fullpage",
+                            channelName: "mode1",
+                            components: {
+                                table: {
+                                    title: "",
+                                    channelName: "table",
+                                    region: "main",
+                                    controls: [
+                                        {
+                                            align: "left",
+                                            class: "btn addNew",
+                                            states: {
+                                                default: {
+                                                    event: "custom:control:one",
+                                                    args: {modelName: modelName},
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Agregar nuevo curso"
+                                        },
+                                        {
+                                            align: "left",
+                                            class: "btn trash",
+                                            states: {
+                                                default: {
+                                                    event: "custom:control:two",
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Eliminar curso seleccionado"
+                                        },
+                                        {
+                                            align: "left",
+                                            class: "btn undo",
+                                            states: {
+                                                default: {
+                                                    event: "custom:control:three",
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Deshacer"
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn removeFilters",
+                                            states: {
+                                                default: {
+                                                    event: "remove:active:filters",
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Limpiar filtros"
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn filterModified",
+                                            states: {
+                                                default: {
+                                                    event: "filter:modified",
+                                                    transition: "press"
+                                                },
+                                                press: {
+                                                    event: "remove:active:filters",
+                                                    class: "press",
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Filtrar cursos modificados"
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn filterNew",
+                                            states: {
+                                                default: {
+                                                    event: "filter:new",
+                                                    transition: "press"
+                                                },
+                                                press: {
+                                                    event: "remove:active:filters",
+                                                    class: "press",
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Filtrar cursos agregados"
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn filterDeleted",
+                                            states: {
+                                                default: {
+                                                    event: "filter:deleted",
+                                                    transition: "press"
+                                                },
+                                                press: {
+                                                    event: "remove:active:filters",
+                                                    class: "press",
+                                                    transition: "default"
+                                                }
+                                            },
+                                            title: "Filtrar cursos eliminados"
+                                        }
+                                    ],
+                                    asset: {
+                                        class: "table",
+                                        initOptions: {},
+                                        startOptions:{
+                                            separator: ".",
+                                            recordsPerPage: 100,
+                                            pagesPerSheet: 10,
+                                            rows: rows,
+                                            schema: schema,
+                                            columns:[
+                                                {
+                                                    property: "sede",
+                                                    nested: true
+                                                },
+                                                {
+                                                    property: "escuela",
+                                                    nested: true
+                                                },
+                                                {
+                                                    property: "regimen",
+                                                    nested: true
+                                                },
+                                                {
+                                                    property: "jornada",
+                                                    nested: true
+                                                },
+                                                {
+                                                    property: "carrera",
+                                                    nested: true
+                                                },
+                                                {
+                                                    property: "codigo_cliente"
+                                                },
+                                                {
+                                                    property: "nombre"
+                                                },
+                                                {
+                                                    property: "semestre"
+                                                }
+                                            ]
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    App.Channel.trigger("app:ready");
+                }
+            });
+        };
 
         App.on("start", function(options){
             App.RootView = new LayoutView();
@@ -216,168 +403,11 @@ define([
                 region: App.RootView.getRegion("outer")
             });
 
-            var modelName = "Curso";
-            var COLL = Backbone.Collection.extend();
-            var emptyCollection = new COLL();
-
-            var modesDict = {
-                edit: {
-                    name:"edit1",
-                    layout: "fullpage",
-                    channelName: "mode1",
-                    components: {
-                        table: {
-                            title: "",
-                            channelName: "table",
-                            region: "main",
-                            controls: [
-                                {
-                                    align: "left",
-                                    class: "btn addNew",
-                                    states: {
-                                        default: {
-                                            event: "custom:control:one",
-                                            args: {modelName: modelName},
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Agregar nuevo curso"
-                                },
-                                {
-                                    align: "left",
-                                    class: "btn trash",
-                                    states: {
-                                        default: {
-                                            event: "custom:control:two",
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Eliminar curso seleccionado"
-                                },
-                                {
-                                    align: "left",
-                                    class: "btn undo",
-                                    states: {
-                                        default: {
-                                            event: "custom:control:three",
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Deshacer"
-                                },
-                                {
-                                    align: "right",
-                                    class: "btn removeFilters",
-                                    states: {
-                                        default: {
-                                            event: "remove:active:filters",
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Limpiar filtros"
-                                },
-                                {
-                                    align: "right",
-                                    class: "btn filterModified",
-                                    states: {
-                                        default: {
-                                            event: "filter:modified",
-                                            transition: "press"
-                                        },
-                                        press: {
-                                            event: "remove:active:filters",
-                                            class: "press",
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Filtrar cursos modificados"
-                                },
-                                {
-                                    align: "right",
-                                    class: "btn filterNew",
-                                    states: {
-                                        default: {
-                                            event: "filter:new",
-                                            transition: "press"
-                                        },
-                                        press: {
-                                            event: "remove:active:filters",
-                                            class: "press",
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Filtrar cursos agregados"
-                                },
-                                {
-                                    align: "right",
-                                    class: "btn filterDeleted",
-                                    states: {
-                                        default: {
-                                            event: "filter:deleted",
-                                            transition: "press"
-                                        },
-                                        press: {
-                                            event: "remove:active:filters",
-                                            class: "press",
-                                            transition: "default"
-                                        }
-                                    },
-                                    title: "Filtrar cursos eliminados"
-                                }
-                            ],
-                            asset: {
-                                class: "table",
-                                initOptions: {},
-                                startOptions:{
-                                    separator: ".",
-                                    recordsPerPage: 100,
-                                    pagesPerSheet: 10,
-                                    rows: emptyCollection,
-                                    schema: emptyCollection,
-                                    columns:[
-                                        {
-                                            property: "sede",
-                                            nested: true
-                                        },
-                                        {
-                                            property: "escuela",
-                                            nested: true
-                                        },
-                                        {
-                                            property: "regimen",
-                                            nested: true
-                                        },
-                                        {
-                                            property: "jornada",
-                                            nested: true
-                                        },
-                                        {
-                                            property: "carrera",
-                                            nested: true
-                                        },
-                                        {
-                                            property: "codigo_cliente"
-                                        },
-                                        {
-                                            property: "nombre"
-                                        },
-                                        {
-                                            property: "semestre"
-                                        }
-                                    ]
-                                }
-
-                            }
-                        }
-                    }
-                }
-            };
-
             var maintainer = new Maintainer("maintainer");
             var maintainerChannel = maintainer.Channel;
             maintainer.start({
                 title: "Mantenedor Cursos",
-                modes: modesDict
+                modes: App.modesDict
             });
 
             App.RootView.on("show", function(){

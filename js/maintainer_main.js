@@ -31,9 +31,16 @@ define([
     var App = new App("maintainer-app");
     var appChannel = App.Channel;
 
-    App.start();
+    var url = "/darwined/backbreakers/";
+    // var url = "/clients/darwined";
+    // var url = "/clients/testing";
 
-    somediv.show(appChannel.request("get:root"));
+    App.startStore(url);
+
+    appChannel.listenTo(appChannel, "app:ready", function(){
+        App.start();
+        somediv.show(appChannel.request("get:root"));
+    });
 
     // Maintainer.start({
     //     channelName: "m1",
