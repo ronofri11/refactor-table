@@ -20,32 +20,45 @@ require.config({
 });
 
 define([
-    "maintainer"
-], function (Maintainer) {
-    Maintainer.start({
-        channelName: "m1",
-        dataMaintainer: {
-            title: "MANTENEDOR DE FRANJAS",
-            modes: [
-                {
-                    name:"edit1",
-                    layout: "columnHeaderMainflip",
-                    state: "edit",
-                    active: true
-                },
-                {
-                    name: "exportar1",
-                    layout: "fullpage",
-                    state: "export",
-                    active: false
-                },
-                {
-                    name: "import1",
-                    layout: "fullpage",
-                    state: "import",
-                    active: false
-                }
-            ]
-        }
+    "app"
+], function (App) {
+    var SomeRegion = Marionette.Region.extend();
+
+    var somediv = new SomeRegion({
+        el: ".maintainer-app"
     });
+
+    var App = new App("maintainer-app");
+    var appChannel = App.Channel;
+
+    App.start();
+
+    somediv.show(appChannel.request("get:root"));
+
+    // Maintainer.start({
+    //     channelName: "m1",
+    //     dataMaintainer: {
+    //         title: "MANTENEDOR DE FRANJAS",
+    //         modes: [
+    //             {
+    //                 name:"edit1",
+    //                 layout: "columnHeaderMainflip",
+    //                 state: "edit",
+    //                 active: true
+    //             },
+    //             {
+    //                 name: "exportar1",
+    //                 layout: "fullpage",
+    //                 state: "export",
+    //                 active: false
+    //             },
+    //             {
+    //                 name: "import1",
+    //                 layout: "fullpage",
+    //                 state: "import",
+    //                 active: false
+    //             }
+    //         ]
+    //     }
+    // });
 });
