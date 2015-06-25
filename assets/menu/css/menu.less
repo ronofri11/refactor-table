@@ -1,0 +1,237 @@
+//// setting custom class ////
+@font-face{font-family:'Open Sans';font-style:normal;font-weight:normal;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Regular.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:300;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Light.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:700;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Bold.ttf') format('truetype')}
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.box-sizing(@box: border-box)
+{
+    -webkit-box-sizing: @box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: @box;    /* Firefox, other Gecko */
+    box-sizing: @box;         /* Opera/IE 8+ */
+}
+
+
+//////// STYLE ///////
+
+.menu
+{
+  width: 50px;
+  height: 100%;
+  position: absolute;
+  z-index: 99;
+  font-family: "open sans";
+  background-color: #02799a;
+  box-sizing: border-box;
+
+  > .items
+  {
+    margin: 0;
+    padding: 0;
+
+
+    > .item
+    {
+      list-style: none;
+      width: 100%;
+      height: 50px;
+      position: relative;
+      border-bottom: 1px solid #fff;
+
+
+      > .icon
+      {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #02799a;
+        border-right: 1px solid #fff;
+
+        &:hover
+        {
+          background-color: #055e7a;
+
+        }
+
+        &:hover + .categoria > .name
+        {
+          background-color: #055e7a;
+
+        }
+
+      }
+
+      > .categoria
+      {
+        display: none;
+        width: 155px;
+        position: absolute;
+        top: 0;
+        left: 51px;
+
+        > .name
+        {
+          width: auto;
+          height: 50px;
+          position: relative;
+          background-color: #02799a;
+          padding: 18px 10px;
+          color: #fff;
+          text-transform: uppercase;
+          font-weight: 300;
+          font-size: 10px;
+          letter-spacing: 1px;
+          cursor: default;
+
+          &:hover
+          {
+            background-color: #055e7a;
+
+          }
+
+          .box-sizing;
+        }
+
+        > .subitem
+        {
+          position: relative;
+          top: 1px;
+          left: 0;
+          z-index: 100;
+          margin: 0;
+          padding: 0;
+
+          > li
+          {
+            width: 100%;
+            list-style: none;
+            height: 50px;
+            position: relative;
+            border-bottom: 1px solid #fff;
+            margin: 0;
+            padding: 0;
+
+            > .icon
+            {
+              width: 50px;
+              height: 50px;
+              position: absolute;
+              top: 0;
+              left: 0;
+              background-color: #02799a;
+              border-right: 1px solid #fff;
+
+
+              &:hover
+              {
+                background-color: #055e7a;
+
+              }
+
+            }
+
+            > a
+            {
+              width: 100%;
+              display: block;
+              text-decoration: none;
+              width: auto;
+              height: 50px;
+              position: relative;
+              background-color: #02799a;
+              padding: 18px 10px;
+              color: #fff;
+              text-transform: uppercase;
+              font-weight: 300;
+              font-size: 10px;
+              letter-spacing: 1px;
+
+              .box-sizing;
+
+              &:hover
+              {
+                background-color: #2C93AF;
+
+              }
+
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+  // icons
+  .icon
+  {
+    background-size: 25px;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .infraestructura
+  {
+    background-image: url(./../img/infraestructura.svg);
+  }
+
+  .institucion
+  {
+    background-image: url(./../img/institucion.svg);
+  }
+
+  .agenda
+  {
+    background-image: url(./../img/agenda.svg);
+  }
+
+  .programacion
+  {
+    background-image: url(./../img/programacion.svg);
+    background-size: 22px;
+  }
+
+  .profesor
+  {
+    background-image: url(./../img/profesores.svg);
+    background-size: 31px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

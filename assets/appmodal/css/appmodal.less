@@ -1,0 +1,70 @@
+//// setting custom class ////
+@font-face{font-family:'Open Sans';font-style:normal;font-weight:normal;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Regular.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:300;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Light.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:700;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Bold.ttf') format('truetype')}
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.centervertical
+{
+  position: absolute;
+  top: 50%;
+
+  .translate(0, -50%);
+
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.box-sizing(@box: border-box)
+{
+    -webkit-box-sizing: @box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: @box;    /* Firefox, other Gecko */
+    box-sizing: @box;         /* Opera/IE 8+ */
+}
+
+
+//////// STYLE ///////
+
+.appmodal
+{
+  display: block;
+  background: white;
+  position: absolute;
+  z-index: 99;
+  border: 1px solid #2b9ec1;
+
+  > .triangle
+  {
+    position: absolute;
+    top: -17px;
+    z-index: 100;
+    width: 30px;
+    height: 18px;
+    background-image: url(../img/whitearrow.svg);
+    background-size: 34px;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+}

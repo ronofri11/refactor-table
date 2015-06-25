@@ -2,37 +2,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <!-- maintainer -->
         <link rel="stylesheet" type="text/css" href="css/darwined.css">
         <link rel="stylesheet" type="text/css" href="css/maintainer.css">
         <link rel="stylesheet" type="text/css" href="css/maintainer-responsive.css">
         <link rel="stylesheet" type="text/css" href="css/regions.css">
         <link rel="stylesheet" type="text/css" href="css/regions-responsive.css">
-        <!-- component -->
-        <link rel="stylesheet" type="text/css" href="js/component/css/component.css">
-        <link rel="stylesheet" type="text/css" href="js/component/css/component-responsive.css">
-        <!-- assets -->
-        <!-- selector -->
-        <link rel="stylesheet" type="text/css" href="assets/selector/css/selector.css">
-        <link rel="stylesheet" type="text/css" href="assets/selector/css/selector-responsive.css">
-        <!-- schedule -->
-        <link rel="stylesheet" type="text/css" href="assets/schedule/css/schedule.css">
-        <link rel="stylesheet" type="text/css" href="assets/schedule/css/schedule-responsive.css">
-        <!-- cardsform -->
-        <link rel="stylesheet" type="text/css" href="assets/cardsform/css/cardsform.css">
-        <!-- searchbar -->
-        <link rel="stylesheet" type="text/css" href="assets/searchbar/css/searchbar.css">
-        <!-- typeahead -->
-        <link rel="stylesheet" type="text/css" href="assets/typeahead/css/typeahead.css">
-        <!-- simpleform -->
-        <link rel="stylesheet" type="text/css" href="assets/simpleform/css/simpleform.css">
-        <link rel="stylesheet" type="text/css" href="assets/simpleform/css/simpleform-responsive.css">
-        <!-- notification -->
-        <link rel="stylesheet" type="text/css" href="assets/notification/css/notification.css">
-        <link rel="stylesheet" type="text/css" href="assets/notification/css/notification-responsive.css">
-        <!-- table -->
-        <link rel="stylesheet" type="text/css" href="assets/table/css/table.css">
-        <link rel="stylesheet" type="text/css" href="assets/table/css/table-responsive.css">
+        <link rel="stylesheet" type="text/css" href="css/mantenedores.css">
+        <link rel="stylesheet" type="text/css" href="css/mantenedores-responsive.css">
+        <link rel="stylesheet" type="text/css" href="assets/menu/css/menu.css">
+        <link rel="stylesheet" type="text/css" href="assets/appbar/css/appbar.css">
+        <link rel="stylesheet" type="text/css" href="assets/appmodal/css/appmodal.css">
+        <!--<script src="js/ie/modernizr.js"></script> --><!-- CSS3 old browser support -->
         <!--[if lt IE 9]>
         <script src="js/ie/selectivizr.js"></script>
         <script src="js/ie/html5.js"></script>
@@ -40,8 +20,21 @@
         <![endif]-->
     </head>
     <body>
-        <div class="container"></div>
-        <div class="notifications"></div>
-        <script data-main="js/main" src="bower_components/requirejs/require.js"></script>
+        <div class="mantenedores">
+            <header>
+                <a href="#" class="logoDarwined"></a><div class="frase">SOFTWARE DE PLANIFICACIÓN ACADÉMICA</div>
+                <div class="right"></div>
+            </header>
+            <main>
+                <div id="menucontainer"></div>
+                <div id="mainRegion"></div>
+            </main>
+            <footer>
+                <a href="#" class="logoForis"></a><div class="fraseEmpresa">DESARROLLADO POR</div>
+            </footer>
+        </div>
+        <div class="outer"></div>
+
+        <script data-main="js/maintainer_main" src="bower_components/requirejs/require.js"></script>
     </body>
 </html>

@@ -1,0 +1,140 @@
+//// setting custom class ////
+@font-face{font-family:'Open Sans';font-style:normal;font-weight:normal;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Regular.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:300;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Light.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:700;src:local('Open Sans'),local('OpenSans'),url('fonts/OpenSans-Bold.ttf') format('truetype')}
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.centervertical
+{
+  position: absolute;
+  top: 50%;
+
+  .translate(0, -50%);
+
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.box-sizing(@box: border-box)
+{
+    -webkit-box-sizing: @box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: @box;    /* Firefox, other Gecko */
+    box-sizing: @box;         /* Opera/IE 8+ */
+}
+
+
+//////// STYLE ///////
+
+.appbar
+{
+  height: 100%;
+  position: relative;
+  margin-top: 20px;
+  margin-right: 20px;
+
+  > .item
+  {
+    color: #2b9ec1;
+    float: left;
+
+    > #escenarios
+    {
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    > #menuapps
+    {
+      cursor: pointer;
+      margin: 0 10px;
+      background-image: url(../img/menuapps.svg);
+      width: 17px;
+      height: 17px;
+      display: block;
+      margin-top: 1px;
+    }
+
+    > #messages
+    {
+      cursor: pointer;
+      margin: 0 2px;
+      background-image: url(../img/messages.svg);
+      width: 18px;
+      height: 25px;
+      display: block;
+      margin-top: 0;
+
+      > span {
+        color: #fff;
+        font-size: 10px;
+        position: relative;
+        top: -4px;
+        left: 6px;
+        text-align: center;
+        pointer-events: none;
+        font-weight: 300;
+      }
+
+    }
+
+    > #loginbar
+    {
+      display: inline-block;
+      margin-top: -6px;
+      cursor: pointer;
+      margin-left: 3px;
+
+      > .thumbnail
+      {
+        pointer-events: none;
+        width: 34px;
+        height: 34px;
+        display: block;
+        border-radius: 50%;
+        border: 2px solid #2b9ec1;
+        position: relative;
+        margin-left: 9px;
+        float: left;
+        background-size: 100%;
+        background-position: center center;
+        background-repeat: no-repeat;
+      }
+
+      > p
+      {
+        pointer-events: none;
+        text-transform: uppercase;
+        font-size: 12px;
+        float: left;
+        margin-left: 9px;
+        margin-top: 11px;
+      }
+    }
+
+  }
+}

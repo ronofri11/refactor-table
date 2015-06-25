@@ -1,0 +1,11 @@
+<div class="icon"></div>
+<div class="categoria">
+    <div class="name"><%- nombre %></div>
+    <ul class="subitem" id="<%- nombre %>">
+        <% _.each(subitems, function(subitem){ %>
+            <li>
+                <a href="<%- subitem.link %>" class="name"><%- subitem.nombre %></a>
+            </li>
+        <% }); %>
+    </ul>
+</div>
