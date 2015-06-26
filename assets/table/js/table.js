@@ -151,11 +151,14 @@ define([
                 var self = this;
                 if(this.model.get("sort") !== null){
                     if(this.model.get("sorterCallback") === undefined){
-                        console.log("creating callback", self.model.get("key"));
                         var callback = function(row){
                             var str;
                             if(self.model.get("type") === "model"){
-                                str = "" + row.get(self.model.get("key")).get(self.model.get("nestedKey"));
+                                str = Table.getNested({
+                                    row: row,
+                                    filterDisplay: self.model.get("filterDisplay"),
+                                    key: self.model.get("key")
+                                });
                             }
                             else{
                                 str = "" + row.get(self.model.get("key"));
@@ -224,8 +227,12 @@ define([
                         switch(self.model.get("type")){
                             case "model":
                                 var key = self.model.get("key");
-                                var nestedProperty = self.model.get("filterKey");
-                                var rowProperty = "" + row.get(key).get(nestedProperty);
+                                var filterDisplay = self.model.get("filterDisplay");
+                                var rowProperty = Table.getNested({
+                                    row: row,
+                                    filterDisplay: filterDisplay,
+                                    key: key
+                                });
                                 return rowProperty.toLowerCase().indexOf(query) > -1;
                             default:
                                 var key = self.model.get("key");
@@ -472,6 +479,8 @@ define([
 
                 if(filter["type"] === "model"){
                     header["nestedKey"] = col.get("filterKey");
+                    header["filterDisplay"] = col.get("filterDisplay");
+
                     filter["filterKey"] = col.get("filterKey");
                     filter["filterDisplay"] = col.get("filterDisplay");
                 }
