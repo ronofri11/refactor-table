@@ -202,7 +202,7 @@
         "key": "carrera",
         "title": "Carrera",
         "filterKey": "codigo_cliente",
-        "filterDisplay": ["codigo_cliente", "planestudio"]
+        "filterDisplay": ["codigo_cliente", "nombre"]
       }
     ],
     "schema": [

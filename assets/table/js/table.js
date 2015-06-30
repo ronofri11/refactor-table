@@ -2,12 +2,13 @@ define([
     "backbone.marionette",
     "backbone.radio",
     "radio.shim",
-    "assets/table/js/paging.js",
+    "assets/table/js/paging",
+    "assets/table/js/filters",
+    "assets/table/js/headers",
     "text!./../templates/table.html",
     "text!./../templates/row.html",
-    "text!./../templates/header.html",
-    "text!./../templates/filter.html"
-], function (Marionette, Radio, Shim, Paging, TableTemplate, RowTemplate, HeaderTemplate, FilterTemplate) {
+    "text!./../templates/header.html"
+], function (Marionette, Radio, Shim, Paging, Filters, Headers, TableTemplate, RowTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -58,235 +59,16 @@ define([
 
                 Table.columns.each(function(column){
                     var type = column.get("type");
-
                     var cell = {};
 
-                    if(type === "model"){
-                        cell["key"] = column.get("key");
-                        var filterKey = column.get("filterKey");
-                        var filterDisplay = column.get("filterDisplay");
-                        if(filterDisplay !== undefined){
-                            cell["display"] = Table.getNested({
-                                row: self.model,
-                                filterDisplay: filterDisplay,
-                                key: cell["key"]
-                            });
-                        }
-                        else{
-                            cell["display"] = this.model.get(cell["key"]).get(filterKey);                        
-                        }
-                    }
-                    else{
-                        cell["key"] = column.get("key");
-                        cell["display"] = this.model.get(cell["key"]);
-                    }
-
+                    cell["key"] = column.get("key");
+                    cell["display"] = this.model.getCellValue(column);
                     cell["width"] = column.get("max_text_width");
 
                     cells.push(cell);
                 }, this);
 
                 return cells;
-            }
-        });
-
-        var HeaderView = Marionette.ItemView.extend({
-            tagName: "div",
-            className: "header",
-            template: _.template(HeaderTemplate),
-            events: {
-                "click": "sortWorkingSet"
-            },
-
-            initialize: function(){
-                this.model.set({"sort": null});
-                this.listenTo(this.model, "change:sort", this.styling);
-            },
-
-            onRender: function(){
-                this.$el.width(this.model.get("width") + "px");
-                this.styling();
-            },
-
-            styling: function(){
-                var arrow = this.$el.find(".arrow");
-
-                arrow.removeClass("upArrow");
-                arrow.removeClass("downArrow");
-                arrow.removeClass("noArrow");
-
-                switch(this.model.get("sort")){
-                    case null:
-                        arrow.addClass("noArrow");
-                        break;
-                    case "ASC":
-                        arrow.addClass("upArrow");
-                        break;
-                    case "DESC":
-                        arrow.addClass("downArrow");
-                        break;
-                }
-            },
-
-            nextState: function(){
-                var nextState;
-
-                switch(this.model.get("sort")){
-                    case null:
-                        nextState = "ASC";
-                        break;
-                    case "ASC":
-                        nextState = "DESC";
-                        break;
-                    case "DESC":
-                        nextState = "ASC";
-                        break;
-                }
-
-                this.model.set({"sort": nextState});
-            },
-
-            sortWorkingSet: function(){
-                this.nextState();
-                var self = this;
-                if(this.model.get("sort") !== null){
-                    if(this.model.get("sorterCallback") === undefined){
-                        var callback = function(row){
-                            var str;
-                            if(self.model.get("type") === "model"){
-                                str = Table.getNested({
-                                    row: row,
-                                    filterDisplay: self.model.get("filterDisplay"),
-                                    key: self.model.get("key")
-                                });
-                            }
-                            else{
-                                str = "" + row.get(self.model.get("key"));
-                            }
-                            str = str.toLowerCase();
-                            if(self.model.get("sort") === "DESC"){
-                                str = str.split("");
-                                str = _.map(str, function(letter) {
-                                    return String.fromCharCode(-(letter.charCodeAt(0)));
-                                });
-                            }
-                            return str;
-                        };
-                        self.model.set({
-                            "sorterCallback": callback
-                        });
-                    }
-                    Table.Channel.trigger("sort:column", {
-                        sorter: this.model
-                    });
-                }
-            }
-        });
-
-        var HeadersView = Marionette.CollectionView.extend({
-            className: "headers",
-            childView: HeaderView,
-            template: _.template('')
-        });
-
-        var FilterView = Marionette.ItemView.extend({
-            tagName: "div",
-            className: "filter",
-            template: _.template(FilterTemplate),
-            events: {
-                "input input": "filterWorkingSet",
-                "focusin input": "hideMglass",
-                "focusout input": "showMglass"
-            },
-            modelEvents: {
-                "filter:working:set": "filterWorkingSet"
-            },
-
-            initialize: function(){
-                if(this.model.get("query") === undefined){
-                    this.model.set({"query": ""});
-                }
-            },
-
-            filterWorkingSet: function(args){
-                var silent;
-                if(args !== undefined){
-                    silent = args.silent;
-                }
-                else{
-                    silent = false;
-                }
-                var filterQuery = this.$el.find("input").val().toLowerCase();
-                var self = this;
-
-                if(this.model.get("filterCallback") === undefined){
-                    var callback = function(row, query){
-                        if(query === ""){
-                            return true;
-                        }
-                        switch(self.model.get("type")){
-                            case "model":
-                                var key = self.model.get("key");
-                                var filterDisplay = self.model.get("filterDisplay");
-                                var rowProperty = Table.getNested({
-                                    row: row,
-                                    filterDisplay: filterDisplay,
-                                    key: key
-                                });
-                                return rowProperty.toLowerCase().indexOf(query) > -1;
-                            default:
-                                var key = self.model.get("key");
-                                var rowProperty = "" + row.get(key);
-                                return rowProperty.toLowerCase().indexOf(query) > -1;
-                        }
-                    };
-                    self.model.set({
-                        "filterCallback": callback
-                    });
-                }
-
-                this.model.set({"query": filterQuery});
-                Table.filterWorkingSet({
-                    filter: this.model, 
-                    silent: silent
-                });
-            },
-            hideMglass: function(event){
-                $(event.target).removeClass("mglass");
-            },
-            showMglass: function(){
-                var self = $(event.target);
-                if(self.val().length > 0){
-
-                }else{
-                    self.addClass("mglass");
-                }
-            }
-        });
-
-        var FiltersView = Marionette.CollectionView.extend({
-            className: "filters",
-            childView: FilterView,
-            template: _.template(''),
-            runFilters: function(){
-                var activeFilters = this.collection.filter(function(filter){
-                     return filter.get("type") !== null && filter.get("query") != "";
-                });
-
-                var totalActiveFilters = activeFilters.length;
-                if(totalActiveFilters !== 0){
-                    var f = 1;
-                    _.each(activeFilters, function(filter){
-                        console.log(filter, f);
-                        var silent = (f !== totalActiveFilters);
-                        filter.trigger("filter:working:set", {silent: silent});
-                        f += 1;
-                    });
-                }
-                else{
-                    Table.workingSet.reset(Table.allowedSet.toArray());
-                }
-
             }
         });
 
@@ -337,18 +119,17 @@ define([
                 if( totalWidth > canvas.width() ){
                     canvas.width(totalWidth);
                 }
-
             }
         });
 
         Table.on("before:start", function(options){
             Table.initValues(options);
             Table.Paging = new Paging(channelName + "_paging");
+            Table.Filters = new Filters(channelName + "_filters");
+            Table.Headers = new Headers(channelName + "_headers");
         });
 
         Table.on("start", function(options){
-
-            console.log("table rows number:", options.rows.length);
 
             var Collection = Backbone.Collection.extend();
 
@@ -372,12 +153,16 @@ define([
             Table.headers = new Collection(headersAndFilters.headers);
             Table.filters = new Collection(headersAndFilters.filters);
 
-            Table.HeadersView = new HeadersView({
-                collection: Table.headers
+            Table.Headers.start({
+                headers: Table.headers,
+                allowedSet: Table.allowedSet,
+                workingSet: Table.workingSet
             });
 
-            Table.FiltersView = new FiltersView({
-                collection: Table.filters
+            Table.Filters.start({
+                filters: Table.filters,
+                allowedSet: Table.allowedSet,
+                workingSet: Table.workingSet
             });
 
             var pager = Table.getPagingOptions(options);
@@ -393,8 +178,10 @@ define([
 
             //when the LayoutView is shown...
             Table.RootView.on("show", function(){
-                Table.RootView.getRegion("headers").show(Table.HeadersView);
-                Table.RootView.getRegion("filters").show(Table.FiltersView);
+                var HeadersView = Table.Headers.Channel.request("get:root");
+                var FiltersView = Table.Filters.Channel.request("get:root");
+                Table.RootView.getRegion("headers").show(HeadersView);
+                Table.RootView.getRegion("filters").show(FiltersView);
 
                 Table.RootView.getRegion("tbody").show(Table.TableView);
                 Table.RootView.getRegion("paging").show(Table.Paging.Channel.request("get:root"));
@@ -412,10 +199,8 @@ define([
                 console.log("contextmenu row");
             });
 
-            Table.Channel.on("sort:column", function(args){
-                console.log("sorting by:", args.sorter.get("key"));
-                Table.sortWorkingSet(args.sorter);
-                Table.FiltersView.runFilters();
+            Table.Channel.listenTo(Table.Headers.Channel, "sort:column", function(args){
+                Table.Filters.Channel.trigger("run:filters");
             });
         });
 
@@ -447,12 +232,19 @@ define([
                 }
 
                 if(schemaCounterpart !== undefined){
+                    if(col.displayKeys !== undefined && col.nested){
+                        schemaCounterpart.set({
+                            "filterDisplay": col.displayKeys
+                        });
+                    }
                     schemaCounterpart.set({
                         "max_text_width": Table.getColumnWidth(schemaCounterpart)
                     });
                     activeColumns.push(schemaCounterpart.clone());
                 }
             });
+
+            console.log("active columns", activeColumns);
 
             return activeColumns;
         };
@@ -506,28 +298,35 @@ define([
         };
 
         Table.getColumnWidth = function(schemaCounterpart){
-            var displayExtractor;
-            if(schemaCounterpart.get("type") === "model"){
-                var nestedModel = schemaCounterpart.get("key");
-                var key = schemaCounterpart.get("filterKey");
-                displayExtractor = function(row){
-                    return Table.getNested({
-                        row: row,
-                        filterDisplay: schemaCounterpart.get("filterDisplay"),
-                        key: nestedModel
-                    });
-                };
-            }
-            else{
-                var key = schemaCounterpart.get("key");
-                displayExtractor = function(row){
-                    return row.get(key);
-                };
-            }
-
             var max_text_width = 10;
             Table.rows.each(function(row){
-                var text = displayExtractor(row);
+                if(row.getCellValue === undefined){
+                    _.extend(row, {
+                        getCellValue: function(column){
+                            var display;
+                            if(column.get("type") === "model"){
+                                var nestedModel = column.get("key");
+                                var displayKeys = column.get("filterDisplay");
+                                var dkCount = 1;
+                                display = "";
+                                _.each(displayKeys, function(dk){
+                                    if(dkCount === displayKeys.length){
+                                        display += this.get(nestedModel).get(dk);
+                                    }
+                                    else{
+                                        display += (this.get(nestedModel).get(dk) + " - ");
+                                    }
+                                    dkCount += 1;
+                                }, this);
+                            }
+                            else{
+                                display = "" + this.get(column.get("key"));
+                            }
+                            return display;
+                        }
+                    });
+                }
+                var text = row.getCellValue(schemaCounterpart);
                 var width = text.length;
 
                 if(width > max_text_width){
@@ -556,41 +355,6 @@ define([
             }
 
             return pager;
-        };
-
-        Table.filterWorkingSet = function(args){
-            var filter = args.filter;
-            var silent = args.silent;
-            var newWorkingSet = Table.allowedSet.filter(function(row){
-                return filter.get("filterCallback")(row, filter.get("query"));
-            });
-
-            Table.workingSet.reset(newWorkingSet, {silent: silent});
-        };
-
-        Table.sortWorkingSet = function(sorter){
-            // console.log("sorter callback", sorter.get("sorterCallback"));
-            var sortedSet = Table.allowedSet.sortBy(sorter.get("sorterCallback"));
-            Table.allowedSet.reset(sortedSet, {silent: true});
-        };
-
-        Table.getNested = function(args){
-            var row = args.row;
-            var filterDisplay = args.filterDisplay;
-            var key = args.key;
-
-            var display = "";
-            var fdCount = 1;
-            _.each(filterDisplay, function(fd){
-                if(fdCount === filterDisplay.length){
-                    display += row.get(key).get(fd);
-                }
-                else{
-                    display += (row.get(key).get(fd) + " - ");
-                }
-                fdCount += 1;
-            });
-            return display;
         };
 
         return Table;

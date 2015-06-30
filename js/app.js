@@ -169,23 +169,28 @@ define([
                                             columns:[
                                                 {
                                                     property: "sede",
-                                                    nested: true
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente"]
                                                 },
                                                 {
                                                     property: "escuela",
-                                                    nested: true
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente"]
                                                 },
                                                 {
                                                     property: "regimen",
-                                                    nested: true
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente"]
                                                 },
                                                 {
                                                     property: "jornada",
-                                                    nested: true
+                                                    nested: true,
+                                                    displayKeys: ["codigo"]
                                                 },
                                                 {
                                                     property: "carrera",
-                                                    nested: true
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente", "planestudio"]
                                                 },
                                                 {
                                                     property: "codigo_cliente"
