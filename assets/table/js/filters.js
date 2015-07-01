@@ -20,6 +20,9 @@ define([
                 "focusin input": "hideMglass",
                 "focusout input": "showMglass"
             },
+            modelEvents: {
+                "change:query": "updateQuery"
+            },
 
             initialize: function(){
                 if(this.model.get("query") === undefined){
@@ -50,21 +53,21 @@ define([
 
             filterWorkingSet: function(args){
                 var filterQuery = this.$el.find("input").val().toLowerCase();
-                var self = this;
-
-                this.model.set({"query": filterQuery});
+                this.model.set({"query": filterQuery}, {silent: true});
                 Filters.Channel.trigger("run:filters");
             },
-            hideMglass: function(event){
-                $(event.target).removeClass("mglass");
+            hideMglass: function(){
+                this.$el.find("input").removeClass("mglass");
             },
             showMglass: function(){
-                var self = $(event.target);
-                if(self.val().length > 0){
-
-                }else{
-                    self.addClass("mglass");
+                var input = this.$el.find("input");
+                if(input.val().length == 0){
+                    input.addClass("mglass");
                 }
+            },
+            updateQuery: function(){
+                this.$el.find("input").val(this.model.get("query"));
+                this.showMglass();
             }
         });
 
@@ -73,9 +76,7 @@ define([
             childView: FilterView,
             template: _.template(''),
             runFilters: function(){
-                var activeFilters = this.collection.filter(function(filter){
-                     return filter.get("type") !== null && filter.get("query") != "";
-                });
+                var activeFilters = this.activeFilters();
 
                 var relevantRows = Filters.allowedSet.filter(function(row){
                     var relevant = true;
@@ -86,6 +87,19 @@ define([
                 });
 
                 Filters.workingSet.reset(relevantRows);
+            },
+
+            cleanFilters: function(){
+                var activeFilters = this.activeFilters();
+                _.each(activeFilters, function(filter){
+                    filter.set({"query": ""});
+                });
+            },
+            activeFilters: function(){
+                var activeFilters = this.collection.filter(function(filter){
+                     return filter.get("type") !== null && filter.get("query") != "";
+                });
+                return activeFilters;
             }
         });
 
@@ -102,7 +116,12 @@ define([
             });
 
             Filters.Channel.on("run:filters", function(){
-                return Filters.RootView.runFilters();
+                Filters.RootView.runFilters();
+            });
+
+            Filters.Channel.on("clean:filters", function(){
+                Filters.RootView.cleanFilters();
+                Filters.Channel.trigger("run:filters");
             });
         });
 

@@ -199,6 +199,10 @@ define([
                 console.log("contextmenu row");
             });
 
+            Table.Channel.on("remove:active:filters", function(){
+                Table.Filters.Channel.trigger("clean:filters");
+            });
+
             Table.Channel.listenTo(Table.Headers.Channel, "sort:column", function(args){
                 Table.Filters.Channel.trigger("run:filters");
             });
@@ -232,15 +236,21 @@ define([
                 }
 
                 if(schemaCounterpart !== undefined){
+                    var columnFromSchema = schemaCounterpart.clone();
                     if(col.displayKeys !== undefined && col.nested){
-                        schemaCounterpart.set({
+                        columnFromSchema.set({
                             "filterDisplay": col.displayKeys
                         });
                     }
-                    schemaCounterpart.set({
-                        "max_text_width": Table.getColumnWidth(schemaCounterpart)
+                    if(col.title !== undefined){
+                        columnFromSchema.set({
+                            "title": col.title
+                        });
+                    }
+                    columnFromSchema.set({
+                        "max_text_width": Table.getColumnWidth(columnFromSchema)
                     });
-                    activeColumns.push(schemaCounterpart.clone());
+                    activeColumns.push(columnFromSchema);
                 }
             });
 
