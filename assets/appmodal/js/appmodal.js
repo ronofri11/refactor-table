@@ -37,7 +37,6 @@ define([
             },
             onShow: function(){
                 this.setTriangle();
-                console.log("appModal:ready");
                 AppModal.Channel.trigger("appModal:ready", {
                     region: AppModal.getRegion("content")
                 });

@@ -321,38 +321,93 @@ define([
             });
 
             // json scenarios
-            var scenarios = [{"id":5,"environment":"planner","database":"darwined_siglo21_planner_5","name":"20151 - SC","comment":"Escenario Base con Sede \u00danica","active":false,"enabled":true,"created":"2014-11-05 09:52:17","modified":"2014-11-05 09:52:31"},{"id":6,"environment":"planner","database":"ko","name":"esc2","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":7,"environment":"planner","database":"ko","name":"esc2","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":8,"environment":"planner","database":"ko","name":"esc3","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":9,"environment":"planner","database":"ko","name":"esc4","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":10,"environment":"planner","database":"ko","name":"esc5","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":11,"environment":"planner","database":"ko","name":"esc6","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":12,"environment":"planner","database":"ko","name":"esc7","comment":"otro","active":false,"enabled":true,"created":"2014-12-17 00:00:00","modified":"2014-12-17 00:00:00"},{"id":13,"environment":"planner","database":"darwined_uniminuto_planner_23","name":"UNIMINUTO","comment":null,"active":false,"enabled":true,"created":"2015-02-19 00:00:00","modified":"2015-02-20 00:00:00"},{"id":14,"environment":"planner","database":"darwined_aiep_barriouniversitario_10","name":"AIEP","comment":"jojo","active":false,"enabled":true,"created":"2015-03-20 00:00:00","modified":"2015-03-27 00:00:00"},{"id":15,"environment":"planner","database":"darwined_fuaa_medellin_43","name":"fuaa medellin","comment":null,"active":false,"enabled":true,"created":"2015-02-19 00:00:00","modified":"2015-02-20 00:00:00"},{"id":16,"environment":"planner","database":"darwined_upn_planner_2","name":"upn 2 2015","comment":"domingos proceso 32","active":true,"enabled":true,"created":"2015-03-20 00:00:00","modified":"2015-03-27 00:00:00"}]
+            var scenarios = [
+                {
+                    "id":5,
+                    "environment":"planner",
+                    "database":"darwined_siglo21_planner_5",
+                    "name":"20151 - SC",
+                    "comment":"Escenario Base con Sede \u00danica",
+                    "active":false,
+                    "enabled":true,
+                    "created":"2014-11-05 09:52:17",
+                    "modified":"2014-11-05 09:52:31",
+                    "procesos": 8,
+                    "mejor": "72%"
+                },{
+                    "id":6,
+                    "environment":"planner",
+                    "database":"ko",
+                    "name":"esc2",
+                    "comment":"otro",
+                    "active":false,
+                    "enabled":true,
+                    "created":"2014-12-17 00:00:00",
+                    "modified":"2014-12-17 00:00:00",
+                    "procesos": 4,
+                    "mejor": "98%"
+                },{
+                    "id":8,
+                    "environment":"planner",
+                    "database":"ko",
+                    "name":"esc2",
+                    "comment":"otro",
+                    "active":false,
+                    "enabled":true,
+                    "created":"2014-12-17 00:00:00",
+                    "modified":"2014-12-17 00:00:00",
+                    "procesos": 12,
+                    "mejor": "90%"
+                },{
+                    "id":16,
+                    "environment":"planner",
+                    "database":"darwined_upn_planner_2",
+                    "name":"upn 2 2015",
+                    "comment":"domingos proceso 32",
+                    "active":true,
+                    "enabled":true,
+                    "created":"2015-03-20 00:00:00",
+                    "modified":"2015-03-27 00:00:00",
+                    "procesos": 4,
+                    "mejor": "98%"
+                }
+            ]
             var active_scenario = _.where(scenarios, {active: true});
 
             // data
             var dataAppbar = [
                 {
                     nombre: "escenarios",
-                    active_scenario: active_scenario[0].name,
                     template: "escenarios",
+                    visible: false,
                     modal: {
                         asset: "selector",
-                        template: "escenarios",
-                        scenarios: scenarios
+                        data: scenarios
                     }
                 },
                 {
                     nombre: "menuapps",
                     icon: "menuapps",
                     template: "menuapps",
+                    visible: false,
                     modal: {
-                        asset: "listItems",
-                        template: "menuapps",
-                        apps: [
+                        asset: "itemlist",
+                        data: [
                             {
+                                id: "1",
                                 nombre: "mantenedores",
                                 active: true,
-                                icon: "mantenedores"
+                                icon: "mantenedores.svg",
+                                sigla: "mantenedores",
+                                url: "#"
                             },
                             {
+                                id: "2",
                                 nombre: "procesos",
                                 active: false,
-                                icon: "procesos"
+                                icon: "procesos.svg",
+                                sigla: "procesos",
+                                url: "https://www.google.cl/url?sa=t&rct=j&q=&esrc=s&source=video&cd=1&cad=rja&uact=8&sqi=2&ved=0CBwQuAIwAA&url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DoHg5SJYRHA0&ei=CP2TVY-8MMuz-QHal5m4CA&usg=AFQjCNEcy3X8QxEz3ZqmxAznmt4YfNijBQ&sig2=_g2_2G4CgQDeCFcYNjoRSw"
                             }
                         ]
                     }
@@ -361,6 +416,7 @@ define([
                     nombre: "messages",
                     icon: "messages",
                     template: "messages",
+                    visible: false,
                     modal: {
                         asset: "listItems",
                         template: "messages",
@@ -393,6 +449,7 @@ define([
                         thumbnail: "4908651.png"
                     },
                     template: "escenarios",
+                    visible: false,
                     modal: {
                         asset: "userstatus",
                         template: "userstatus",
@@ -402,6 +459,32 @@ define([
                             thumbnail: "4908651.png",
                             profile: "admin"
                         }
+                    }
+                },
+                {
+                    nombre: "idioma",
+                    template: "idioma",
+                    visible: false,
+                    modal: {
+                        asset: "itemlist",
+                        data: [
+                            {
+                                id: "1",
+                                nombre: "Español",
+                                sigla: "CL",
+                                icon: "chile.svg",
+                                active: true,
+                                url: "#"
+                            },
+                            {
+                                id: "2",
+                                nombre: "Português",
+                                sigla: "BR",
+                                icon: "brasil.svg",
+                                active: false,
+                                url: "https://www.google.cl/url?sa=t&rct=j&q=&esrc=s&source=video&cd=1&cad=rja&uact=8&ved=0CBwQuAIwAA&url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D2QxSxEDxi5A&ei=v_yTVbmcCsWkwAT0truACw&usg=AFQjCNEwX2Xg91QQYPQQ7Uth54TRQ-DGBg&sig2=euzmOCidCTeak_bfHV8n-w"
+                            }
+                        ]
                     }
                 }
             ];
@@ -423,7 +506,7 @@ define([
 
             App.RootView.on("show", function(){
                 var menuView = menuChannel.request("get:root");
-                App.RootView.getRegion("menuContainer").show(menuView); 
+                App.RootView.getRegion("menuContainer").show(menuView);
 
                 var appbarView = appbarChannel.request("get:root");
                 App.RootView.getRegion("appBar").show(appbarView);

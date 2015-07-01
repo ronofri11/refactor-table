@@ -27,15 +27,12 @@
     font-family: 'Open Sans';
     display: inline-block;
     width: 100%;
-    height: 100%;
-    position: relative;
 
     > .searchbox
     {
         width: 100%;
         position: relative;
         float: left;
-        height: 20%;
 
         > input
         {
@@ -48,7 +45,6 @@
             border: none;
             padding: 9px 12px;
             box-sizing: border-box;
-            height: 100%;
 
         }
 
@@ -63,22 +59,18 @@
 
     > .optionbox
     {
+        // display: none;
         width: 100%;
         position: absolute;
         background: #f0f3f6;
-        top: 20%;
-        height: 80%;
-        float: left;
+        top: 35px;
 
         > ul
         {
             padding: 0;
             margin: 0;
+            // max-height: 200px;
             overflow-y: auto;
-            width: 100%;
-            box-sizing: border-box;
-
-            height: 100% !important;
 
             > li
             {
@@ -88,7 +80,6 @@
                 box-sizing: border-box;
                 font-weight: 300;
                 cursor: default;
-                display: inline-block;
 
                 &:nth-child(odd) {
                     background: #EFF1F6;
@@ -126,79 +117,6 @@
                             {
                                 content: " : ";
                             }
-                        }
-                    }
-                }
-
-                > .container
-                {
-                    width: 100%;
-                    display: inline-block;
-                    padding: 5px;
-                    cursor: pointer;
-
-                    &:hover .right > span, &:hover .left > span
-                    {
-                        color: #fff;
-                    }
-
-                    > .left
-                    {
-                        width: 60%;
-                        float: left;
-                        height: 100%;
-                        display: block;
-
-                        > span
-                        {
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                            width: 100%;
-                            float: left;
-                            text-transform: uppercase;
-                            color: #2b9ec1;
-
-                            &:first-child
-                            {
-                                font-weight: 700;
-                                font-size: 15px;
-
-                            }
-
-                            &:nth-child(2)
-                            {
-                                font-weight: 400;
-                                font-size: 10px;
-                            }
-                        }
-                    }
-
-                    > .right
-                    {
-                        width: 38%;
-                        float: left;
-                        height: 100%;
-                        display: block;
-
-                        > span
-                        {
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                            width: 100%;
-                            float: left;
-                            text-transform: uppercase;
-                            color: #2b9ec1;
-                            font-weight: 400;
-                            font-size: 10px;
-                            text-align: right;
-
-                            &:first-child
-                            {
-                                margin-top: 4px;
-                            }
-
                         }
                     }
                 }

@@ -3,39 +3,54 @@ define([
     "backbone.radio",
     "radio.shim",
     "text!./../templates/selector.html",
-    "text!./../templates/optiontemplate.html"
-], function (Marionette, Radio, Shim, SelectorTemplate, OptionTemplate) {
+    "text!./../templates/optiontemplate.html",
+    "text!./../templates/escenarioptiontemplate.html"
+], function (Marionette, Radio, Shim, SelectorTemplate, OptionTemplate, EscenarioOptionTemplate) {
 
     var SelectorConstructor = function(channelName){
 
         var Selector = new Marionette.Application();
         Selector.Channel = Radio.channel(channelName);
 
+
+
         Selector.OptionItemView = Marionette.ItemView.extend({
             tagName: "li",
-            template: _.template(OptionTemplate),
+            getTemplate: function(){
+                switch(Selector.childTemplate){
+                    case "EscenarioOptionTemplate":
+                        return _.template(EscenarioOptionTemplate);
+                        break;
+                    default:
+                        return _.template(OptionTemplate);
+                        break;
+                }
+            },
             templateHelpers: function(){
-                cap = "";
-                var nameless = false;
-                _.each(this.options.displayKeys, function(key){
-                    if(this.model.get(key) === "" && nameless === false){
-                        text1 = Selector.Nameless.display;
+                switch(Selector.childTemplate){
+                    default:
+                        cap = "";
+                        var nameless = false;
+                        _.each(this.options.displayKeys, function(key){
+                            if(this.model.get(key) === "" && nameless === false){
+                                text1 = Selector.Nameless.display;
 
-                        if(this.model.get("namelessCount") === undefined){
-                            this.model.set({"namelessCount": Selector.Nameless.counter});
-                            Selector.Nameless["counter"] += 1;
-                        }
-                        text2 = this.model.get("namelessCount");
-                        cap = "<span>" + text1 + "</span>";
-                        cap += "<span>" + text2 + "</span>";
-                        nameless = true;
-                    }
-                    if(nameless === false){
-                        cap = cap + "<span>" + this.model.get(key) + "</span>";
-                    }
-                }, this);
-
-                return {caption: cap};
+                                if(this.model.get("namelessCount") === undefined){
+                                    this.model.set({"namelessCount": Selector.Nameless.counter});
+                                    Selector.Nameless["counter"] += 1;
+                                }
+                                text2 = this.model.get("namelessCount");
+                                cap = "<span>" + text1 + "</span>";
+                                cap += "<span>" + text2 + "</span>";
+                                nameless = true;
+                            }
+                            if(nameless === false){
+                                cap = cap + "<span>" + this.model.get(key) + "</span>";
+                            }
+                        }, this);
+                        return {caption: cap};
+                        break;
+                }
             },
             events: {
                 "click": "enterOption"
@@ -103,7 +118,11 @@ define([
             initialize: function(options){
                 this.childViewOptions = {
                     separator: options.separator,
-                    displayKeys: options.displayKeys
+                    displayKeys: options.displayKeys,
+                    template: options.childTpl,
+                    getTemplate: function(){
+
+                    }
                 };
 
                 this.listenTo(Selector.optionCollection, "remove", this.onRemoveFromCollection);
@@ -117,18 +136,6 @@ define([
                 var optionboxHeight = heightContainer - searchboxHeight;
                 this.$el.find(".optionbox").css({ "top": searchboxHeight + "px" });
                 this.$el.find(".optionbox ul").height(optionboxHeight + "px");
-            },
-            modelCaption: function(model){
-                var cap = "";
-                _.each(this.options.displayKeys, function(key, i){
-                    if(i === this.options.displayKeys.length - 1){
-                        cap = cap + model.get(key);
-                    }
-                    else{
-                        cap = cap + model.get(key) + ": ";
-                    }
-                }, this);
-                return cap;
             },
             optionClicked: function(view, args){
                 this.updateSelected(args.model);
@@ -292,7 +299,6 @@ define([
         });
 
         Selector.on("start", function(options){
-
             var OptionCollection = Backbone.Collection.extend();
 
             Selector.Nameless = {};
@@ -306,10 +312,17 @@ define([
             Selector.optionAllowedPool.reset(Selector.optionCollection.toArray());
             Selector.optionArrayPool.reset(Selector.optionAllowedPool.toArray());
 
+            console.log("childTemplate: ", options.childTemplate);
+
+            if(options.childTemplate != undefined){
+                Selector.childTemplate = options.childTemplate;
+            }
+
             Selector.RootView = new Selector.OptionCompositeView({
                 collection: Selector.optionArrayPool,
                 displayKeys: options.displayKeys
             });
+
 
             Selector.Channel.trigger("notify", {
                 message: Selector.optionAllowedPool.length + " Profesores cargados.",
