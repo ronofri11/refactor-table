@@ -31,8 +31,8 @@ define([
     var App = new App("maintainer-app");
     var appChannel = App.Channel;
 
-    var url = "/darwined/backbreakers/";
-    // var url = "/clients/darwined";
+    // var url = "/darwined/backbreakers/";
+    var url = "/clients/darwined";
     // var url = "/clients/testing";
 
     App.startStore(url);

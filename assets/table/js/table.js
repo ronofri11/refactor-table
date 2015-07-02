@@ -28,10 +28,15 @@ define([
                 };
             },
             events: {
-                "click": "broadcastEvent",
-                contextmenu: "broadcastEvent"
+                "click .cell": "cellClick",
+                contextmenu: "cellRightClick"
+            },
+            modelEvents: {
+                "unselect": "unselect",
+                "select": "select"
             },
             initialize: function(){
+                this.model.set({"selected": false});
                 // this.listenTo(this.model, "change:selected", this.styling);
                 // this.listenTo(this.model, "model:modified", this.render);
             },
@@ -46,13 +51,18 @@ define([
                     this.$el.removeClass("selected");
                 }
             },
-            broadcastEvent: function(event){
+            cellClick: function(event){
                 event.stopPropagation();
                 event.preventDefault();
-                var eventName = "row:" + event.type;
-                Table.Channel.trigger(eventName, {eventName: eventName, model: this.model});
+                Table.Channel.trigger("row:click", {cell: $(event.target), row: this.model});
             },
-
+            cellRightClick: function(event){
+                event.stopPropagation();
+                event.preventDefault();
+                if($(event.target).hasClass("cell")){
+                    Table.Channel.trigger("row:contextmenu", {cell: $(event.target), row: this.model});
+                }
+            },
             extractCells: function(){
                 var cells = [];
                 var self = this;
@@ -61,7 +71,7 @@ define([
                     var type = column.get("type");
                     var cell = {};
 
-                    cell["key"] = column.get("key");
+                    cell["key"] = column.get("alias");
                     cell["display"] = this.model.getCellValue(column);
                     cell["width"] = column.get("max_text_width");
 
@@ -69,6 +79,20 @@ define([
                 }, this);
 
                 return cells;
+            },
+            unselect: function(args){
+                var column = args.column;
+                var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
+                cell.removeClass("selected");
+                this.model.set({"selected": false});
+                this.styling();
+            },
+            select: function(args){
+                var column = args.column;
+                var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
+                cell.addClass("selected");
+                this.model.set({"selected": true});
+                this.styling();
             }
         });
 
@@ -172,6 +196,8 @@ define([
                 windowSet: Table.windowSet
             });
 
+            Table.workingColumn = null;
+
             console.log("table in window rows:", Table.windowSet.length);
 
             Table.RootView = new LayoutView();
@@ -191,8 +217,8 @@ define([
                 return Table.RootView;
             });
 
-            Table.Channel.on("row:click", function(){
-                console.log("clicked row");
+            Table.Channel.on("row:click", function(args){
+                Table.singleSelection(args);
             });
 
             Table.Channel.on("row:contextmenu", function(){
@@ -247,14 +273,22 @@ define([
                             "title": col.title
                         });
                     }
+                    if(col.alias !== undefined){
+                        columnFromSchema.set({
+                            "alias": col.alias
+                        });
+                    }
+                    else{
+                        columnFromSchema.set({
+                            "alias": col.property
+                        });
+                    }
                     columnFromSchema.set({
                         "max_text_width": Table.getColumnWidth(columnFromSchema)
                     });
                     activeColumns.push(columnFromSchema);
                 }
             });
-
-            console.log("active columns", activeColumns);
 
             return activeColumns;
         };
@@ -365,6 +399,91 @@ define([
             }
 
             return pager;
+        };
+
+        Table.inBetweenSelection = function(args){
+            var row = args.row;
+            var cellKey = args.cell.data("key");
+
+            var startRow = Table.workingSet.findWhere({
+                "selected": true
+            });
+
+            if(startRow === undefined){
+                Table.singleSelection(args);
+            }
+            else{
+                if(Table.workingColumn.get("alias") === cellKey){
+                    var start = Table.workingSet.indexOf(startRow);
+                    var end = Table.workingSet.indexOf(row);
+
+                    if(end < start){
+                        var temp = start;
+                        start = end;
+                        end = temp;
+                    }
+
+                    for(var i = start; i <= end; i++){
+                        var currentRow = Table.workingSet.at(i);
+                        if(!currentRow.get("selected")){
+                            currentRow.trigger("select", {column: Table.workingColumn});
+                        }
+                    }
+                }
+                else{
+                   Table.singleSelection(args); 
+                }
+            }
+        };
+
+        Table.singleSelection = function(args){
+            var row = args.row;
+            var cellKey = args.cell.data("key");
+
+            var selectedRows = Table.workingSet.filter(function(row){
+                return row.get("selected");
+            });
+
+            _.each(selectedRows, function(row){
+                row.trigger("unselect", {column: Table.workingColumn});
+            });
+
+            Table.workingColumn = Table.columns.findWhere({"alias": cellKey});
+            if(Table.workingColumn === undefined){
+                Table.workingColumn = null;
+            }
+
+            row.trigger("select", {column: Table.workingColumn});
+        };
+
+        Table.addToSelection = function(args){
+            var row = args.row;
+            var cellKey = args.cell.data("key");
+
+            if(Table.workingColumn !== null){
+                if(Table.workingColumn.get("alias") !== cellKey){
+                    var selectedRows = Table.workingSet.filter(function(row){
+                        return row.get("selected");
+                    });
+
+                    _.each(selectedRows, function(row){
+                        row.trigger("unselect", {column: Table.workingColumn});
+                    });
+
+                    Table.workingColumn = Table.columns.findWhere({"alias": cellKey});
+                    if(Table.workingColumn === undefined){
+                        Table.workingColumn = null;
+                    }
+                }
+            }
+            else{
+                Table.workingColumn = Table.columns.findWhere({"alias": cellKey});
+                if(Table.workingColumn === undefined){
+                    Table.workingColumn = null;
+                }
+            }
+
+            row.trigger("select", {column: Table.workingColumn});
         };
 
         return Table;
