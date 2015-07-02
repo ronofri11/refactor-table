@@ -5,12 +5,13 @@ define([
     "../../appmodal/js/appmodal",
     "../../itemlist/js/itemlist",
     "../../selector/js/selector",
+    "../../usercard/js/usercard",
     "text!assets/appbar/templates/escenarios.html",
     "text!assets/appbar/templates/menuapps.html",
     "text!assets/appbar/templates/messages.html",
     "text!assets/appbar/templates/loginbar.html",
     "text!assets/appbar/templates/idioma.html",
-], function (Marionette, Radio, Shim, AppModal, ItemList, Selector, EscenariosTemplate, MenuAppsTemplate, MessagesTemplate, LoginBarTemplate, IdiomaTemplate) {
+], function (Marionette, Radio, Shim, AppModal, ItemList, Selector, UserCard, EscenariosTemplate, MenuAppsTemplate, MessagesTemplate, LoginBarTemplate, IdiomaTemplate) {
     var AppBarConstructor = function(channelName){
 
         var AppBar = new Marionette.Application();
@@ -64,6 +65,21 @@ define([
                             }()
                         }
                         break;
+
+                    case "loginbar":
+                        return{
+                            id: function(){
+                                return active.id;
+                            }(),
+                            nombre: function(){
+                                return active.nombre;
+                            }(),
+                            thumbnail: function(){
+                                return active.thumbnail;
+                            }()
+                        }
+                        break;
+
                 }
             },
             events: {
@@ -165,17 +181,34 @@ define([
                             }
                             thedata.push(item);
                         });
-                        // optionArray.push({id: 17, name: "mosca", content: "azul"});
 
                         // create collection
                         var datacollection = Backbone.Collection.extend();
                         var selectorcollection = new datacollection(thedata);
 
                         contentmodal.start({
+                            mainTemplate: "EscenarioSelectorTemplate",
                             childTemplate: "EscenarioOptionTemplate",
                             separator: "__",
                             displayKeys: ["name", "content"],
                             models: selectorcollection,
+                        });
+
+                        var ContentmodalView = contentmodalChannel.request("get:root");
+                        contentRegion.get("contentmodalregion").show(ContentmodalView);
+                        break;
+
+                    case "usercard":
+
+                        var contentmodal = new UserCard("contentmodal");
+                        var contentmodalChannel = contentmodal.Channel;
+
+                        console.log("args.modal.data: ", args.modal.data[0]);
+
+                        contentmodal.start({
+                            modalStuff: args.modal.data[0],
+                            // modalStuff: AppBar.collection,
+                            app: args.appName
                         });
 
                         var ContentmodalView = contentmodalChannel.request("get:root");

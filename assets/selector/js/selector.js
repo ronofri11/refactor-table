@@ -4,15 +4,14 @@ define([
     "radio.shim",
     "text!./../templates/selector.html",
     "text!./../templates/optiontemplate.html",
+    "text!./../templates/escenarioselectortemplate.html",
     "text!./../templates/escenarioptiontemplate.html"
-], function (Marionette, Radio, Shim, SelectorTemplate, OptionTemplate, EscenarioOptionTemplate) {
+], function (Marionette, Radio, Shim, SelectorTemplate, OptionTemplate, EscenarioSelectorTemplate, EscenarioOptionTemplate) {
 
     var SelectorConstructor = function(channelName){
 
         var Selector = new Marionette.Application();
         Selector.Channel = Radio.channel(channelName);
-
-
 
         Selector.OptionItemView = Marionette.ItemView.extend({
             tagName: "li",
@@ -106,7 +105,16 @@ define([
             className: "selector",
             childView: Selector.OptionItemView,
             childViewContainer: "ul",
-            template: _.template(SelectorTemplate),
+            getTemplate: function(){
+                switch(Selector.mainTemplate){
+                    case "EscenarioSelectorTemplate":
+                        return _.template(EscenarioSelectorTemplate);
+                        break;
+                    default:
+                        return _.template(SelectorTemplate);
+                        break;
+                }
+            },
             events: {
                 'focusin .searchbox input': 'toggleMglass',
                 'focusout .searchbox input': 'outMglass',
@@ -314,8 +322,14 @@ define([
 
             console.log("childTemplate: ", options.childTemplate);
 
+            // get child template
             if(options.childTemplate != undefined){
                 Selector.childTemplate = options.childTemplate;
+            }
+
+            // get main template
+            if(options.mainTemplate != undefined){
+                Selector.mainTemplate = options.mainTemplate;
             }
 
             Selector.RootView = new Selector.OptionCompositeView({

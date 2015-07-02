@@ -378,8 +378,6 @@ define([
             var dataAppbar = [
                 {
                     nombre: "escenarios",
-                    template: "escenarios",
-                    visible: false,
                     modal: {
                         asset: "selector",
                         data: scenarios
@@ -388,8 +386,6 @@ define([
                 {
                     nombre: "menuapps",
                     icon: "menuapps",
-                    template: "menuapps",
-                    visible: false,
                     modal: {
                         asset: "itemlist",
                         data: [
@@ -412,59 +408,51 @@ define([
                         ]
                     }
                 },
+                // {
+                //     nombre: "messages",
+                //     icon: "messages",
+                //     modal: {
+                //         asset: "listItems",
+                //         template: "messages",
+                //         messages: [
+                //             {
+                //                 id: "r654r",
+                //                 content: "mensaje1",
+                //                 type: "message",
+                //                 from: "user12"
+                //             },
+                //             {
+                //                 id: "re5re",
+                //                 content: "mensaje2",
+                //                 type: "warning",
+                //                 from: "system"
+                //             },
+                //             {
+                //                 id: "o988w",
+                //                 content: "mensaje2",
+                //                 type: "succes",
+                //                 from: "system"
+                //             }
+                //         ]
+                //     }
+                // },
                 {
-                    nombre: "messages",
-                    icon: "messages",
-                    template: "messages",
-                    visible: false,
+                    nombre: "loginbar",
                     modal: {
-                        asset: "listItems",
-                        template: "messages",
-                        messages: [
+                        asset: "usercard",
+                        data: [
                             {
-                                id: "r654r",
-                                content: "mensaje1",
-                                type: "message",
-                                from: "user12"
-                            },
-                            {
-                                id: "re5re",
-                                content: "mensaje2",
-                                type: "warning",
-                                from: "system"
-                            },
-                            {
-                                id: "o988w",
-                                content: "mensaje2",
-                                type: "succes",
-                                from: "system"
+                                active: true,
+                                id: "8y87a6y8a7",
+                                nombre: "Felipe Meneses",
+                                thumbnail: "4908651.png",
+                                profile: "admin"
                             }
                         ]
                     }
                 },
                 {
-                    nombre: "loginbar",
-                    active_user: {
-                        nombre: "Felipe Meneses",
-                        thumbnail: "4908651.png"
-                    },
-                    template: "escenarios",
-                    visible: false,
-                    modal: {
-                        asset: "userstatus",
-                        template: "userstatus",
-                        info: {
-                            id: "8y87a6y8a7",
-                            nombre: "Felipe Meneses",
-                            thumbnail: "4908651.png",
-                            profile: "admin"
-                        }
-                    }
-                },
-                {
                     nombre: "idioma",
-                    template: "idioma",
-                    visible: false,
                     modal: {
                         asset: "itemlist",
                         data: [
