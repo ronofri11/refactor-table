@@ -31,10 +31,16 @@ define([
             store.start({url: url});
 
             var rows;
-            var modelName = "Curso";
+            var scheduleModel;
+            var tableRows;
+
+            var modelName = "Profesor";
+            var scheduleName = "Schedule";
 
             App.Channel.listenTo(storeChannel, "end:configuration", function(){
                 storeChannel.command("fetch:chain:for", {modelName: modelName});
+                storeChannel.command("fetch:chain:for", {modelName: scheduleName});
+                storeChannel.command("fetch:chain:for", {modelName: "Curso"});
             });
 
             App.Channel.listenTo(storeChannel, "store:model:loaded", function(args){
@@ -43,13 +49,26 @@ define([
                         rows = storeChannel.request("get:models", {modelName: modelName});
                         App.Channel.trigger("request:complete", args);
                         break;
+                    case scheduleName:
+                        var scheduleCollection = storeChannel.request("get:models", {modelName: "Schedule"});
+                        scheduleModel = scheduleCollection.at(0);
+                        App.Channel.trigger("request:complete", args);
+                        break;
+                    case "Curso":
+                        tableRows = storeChannel.request("get:models", {modelName: "Curso"});
+                        App.Channel.trigger("request:complete", args);
+                        break;
                 }
             });
 
             App.Channel.on("request:complete", function(args){
-                if(rows !== undefined){
+                if(rows !== undefined && scheduleModel !== undefined && tableRows !== undefined){
                     var schema = storeChannel.request("get:schema:for", {
                         modelName: modelName
+                    });
+
+                    var tableSchema = storeChannel.request("get:schema:for", {
+                        modelName: "Curso"
                     });
 
                     App.modesDict = {
@@ -58,6 +77,7 @@ define([
                             layout: "fullpage",
                             channelName: "mode1",
                             iconClass: "edit",
+                            type: "table",
                             components: {
                                 table: {
                                     title: "",
@@ -165,8 +185,8 @@ define([
                                             separator: ".",
                                             recordsPerPage: 100,
                                             pagesPerSheet: 10,
-                                            rows: rows,
-                                            schema: schema,
+                                            rows: tableRows,
+                                            schema: tableSchema,
                                             columns:[
                                                 {
                                                     property: "sede",
@@ -219,63 +239,161 @@ define([
                         },
                         edit2: {
                             name:"edit2",
-                            layout: "columnHeaderMainflip",
+                            layout: "columnHeaderMain",
                             channelName: "mode2",
                             iconClass: "import",
+                            type: "grid",
                             components: {
-                                table: {
-                                    title: "",
-                                    channelName: "mode2_table",
-                                    region: "main",
-                                    controls: [],
+                                selector: {
+                                    title: "Profesor",
+                                    channelName: "selector",
+                                    region: "columnLeft",
+                                    controls: [
+                                        {
+                                            align: "left",
+                                            class: "btn addNew",
+                                            states: {
+                                                default: {
+                                                    event: "custom:control:one",
+                                                    args: {modelName: "Profesor"},
+                                                    transition: "default"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            align: "left",
+                                            class: "btn trash",
+                                            states: {
+                                                default: {
+                                                    event: "custom:control:two",
+                                                    transition: "default"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            align: "left",
+                                            class: "btn undo",
+                                            states: {
+                                                default: {
+                                                    event: "custom:control:three",
+                                                    transition: "default"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn removeFilters",
+                                            states: {
+                                                default: {
+                                                    event: "remove:active:filters",
+                                                    transition: "default"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn filterModified",
+                                            states: {
+                                                default: {
+                                                    event: "filter:modified",
+                                                    transition: "press"
+                                                },
+                                                press: {
+                                                    event: "remove:active:filters",
+                                                    class: "press",
+                                                    transition: "default"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn filterNew",
+                                            states: {
+                                                default: {
+                                                    event: "filter:new",
+                                                    transition: "press"
+                                                },
+                                                press: {
+                                                    event: "remove:active:filters",
+                                                    class: "press",
+                                                    transition: "default"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn filterDeleted",
+                                            states: {
+                                                default: {
+                                                    event: "filter:deleted",
+                                                    transition: "press"
+                                                },
+                                                press: {
+                                                    event: "remove:active:filters",
+                                                    class: "press",
+                                                    transition: "default"
+                                                }
+                                            }
+                                        }
+                                    ],
                                     asset: {
-                                        class: "table",
+                                        class: "selector",
                                         initOptions: {},
                                         startOptions:{
-                                            separator: ".",
-                                            recordsPerPage: 10,
-                                            pagesPerSheet: 20,
-                                            rows: rows,
-                                            schema: schema,
-                                            columns:[
-                                                {
-                                                    property: "sede",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente"]
-                                                },
-                                                {
-                                                    property: "escuela",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente"]
-                                                },
-                                                {
-                                                    property: "regimen",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente"]
-                                                },
-                                                {
-                                                    property: "jornada",
-                                                    nested: true,
-                                                    displayKeys: ["codigo"]
-                                                },
-                                                {
-                                                    property: "carrera",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente", "planestudio"],
-                                                    alias: "carrera_planestudio"
-                                                },
-                                                {
-                                                    property: "codigo_cliente"
-                                                },
-                                                {
-                                                    property: "nombre"
-                                                },
-                                                {
-                                                    property: "semestre"
-                                                }
-                                            ]
+                                            displayKeys: ["nombre_virtual", "codigo_virtual"],
+                                            models: rows,
+                                            newDisplay: "Nuevo Profesor"
                                         }
+                                    }
+                                },
+                                schedule: {
+                                    title: "Disponibilidad",
+                                    channelName: "schedule",
+                                    region: "main",
+                                    controls: [
+                                        {
+                                            align: "right",
+                                            class: "btn btnNew",
+                                            states: {
+                                                default: {
+                                                    event: "change:mode",
+                                                    args: {modelName: "create"},
+                                                    transition: "default"
+                                                }
+                                            }
 
+                                        },
+                                        {
+                                            align: "right",
+                                            class: "btn btnDeleted",
+                                            states: {
+                                                default: {
+                                                    event: "change:mode",
+                                                    args: {mode: "delete"},
+                                                    transition: "default"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    asset: {
+                                        class: "schedule",
+                                        initOptions: {},
+                                        startOptions:{
+                                            source: scheduleModel
+                                        }
+                                    }
+                                },
+                                simpleform: {
+                                    title: "Datos básicos",
+                                    channelName: "simpleform",
+                                    region: "header",
+                                    controls: [],
+                                    asset: {
+                                        class: "simpleform",
+                                        initOptions: {},
+                                        startOptions:{
+                                            schema: schema
+                                        }
                                     }
                                 }
                             }
@@ -554,7 +672,7 @@ define([
             var maintainer = new Maintainer("maintainer");
             var maintainerChannel = maintainer.Channel;
             maintainer.start({
-                title: "Mantenedor Cursos",
+                title: "Mantenedor Demo",
                 modes: App.modesDict
             });
 

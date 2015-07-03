@@ -3,9 +3,10 @@ define([
     "backbone.radio",
     "radio.shim",
     "mode",
+    "gridmode",
     "text!templates/maintainer.html",
     "text!templates/modeselector.html"
-], function (Marionette, Radio, Shim, Mode, maintainerTemplate, modeSelectorTemplate) {
+], function (Marionette, Radio, Shim, Mode, GridMode, maintainerTemplate, modeSelectorTemplate) {
     
     var MaintainerConstructor = function(channelName){
         var Maintainer = new Marionette.Application();
@@ -139,7 +140,14 @@ define([
                 if(Maintainer.activeKey === undefined){
                     Maintainer.activeKey = key;
                 }
-                Maintainer.modes[key] = new Mode(options.modes[key]);
+                switch(options.modes[key].type){
+                    case "table":
+                        Maintainer.modes[key] = new Mode(options.modes[key]);
+                        break;
+                    case "grid":
+                        Maintainer.modes[key] = new GridMode(options.modes[key]);
+                        break;
+                }
             }
 
             Maintainer.modes[Maintainer.activeKey].start();

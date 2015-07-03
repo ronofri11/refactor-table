@@ -6,8 +6,9 @@ define([
     "../../assets/schedule/js/schedule",
     "../../assets/cardsform/js/cardsform",
     "../../assets/simpleform/js/simpleform",
+    "../../assets/selector/js/selector",
     "text!component/templates/componentTemplate.html"
-], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, ComponentTemplate) {
+], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, Selector, ComponentTemplate) {
 
 var ComponentConstructor = function(dataComponent){
         var Component = new Marionette.Application();
@@ -170,7 +171,6 @@ var ComponentConstructor = function(dataComponent){
         Component.getAsset = function(){
             switch(Component.Model.get("asset").class){
                 case "table":
-                    console.log("table class!");
                     return Table;
                 case "schedule":
                     return Schedule;
@@ -178,6 +178,8 @@ var ComponentConstructor = function(dataComponent){
                     return CardsForm;
                 case "simpleform":
                     return SimpleForm;
+                case "selector":
+                    return Selector;
                 default:
                     return Table;
                 //to be continued...
