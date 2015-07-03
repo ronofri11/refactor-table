@@ -53,14 +53,15 @@ define([
                     });
 
                     App.modesDict = {
-                        edit: {
+                        edit1: {
                             name:"edit1",
                             layout: "fullpage",
                             channelName: "mode1",
+                            iconClass: "edit",
                             components: {
                                 table: {
                                     title: "",
-                                    channelName: "table",
+                                    channelName: "mode1_table",
                                     region: "main",
                                     controls: [
                                         {
@@ -199,6 +200,69 @@ define([
                                                     displayKeys: ["planestudio"],
                                                     title: "PLAN DE ESTUDIO",
                                                     alias: "planestudio"
+                                                },
+                                                {
+                                                    property: "codigo_cliente"
+                                                },
+                                                {
+                                                    property: "nombre"
+                                                },
+                                                {
+                                                    property: "semestre"
+                                                }
+                                            ]
+                                        }
+
+                                    }
+                                }
+                            }
+                        },
+                        edit2: {
+                            name:"edit2",
+                            layout: "columnHeaderMainflip",
+                            channelName: "mode2",
+                            iconClass: "import",
+                            components: {
+                                table: {
+                                    title: "",
+                                    channelName: "mode2_table",
+                                    region: "main",
+                                    controls: [],
+                                    asset: {
+                                        class: "table",
+                                        initOptions: {},
+                                        startOptions:{
+                                            separator: ".",
+                                            recordsPerPage: 10,
+                                            pagesPerSheet: 20,
+                                            rows: rows,
+                                            schema: schema,
+                                            columns:[
+                                                {
+                                                    property: "sede",
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente"]
+                                                },
+                                                {
+                                                    property: "escuela",
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente"]
+                                                },
+                                                {
+                                                    property: "regimen",
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente"]
+                                                },
+                                                {
+                                                    property: "jornada",
+                                                    nested: true,
+                                                    displayKeys: ["codigo"]
+                                                },
+                                                {
+                                                    property: "carrera",
+                                                    nested: true,
+                                                    displayKeys: ["codigo_cliente", "planestudio"],
+                                                    alias: "carrera_planestudio"
                                                 },
                                                 {
                                                     property: "codigo_cliente"

@@ -83,14 +83,14 @@ define([
             unselect: function(args){
                 var column = args.column;
                 var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
-                cell.removeClass("selected");
+                cell.removeClass("selectedCell");
                 this.model.set({"selected": false});
                 this.styling();
             },
             select: function(args){
                 var column = args.column;
                 var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
-                cell.addClass("selected");
+                cell.addClass("selectedCell");
                 this.model.set({"selected": true});
                 this.styling();
             }
@@ -197,6 +197,7 @@ define([
             });
 
             Table.workingColumn = null;
+            Table.mode = "single";
 
             console.log("table in window rows:", Table.windowSet.length);
 
@@ -217,12 +218,30 @@ define([
                 return Table.RootView;
             });
 
+            Table.Channel.on("change:mode", function(args){
+                Table.mode = args.mode;
+            });
+
             Table.Channel.on("row:click", function(args){
-                Table.singleSelection(args);
+                switch(Table.mode){
+                    case "append":
+                        Table.addToSelection(args);
+                        break;
+                    case "between":
+                        Table.inBetweenSelection(args);
+                        break;
+                    default: //single mode
+                        Table.singleSelection(args);
+                }
             });
 
             Table.Channel.on("row:contextmenu", function(){
                 console.log("contextmenu row");
+            });
+
+            Table.Channel.on("print:selection:count", function(){
+                var selection = Table.getSelectedRows();
+                console.log("selection count:", selection.length);
             });
 
             Table.Channel.on("remove:active:filters", function(){
@@ -231,6 +250,10 @@ define([
 
             Table.Channel.listenTo(Table.Headers.Channel, "sort:column", function(args){
                 Table.Filters.Channel.trigger("run:filters");
+            });
+
+            Table.Channel.listenTo(Table.windowSet, "reset", function(){
+                Table.emptySelection();
             });
         });
 
@@ -462,10 +485,10 @@ define([
 
             if(Table.workingColumn !== null){
                 if(Table.workingColumn.get("alias") !== cellKey){
+
                     var selectedRows = Table.workingSet.filter(function(row){
                         return row.get("selected");
                     });
-
                     _.each(selectedRows, function(row){
                         row.trigger("unselect", {column: Table.workingColumn});
                     });
@@ -483,7 +506,26 @@ define([
                 }
             }
 
-            row.trigger("select", {column: Table.workingColumn});
+            if(row.get("selected")){
+                row.trigger("unselect", {column: Table.workingColumn});
+            }
+            else{
+                row.trigger("select", {column: Table.workingColumn});
+            }
+        };
+
+        Table.getSelectedRows = function(){
+            return Table.workingSet.filter(function(row){
+                return row.get("selected");
+            });
+        };
+
+        Table.emptySelection = function(){
+            var selectedRows = Table.getSelectedRows();
+            _.each(selectedRows, function(row){
+                row.trigger("unselect", {column: Table.workingColumn});
+            });
+            Table.workingColumn = null;
         };
 
         return Table;

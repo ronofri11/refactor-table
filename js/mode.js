@@ -75,24 +75,26 @@ define([
             }
         });
 
-        Mode.RootView = new ContentLayoutView();
-        Mode.RootView.addRegion("main", ".region.main");
-        Mode.RootView.addRegion("mainFlip", ".region.mainFlip");
-        Mode.RootView.addRegion("header", ".region.header");
-        Mode.RootView.addRegion("columnLeft", ".region.columnLeft");
-
-        var channelName = dataMode.channelName;
-        Mode.Channel = Radio.channel(channelName);
-
-        // component
-        Mode.components = {};
-
-        for(var key in dataMode.components){
-            console.log(key, dataMode.components[key]);
-            Mode.components[key] = new Component(dataMode.components[key]);
-        }
 
         Mode.on("start", function(options){
+
+            Mode.RootView = new ContentLayoutView();
+            Mode.RootView.addRegion("main", ".region.main");
+            Mode.RootView.addRegion("mainFlip", ".region.mainFlip");
+            Mode.RootView.addRegion("header", ".region.header");
+            Mode.RootView.addRegion("columnLeft", ".region.columnLeft");
+
+            var channelName = dataMode.channelName;
+            Mode.Channel = Radio.channel(channelName);
+
+            // component
+            Mode.components = {};
+
+            for(var key in dataMode.components){
+                console.log(key, dataMode.components[key]);
+                Mode.components[key] = new Component(dataMode.components[key]);
+            }
+            
             var tableChannel = Mode.components["table"].Channel;
 
             Mode.Channel.listenTo(tableChannel, "notify", function(args){
@@ -151,19 +153,37 @@ define([
                 }
             });
 
-            $(document).on("keyup", function(event){
-                switch(event.which){
-                    case 38: //UP
-                        tableChannel.trigger("option:prev");
-                        event.preventDefault();
-                        break;
-                    case 40: //DOWN
-                        tableChannel.trigger("option:next");
-                        event.preventDefault();
-                        break;
+            $(window).keydown(function(event) {
+                if(event.ctrlKey || event.metaKey){
+                    tableChannel.trigger("change:mode", {mode: "append"});
                 }
-                event.stopPropagation();
+                else if(event.shiftKey){
+                    tableChannel.trigger("change:mode", {mode: "between"});
+                }
             });
+
+            $(window).keyup(function(event) {
+                if(!event.ctrlKey && !event.metaKey && !event.shiftKey){
+                    tableChannel.trigger("change:mode", {mode: "single"});
+                }
+                if(event.which === 83){//letter S
+                    tableChannel.trigger("print:selection:count");
+                }
+            });
+
+            // $(document).on("keyup", function(event){
+            //     switch(event.which){
+            //         case 38: //UP
+            //             tableChannel.trigger("option:prev");
+            //             event.preventDefault();
+            //             break;
+            //         case 40: //DOWN
+            //             tableChannel.trigger("option:next");
+            //             event.preventDefault();
+            //             break;
+            //     }
+            //     event.stopPropagation();
+            // });
 
         };
 
