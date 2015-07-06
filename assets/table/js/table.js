@@ -255,6 +255,21 @@ define([
             Table.Channel.listenTo(Table.windowSet, "reset", function(){
                 Table.emptySelection();
             });
+
+            Table.Channel.reply("get:selection", function(){
+                return {
+                    column: Table.workingColumn,
+                    rows: Table.getSelectedRows()
+                };
+            });
+
+            Table.Channel.reply("get:context:selector", function(){
+                return Table.RootView.$el;
+            });
+
+            Table.Channel.on("empty:selection", function(){
+                Table.emptySelection();
+            });
         });
 
         Table.initValues = function(options){
@@ -424,58 +439,19 @@ define([
             return pager;
         };
 
-        Table.inBetweenSelection = function(args){
-            var row = args.row;
-            var cellKey = args.cell.data("key");
-
-            var startRow = Table.workingSet.findWhere({
-                "selected": true
-            });
-
-            if(startRow === undefined){
-                Table.singleSelection(args);
-            }
-            else{
-                if(Table.workingColumn.get("alias") === cellKey){
-                    var start = Table.workingSet.indexOf(startRow);
-                    var end = Table.workingSet.indexOf(row);
-
-                    if(end < start){
-                        var temp = start;
-                        start = end;
-                        end = temp;
-                    }
-
-                    for(var i = start; i <= end; i++){
-                        var currentRow = Table.workingSet.at(i);
-                        if(!currentRow.get("selected")){
-                            currentRow.trigger("select", {column: Table.workingColumn});
-                        }
-                    }
-                }
-                else{
-                   Table.singleSelection(args); 
-                }
-            }
-        };
-
         Table.singleSelection = function(args){
             var row = args.row;
             var cellKey = args.cell.data("key");
 
-            var selectedRows = Table.workingSet.filter(function(row){
-                return row.get("selected");
-            });
+            Table.emptySelection();
 
-            _.each(selectedRows, function(row){
-                row.trigger("unselect", {column: Table.workingColumn});
-            });
-
-            Table.workingColumn = Table.columns.findWhere({"alias": cellKey});
-            if(Table.workingColumn === undefined){
+            var currentWorkingColumn = Table.columns.findWhere({"alias": cellKey});
+            if(currentWorkingColumn === undefined){
                 Table.workingColumn = null;
             }
-
+            else{
+                Table.workingColumn = currentWorkingColumn;
+            }
             row.trigger("select", {column: Table.workingColumn});
         };
 
@@ -483,41 +459,48 @@ define([
             var row = args.row;
             var cellKey = args.cell.data("key");
 
-            if(Table.workingColumn !== null){
-                if(Table.workingColumn.get("alias") !== cellKey){
-
-                    var selectedRows = Table.workingSet.filter(function(row){
-                        return row.get("selected");
-                    });
-                    _.each(selectedRows, function(row){
-                        row.trigger("unselect", {column: Table.workingColumn});
-                    });
-
-                    Table.workingColumn = Table.columns.findWhere({"alias": cellKey});
-                    if(Table.workingColumn === undefined){
-                        Table.workingColumn = null;
-                    }
-                }
-            }
-            else{
-                Table.workingColumn = Table.columns.findWhere({"alias": cellKey});
-                if(Table.workingColumn === undefined){
-                    Table.workingColumn = null;
-                }
-            }
-
             if(row.get("selected")){
                 row.trigger("unselect", {column: Table.workingColumn});
+            }
+            else if(Table.workingColumn === null){
+                Table.singleSelection(args);
+            }
+            else if(Table.workingColumn.get("alias") !== cellKey){
+                Table.singleSelection(args);
             }
             else{
                 row.trigger("select", {column: Table.workingColumn});
             }
         };
 
+        Table.inBetweenSelection = function(args){
+            var row = args.row;
+            var cellKey = args.cell.data("key");
+
+            var selectedRows = Table.getSelectedRows();
+
+            if(selectedRows.length === 0 || Table.workingColumn.get("alias") !== cellKey){
+                Table.singleSelection(args);
+            }
+            else{
+                var start = Table.workingSet.indexOf(selectedRows[0]);
+                var end = Table.workingSet.indexOf(selectedRows[selectedRows.length - 1]);
+                var current = Table.workingSet.indexOf(row);
+
+                start = Math.min(start, current);
+                end = Math.max(end, current);
+
+                for(var i = start; i <= end; i++){
+                    var currentRow = Table.workingSet.at(i);
+                    if(!currentRow.get("selected")){
+                        currentRow.trigger("select", {column: Table.workingColumn});
+                    }
+                }
+            }
+        };
+
         Table.getSelectedRows = function(){
-            return Table.workingSet.filter(function(row){
-                return row.get("selected");
-            });
+            return Table.workingSet.where({"selected": true});
         };
 
         Table.emptySelection = function(){

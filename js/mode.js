@@ -75,7 +75,6 @@ define([
             }
         });
 
-
         Mode.on("start", function(options){
 
             Mode.RootView = new ContentLayoutView();
@@ -168,6 +167,13 @@ define([
                 }
                 if(event.which === 83){//letter S
                     tableChannel.trigger("print:selection:count");
+                }
+            });
+
+            $(document).on("click", function(event){
+                var tableContext = tableChannel.request("get:context:selector");
+                if($(event.target).not(tableContext)){
+                    tableChannel.trigger("empty:selection");
                 }
             });
 
