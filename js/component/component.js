@@ -179,7 +179,8 @@ var ComponentConstructor = function(dataComponent){
                 case "simpleform":
                     return SimpleForm;
                 default:
-                    return Table;
+                    alert("The required component is not defined");
+                    return undefined;
                 //to be continued...
             }
         };
