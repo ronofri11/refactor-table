@@ -5,8 +5,9 @@ define([
     "component/component",
     "text!templates/regions/fullpage.html",
     "text!templates/regions/columnHeaderMain.html",
-    "text!templates/regions/columnHeaderMainflip.html"
-], function (Marionette, Radio, Shim, Component, fullpageTemplate, columnHeaderMainTemplate, columnHeaderMainflipTemplate) {
+    "text!templates/regions/columnHeaderMainflip.html",
+    "text!templates/regions/mainFooterColumn.html",
+], function (Marionette, Radio, Shim, Component, fullpageTemplate, columnHeaderMainTemplate, columnHeaderMainflipTemplate, MainFooterColumnTemplate) {
 
     var ModeConstructor = function(dataMode){
         var Mode = new Marionette.Application();
@@ -20,6 +21,9 @@ define([
                         return _.template(columnHeaderMainflipTemplate);
                     case "columnHeaderMain":
                         return _.template(columnHeaderMainTemplate);
+                    case "mainFooterColumn":
+                        return _.template(MainFooterColumnTemplate);
+
                 }
             },
             onShow: function(){
@@ -93,7 +97,7 @@ define([
                 console.log(key, dataMode.components[key]);
                 Mode.components[key] = new Component(dataMode.components[key]);
             }
-            
+
             var tableChannel = Mode.components["table"].Channel;
 
             Mode.Channel.listenTo(tableChannel, "notify", function(args){
@@ -145,7 +149,7 @@ define([
                 console.log("added new model");
             });
 
-            $(window).keydown(function(event) { 
+            $(window).keydown(function(event) {
                 if((event.ctrlKey || event.metaKey) && event.keyCode == 83) {
                     Mode.Channel.trigger("save:models", {modelName: "Asignatura"});
                     event.preventDefault();

@@ -217,9 +217,9 @@ define([
                                 }
                             }
                         },
-                        edit2: {
-                            name:"edit2",
-                            layout: "columnHeaderMainflip",
+                        import1: {
+                            name:"import1",
+                            layout: "mainFooterColumn",
                             channelName: "mode2",
                             iconClass: "import",
                             components: {
