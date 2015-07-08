@@ -3,10 +3,11 @@ define([
     "backbone.radio",
     "radio.shim",
     "mode",
+    "modeimport",
     "text!templates/maintainer.html",
     "text!templates/modeselector.html"
-], function (Marionette, Radio, Shim, Mode, maintainerTemplate, modeSelectorTemplate) {
-    
+], function (Marionette, Radio, Shim, Mode, ModeImport, maintainerTemplate, modeSelectorTemplate) {
+
     var MaintainerConstructor = function(channelName){
         var Maintainer = new Marionette.Application();
         Maintainer.Channel = Radio.channel(channelName);
@@ -62,7 +63,7 @@ define([
             childView: ModeItemView,
             template: _.template(modeSelectorTemplate),
             childViewContainer: ".options",
-            
+
             events: {
                 "mouseenter.modeselector" : "modeButton",
                 "mouseleave.modeselector" : "hideOptions",
@@ -73,7 +74,7 @@ define([
                 var modeActive = this.collection.findWhere({"active": true});
                 Maintainer.Channel.trigger("update:action:button", {
                     iconClass: modeActive.get("iconClass")
-                });                
+                });
                 return {
                     activeKey: modeActive.get("key"),
                     activeIconClass: modeActive.get("iconClass"),
@@ -123,8 +124,6 @@ define([
                 };
             });
 
-            console.log("array modeOptions", modeOptions);
-
             Maintainer.modeOptions = new Collection(modeOptions);
 
             if(Maintainer.modeOptions.length > 0){
@@ -139,7 +138,14 @@ define([
                 if(Maintainer.activeKey === undefined){
                     Maintainer.activeKey = key;
                 }
-                Maintainer.modes[key] = new Mode(options.modes[key]);
+                switch(options.modes[key].type){
+                    case "table":
+                        Maintainer.modes[key] = new Mode(options.modes[key]);
+                        break;
+                    case "uploadDrag":
+                        Maintainer.modes[key] = new ModeImport(options.modes[key]);
+                        break;
+                }
             }
 
             Maintainer.modes[Maintainer.activeKey].start();
@@ -156,14 +162,13 @@ define([
             });
 
             Maintainer.Channel.on("change:active:mode", function(args){
-                console.log(args.key);
                 var activeKey = args.key;
                 if(Maintainer.activeKey !== activeKey){
                     Maintainer.RootView.getRegion("container").reset();
 
                     var previousMode = Maintainer.modes[Maintainer.activeKey];
                     previousMode.trigger("stop");
-                    
+
                     var mode = Maintainer.modes[activeKey];
                     mode.start();
 

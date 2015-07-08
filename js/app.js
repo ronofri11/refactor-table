@@ -58,6 +58,7 @@ define([
                             layout: "fullpage",
                             channelName: "mode1",
                             iconClass: "edit",
+                            type: "table",
                             components: {
                                 table: {
                                     title: "",
@@ -222,62 +223,88 @@ define([
                             layout: "mainFooterColumn",
                             channelName: "mode2",
                             iconClass: "import",
+                            type: "uploadDrag",
                             components: {
-                                table: {
+                                uploadDrag: {
                                     title: "",
-                                    channelName: "mode2_table",
+                                    channelName: "mode2_uploadDrag",
                                     region: "main",
                                     controls: [],
                                     asset: {
-                                        class: "table",
+                                        class: "uploadDrag",
                                         initOptions: {},
                                         startOptions:{
-                                            separator: ".",
-                                            recordsPerPage: 10,
-                                            pagesPerSheet: 20,
-                                            rows: rows,
-                                            schema: schema,
-                                            columns:[
+                                            action: "/clients/darwined_demo/salas/exportar",
+                                            multiple: false
+                                        }
+                                    }
+                                },
+                                options: {
+                                    title: "",
+                                    channelName: "mode2_options",
+                                    region: "columnRight",
+                                    controls: [],
+                                    asset: {
+                                        class: "options",
+                                        initOptions: {},
+                                        startOptions:{
+                                            options: [
                                                 {
-                                                    property: "sede",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente"]
+                                                    type: "checkbox",
+                                                    content: "inferir listas cruzadas",
+                                                    value: "listacruzada"
                                                 },
                                                 {
-                                                    property: "escuela",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente"]
+                                                    type: "checkbox",
+                                                    content: "reemplazar todos los datos",
+                                                    value: "reemplaza"
                                                 },
                                                 {
-                                                    property: "regimen",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente"]
-                                                },
-                                                {
-                                                    property: "jornada",
-                                                    nested: true,
-                                                    displayKeys: ["codigo"]
-                                                },
-                                                {
-                                                    property: "carrera",
-                                                    nested: true,
-                                                    displayKeys: ["codigo_cliente", "planestudio"],
-                                                    alias: "carrera_planestudio"
-                                                },
-                                                {
-                                                    property: "codigo_cliente"
-                                                },
-                                                {
-                                                    property: "nombre"
-                                                },
-                                                {
-                                                    property: "semestre"
+                                                    type: "checkbox",
+                                                    content: "validar solo planilla",
+                                                    value: "planilla"
                                                 }
                                             ]
                                         }
-
+                                    }
+                                },
+                                download: {
+                                    title: "",
+                                    channelName: "mode2_import",
+                                    region: "footer",
+                                    controls: [],
+                                    asset: {
+                                        class: "download",
+                                        initOptions: {},
+                                        startOptions:{
+                                            action: "ruta/descarga/matriz",
+                                            options: [
+                                                {
+                                                    type: "button",
+                                                    nombre: "DESCARGA MATRIZ",
+                                                    className: "descargamatriz",
+                                                    icon: "plantilla"
+                                                },
+                                                {
+                                                    type: "select",
+                                                    nombre: "Período",
+                                                    className: "periodo",
+                                                    options: [
+                                                        {
+                                                            nombre: "opción 1",
+                                                            value: "valor1"
+                                                        },
+                                                        {
+                                                            nombre: "opción 2",
+                                                            value: "valor2"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
+
                             }
                         }
                     };

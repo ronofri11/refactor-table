@@ -1,0 +1,133 @@
+//// setting custom class ////
+@font-face{font-family:'Open Sans';font-style:normal;font-weight:normal;src:local('Open Sans'),local('OpenSans'),url('../../css/fonts/OpenSans-Regular.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:300;src:local('Open Sans'),local('OpenSans'),url('../../css/fonts/OpenSans-Light.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:700;src:local('Open Sans'),local('OpenSans'),url('../../css/fonts/OpenSans-Bold.ttf') format('truetype')}
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.centervertical
+{
+  position: absolute;
+  top: 50%;
+
+  .translate(0, -50%);
+
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.box-sizing(@box: border-box)
+{
+    -webkit-box-sizing: @box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: @box;    /* Firefox, other Gecko */
+    box-sizing: @box;         /* Opera/IE 8+ */
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+//////// STYLE ///////
+
+.download
+{
+  width: 100%;
+  padding: 0 3%;
+  .centervertical;
+
+  > #download
+  {
+    width: 100%;
+
+    .options
+    {
+      > .item
+      {
+        float: left;
+        margin: 0 1%;
+
+        > button
+        {
+          height: 46px;
+          box-sizing: border-box;
+          display: inline-block;
+          background-color: #fff;
+          border: 1px solid #acbbc6;
+          color: #acbbc6;
+          font-size: 10px;
+          padding: 6px 10px;
+          cursor: pointer;
+          .border-radius;
+
+          > span
+          {
+            width: 33px;
+            height: 32px;
+            display: block;
+            background-size: 33px;
+            float: left;
+            .noselect
+          }
+
+          > .name
+          {
+            width: auto;
+            margin: 0 10px;
+            margin-top: 10px;
+          }
+
+          > .plantilla
+          {
+              background-image: url(../img/plantilla.svg);
+          }
+        }
+
+        > select
+        {
+          box-sizing: border-box;
+          display: inline-block;
+          background-color: #fff;
+          border: 1px solid #acbbc6;
+          color: #acbbc6;
+          font-size: 10px;
+          cursor: pointer;
+          .border-radius(15px);
+          .centervertical;
+        }
+      }
+    }
+
+  }
+}
+
+
+
+
+

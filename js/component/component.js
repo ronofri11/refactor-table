@@ -6,8 +6,11 @@ define([
     "../../assets/schedule/js/schedule",
     "../../assets/cardsform/js/cardsform",
     "../../assets/simpleform/js/simpleform",
+    "../../assets/uploadDrag/js/uploadDrag",
+    "../../assets/options/js/options",
+    "../../assets/download/js/download",
     "text!component/templates/componentTemplate.html"
-], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, ComponentTemplate) {
+], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, UploadDrag, Options, Download, ComponentTemplate) {
 
 var ComponentConstructor = function(dataComponent){
         var Component = new Marionette.Application();
@@ -111,37 +114,51 @@ var ComponentConstructor = function(dataComponent){
                 var controlsPointer = this.$el.find(".controls");
                 var content = this.$el.find(".content");
 
-                if(title === "" || title === null || title === undefined){
+                if(title === "" && controls.length == 0){
                     // eliminate header
                     header.hide();
-                    // add title height to content height
-                    var titleHeight = 0;
-                }else{
-                    var titleHeight = header.outerHeight();
-                }
 
-                if(controls.length == 0 || controls == null){
-                    // eliminate header
+                    // eliminate controls
                     controlsPointer.hide();
-                    // add title height to content height
-                    var controlsHeight = 0;
+
+                    // put height full height
+                    this.$el.find(".content").css({"height": "100%"});
                 }else{
-                    var controlsHeight = controlsPointer.outerHeight();
+                    if(title === "" || title === null || title === undefined){
+                        // eliminate header
+                        header.hide();
+
+                        // add title height to content height
+                        var titleHeight = 0;
+                    }else{
+                        var titleHeight = header.outerHeight();
+                    }
+
+                    if(controls.length == 0 || controls == null){
+                        // eliminate controls
+                        controlsPointer.hide();
+                        // add title height to content height
+                        var controlsHeight = 0;
+                    }else{
+                        var controlsHeight = controlsPointer.outerHeight();
+                    }
+
+                    // get region parent dimentions
+                    var regionHeight = this.$el.parent().outerHeight() - parseInt( this.$el.parent().css("padding") ) * 2;
+
+
+                    // set content height
+                    var baseContentHeight = regionHeight - titleHeight - controlsHeight;
+
+                    if(baseContentHeight < 65){
+                        baseContentHeight = 65;
+                    }
+
+                    // put height to content
+                    this.$el.find(".content").height(baseContentHeight + "px");
+
                 }
 
-                // get region parent dimentions
-                var regionHeight = this.$el.parent().outerHeight() - parseInt( this.$el.parent().css("padding") ) * 2;
-
-
-                // set content height
-                var baseContentHeight = regionHeight - titleHeight - controlsHeight;
-
-                if(baseContentHeight < 65){
-                    baseContentHeight = 65;
-                }
-
-                // put height to content
-                this.$el.find(".content").height(baseContentHeight + "px");
             }
         });
 
@@ -157,12 +174,14 @@ var ComponentConstructor = function(dataComponent){
             Component.Asset = new AssetClass(Component.Model.get("channelName"));
         });
         Component.on("start", function(options){
+
             Component.Asset.start(Component.Model.get("asset").startOptions);
             Component.Channel.reply("get:component:root", function(){
                 return Component.RootView;
             });
             Component.RootView.on("show", function(){
                 var assetView = Component.Asset.Channel.request("get:root");
+
                 Component.RootView.getRegion("content").show(assetView);
             });
         });
@@ -170,7 +189,6 @@ var ComponentConstructor = function(dataComponent){
         Component.getAsset = function(){
             switch(Component.Model.get("asset").class){
                 case "table":
-                    console.log("table class!");
                     return Table;
                 case "schedule":
                     return Schedule;
@@ -178,9 +196,16 @@ var ComponentConstructor = function(dataComponent){
                     return CardsForm;
                 case "simpleform":
                     return SimpleForm;
+                case "selector":
+                    return Selector;
+                case "uploadDrag":
+                    return UploadDrag;
+                case "options":
+                    return Options;
+                case "download":
+                    return Download;
                 default:
-                    alert("The required component is not defined");
-                    return undefined;
+                    return Table;
                 //to be continued...
             }
         };

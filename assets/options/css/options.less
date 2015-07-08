@@ -1,0 +1,109 @@
+//// setting custom class ////
+@font-face{font-family:'Open Sans';font-style:normal;font-weight:normal;src:local('Open Sans'),local('OpenSans'),url('../../css/fonts/OpenSans-Regular.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:300;src:local('Open Sans'),local('OpenSans'),url('../../css/fonts/OpenSans-Light.ttf') format('truetype')}@font-face{font-family:'Open Sans';font-weight:700;src:local('Open Sans'),local('OpenSans'),url('../../css/fonts/OpenSans-Bold.ttf') format('truetype')}
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.centervertical
+{
+  position: absolute;
+  top: 50%;
+
+  .translate(0, -50%);
+
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.box-sizing(@box: border-box)
+{
+    -webkit-box-sizing: @box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: @box;    /* Firefox, other Gecko */
+    box-sizing: @box;         /* Opera/IE 8+ */
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+//////// STYLE ///////
+
+.options
+{
+  .box-sizing;
+
+  > .header
+  {
+    width: 100%;
+    padding: 3% 0;
+    background-color: #ACBBC0;
+    color: #fbfbfb;
+    text-align: center;
+    box-sizing: border-box;
+    height: auto;
+    font-size: 13px;
+    letter-spacing: 1px;
+
+    .box-sizing;
+  }
+
+  > .options
+  {
+    > .option
+    {
+      background-color: #dbe3e5;
+      font-size: 13px;
+      color: #557f9b;
+      margin: 2px 0;
+      cursor: pointer;
+
+      > label
+      {
+        width: 100%;
+        padding: 15px;
+        display: block;
+        cursor: pointer;
+        .box-sizing;
+        .noselect;
+
+        &:hover
+        {
+          background-color: rgb(196, 223, 230);
+        }
+
+        > input
+        {
+            margin-right: 10px;
+        }
+      }
+    }
+  }
+}

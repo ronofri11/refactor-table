@@ -1,0 +1,21 @@
+<form id="upload" action="<%- action %>" method="POST" enctype="multipart/form-data">
+
+    <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+
+    <div id="filedrag">
+        <div class="icon"></div>
+        <span>Arrastra tu archivo aquí</span>
+        <p>O seleccionalo <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" /></p>
+        <div id="messages">
+            <!-- <p>Status Messages</p> -->
+        </div>
+    </div>
+
+    <!-- <div id="submitbutton">
+        <button type="submit">Upload Files</button>
+    </div> -->
+
+
+</form>
+
+
