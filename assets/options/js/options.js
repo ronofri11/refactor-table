@@ -20,11 +20,26 @@ define([
                   type: function(){
                     switch( self.model.get("type") ){
                         case "checkbox":
-                            return "<label><input type=\"checkbox\" value=\"" + self.model.get("content") + "\">" + self.model.get("content") + "</label>"
+                            return "<label><input type=\"checkbox\" name=\"" + self.model.get("name") + "\">" + self.model.get("content") + "</label>"
                             break;
                     }
                   }()
                 };
+            },
+            events: {
+                "change": "uploadData"
+            },
+            uploadData: function(event){
+                var type = this.$el.find("input[type=checkbox]").prop("type");
+                switch(type){
+                    case "checkbox":
+                        var val = this.$el.find("input[type=checkbox]").prop('checked');
+                        this.model.set( {"value": val } );
+                        break;
+                }
+            },
+            initialize: function(){
+                this.model.set({"value":false});
             }
         });
 
@@ -33,7 +48,19 @@ define([
             className: "options",
             childView: Options.ItemView,
             childViewContainer: ".options",
-            template: _.template(OptionsTemplate)
+            template: _.template(OptionsTemplate),
+            getActiveOptions: function(){
+                return this.collection.where({"value":true});
+            },
+            initialize: function(){
+                var self = this;
+                this.listenTo(this.collection, "change:value", function(){
+                    Options.Channel.trigger("options:change", {
+                        activeOptions: self.getActiveOptions()
+                    });
+                });
+            }
+
         });
 
         Options.on("start", function(args){
@@ -46,6 +73,12 @@ define([
             Options.Channel.reply("get:root", function(){
                 return Options.Compositeview;
             });
+
+            Options.Channel.reply("get:active:options", function(){
+                return Options.Compositeview.getActiveOptions();
+            });
+
+
 
         });
 

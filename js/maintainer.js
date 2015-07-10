@@ -39,6 +39,16 @@ define([
                 var actionButton = this.$el.find(".header .right .actionButton li");
                 actionButton.removeClass();
                 actionButton.addClass(iconClass);
+            },
+            actionButtonSetClass: function(args){
+                console.log("el: ", this.$el);
+                var lockClass = args.class;
+                var remove = args.remove;
+                if(remove == true){
+                    this.$el.find(".actionButton").removeClass(lockClass);
+                }else{
+                    this.$el.find(".actionButton").addClass(lockClass);
+                }
             }
         });
 
@@ -102,9 +112,12 @@ define([
 
                 this.render();
             }
+
         });
 
         Maintainer.on("start", function(options){
+            Maintainer.activeButtonCallback = null;
+
             var Collection = Backbone.Collection.extend();
 
             Maintainer.title = options.title;
@@ -176,6 +189,21 @@ define([
                     Maintainer.RootView.getRegion("container").show(modeView);
 
                     Maintainer.activeKey = activeKey;
+
+                    Maintainer.Channel.listenTo(mode.Channel, "active:button:set:callback", function(args){
+                        Maintainer.activeButtonCallback = args.callback;
+                        if(Maintainer.activeButtonCallback !== null){
+                            Maintainer.RootView.actionButtonSetClass({
+                                "class": "lock",
+                                "remove": true
+                            });
+                        }else{
+                            Maintainer.RootView.actionButtonSetClass({
+                                "class": "lock",
+                                "remove": false
+                            });
+                        }
+                    });
                 }
             });
 
@@ -187,6 +215,16 @@ define([
             Maintainer.Channel.on("action:button:click", function(){
                 console.log("action button clicked");
             });
+
+
+
+            Maintainer.Channel.on("action:button:click", function(args){
+                if(Maintainer.activeButtonCallback !== null){
+                    Maintainer.activeButtonCallback();
+                }
+            });
+
+
         });
 
         return Maintainer;

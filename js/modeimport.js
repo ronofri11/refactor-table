@@ -43,7 +43,7 @@ define([
             for(var key in dataMode.components){
                 Mode.components[key] = new Component(dataMode.components[key]);
                 console.log("Mode.components[key].Channel : ", Mode.components[key].Channel);
-                var importChannel = Mode.components[key].Channel;
+                // var importChannel = Mode.components[key].Channel;
             }
 
 
@@ -58,6 +58,7 @@ define([
 
         Mode.setHandlers = function(){
             var importChannel = Mode.components["uploadDrag"].Channel;
+            var optionChannel = Mode.components["options"].Channel;
 
             Mode.Channel.reply("get:mode:root", function(){
                 return Mode.RootView;
@@ -72,12 +73,48 @@ define([
                 }
             });
 
-            // $(window).keydown(function(event) {
-            //     if((event.ctrlKey || event.metaKey) && event.keyCode == 83) {
-            //         Mode.Channel.trigger("save:models", {modelName: "Asignatura"});
-            //         event.preventDefault();
-            //     }
-            // });
+            Mode.Channel.listenTo(importChannel, "upload:change", function(args){
+                var activeOptions = optionChannel.request("get:active:options");
+                var filename = args.filename;
+                var callback;
+
+                if(filename == ""){
+                    callback = null;
+                }else{
+                    callback = function(){
+                        console.log('options: ', activeOptions);
+                    };
+                }
+
+                Mode.Channel.trigger("active:button:set:callback", {
+                    callback: callback
+                });
+            });
+
+            Mode.Channel.listenTo(optionChannel, "options:change", function(args){
+                var filename = importChannel.request("get:filename");
+                var activeOptions = args.activeOptions;
+
+                if(filename == ""){
+                    callback = null;
+                }else{
+                    callback = function(){
+                        var options = "";
+                        _.each(activeOptions, function(opt){
+                            options = options + ", " + opt.get("name");
+                        });
+
+                        console.log('file, options: ', filename, activeOptions);
+                        alert(filename);
+                        alert(options);
+                    };
+                }
+
+                Mode.Channel.trigger("active:button:set:callback", {
+                    callback: callback
+                });
+            });
+
 
         };
 

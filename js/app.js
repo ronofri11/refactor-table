@@ -25,6 +25,7 @@ define([
         });
 
         App.startStore = function(url){
+            App.urlAPI = url;
             var store = new Store("store");
             var storeChannel = store.Channel;
 
@@ -192,15 +193,8 @@ define([
                                                 {
                                                     property: "carrera",
                                                     nested: true,
-                                                    displayKeys: ["codigo_cliente"],
+                                                    displayKeys: ["codigo_cliente", "planestudio"],
                                                     alias: "carrera"
-                                                },
-                                                {
-                                                    property: "carrera",
-                                                    nested: true,
-                                                    displayKeys: ["planestudio"],
-                                                    title: "PLAN DE ESTUDIO",
-                                                    alias: "planestudio"
                                                 },
                                                 {
                                                     property: "codigo_cliente"
@@ -252,17 +246,17 @@ define([
                                                 {
                                                     type: "checkbox",
                                                     content: "inferir listas cruzadas",
-                                                    value: "listacruzada"
+                                                    name: "listacruzada"
                                                 },
                                                 {
                                                     type: "checkbox",
                                                     content: "reemplazar todos los datos",
-                                                    value: "reemplaza"
+                                                    name: "reemplaza"
                                                 },
                                                 {
                                                     type: "checkbox",
                                                     content: "validar solo planilla",
-                                                    value: "planilla"
+                                                    name: "planilla"
                                                 }
                                             ]
                                         }
@@ -277,7 +271,7 @@ define([
                                         class: "download",
                                         initOptions: {},
                                         startOptions:{
-                                            action: "ruta/descarga/matriz",
+                                            action: App.urlAPI + "/salas/exportar",
                                             options: [
                                                 {
                                                     type: "button",

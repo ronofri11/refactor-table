@@ -14,6 +14,22 @@ define([
             tagname: "li",
             className: "item",
             template: _.template(ItemDownloadTemplate),
+            events: function (){
+                var evtSelector = "click ." + this.model.get("className");
+                var evt = {};
+                evt[evtSelector] = "downloadTemplate";
+                return evt;
+            },
+            downloadTemplate: function(event){
+                $.ajax({
+                  url: Download.Action,
+                  type: "GET",
+                }).done(function(result) {
+                    console.log("result file download", result);
+                });
+                event.preventDefault();
+                event.stopPropagation();
+            },
             templateHelpers: function(){
                 var self = this;
                 return {
@@ -28,7 +44,6 @@ define([
                             _.each( self.model.get("options") , function(option){
                                 items = items + "<option value=\"" + option.value + "\">" + option.nombre + "</option>";
                             });
-
                             return "<select class=\"" + self.model.get("className") + "\">" + items + "</select>"
                             break;
                     }
@@ -42,12 +57,7 @@ define([
             className: "download",
             childView: Download.ItemView,
             childViewContainer: ".options",
-            template: _.template(DownloadTemplate),
-            templateHelpers: function(){
-                return {
-                    action: Download.Action
-                }
-            }
+            template: _.template(DownloadTemplate)
         });
 
         Download.on("start", function(args){

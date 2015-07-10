@@ -61,6 +61,12 @@
     {
       width: 100%;
       height: 100%;
+      border: 2px dashed #A9B7C2;
+
+      &.hover
+      {
+        border: 2px dashed #5AA958;
+      }
 
       > .icon
       {
@@ -75,6 +81,24 @@
         -khtml-user-select: none;
         -webkit-user-select: none;
         user-select: none;
+
+        > .file
+        {
+          width: 100%;
+          font-size: 44px;
+          font-weight: 700;
+          text-align: center;
+          color: rgb(90, 169, 88);
+
+          .centervertical;
+
+          > .size
+          {
+            font-size: 14px;
+            font-weight: 300;
+            margin-bottom: 50px;
+          }
+        }
       }
 
       > span
