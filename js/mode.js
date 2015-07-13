@@ -3,11 +3,12 @@ define([
     "backbone.radio",
     "radio.shim",
     "component/component",
+    "assets/contextmenu/js/contextmenu",
     "text!templates/regions/fullpage.html",
     "text!templates/regions/columnHeaderMain.html",
     "text!templates/regions/columnHeaderMainflip.html",
     "text!templates/regions/mainFooterColumn.html",
-], function (Marionette, Radio, Shim, Component, fullpageTemplate, columnHeaderMainTemplate, columnHeaderMainflipTemplate, MainFooterColumnTemplate) {
+], function (Marionette, Radio, Shim, Component, ContextMenu, fullpageTemplate, columnHeaderMainTemplate, columnHeaderMainflipTemplate, MainFooterColumnTemplate) {
 
     var ModeConstructor = function(dataMode){
         var Mode = new Marionette.Application();
@@ -23,7 +24,6 @@ define([
                         return _.template(columnHeaderMainTemplate);
                     case "mainFooterColumn":
                         return _.template(MainFooterColumnTemplate);
-
                 }
             },
             onShow: function(){
@@ -65,6 +65,7 @@ define([
                     // selected region
                     var selectedRegion = slide.children(".selected");
                     var indexRegion = selectedRegion.index();
+
                     // refresh selected
                     selectedRegion.next().addClass("next");
                     region.addClass("hide").removeClass("selected");
@@ -114,6 +115,70 @@ define([
             Mode.Selection = new EmptyCollection();
 
             this.setHandlers();
+
+            // CONTEXTMENU OPTIONS
+            Mode.Channel.listenTo(tableChannel, "show:contextmenu", function(args){
+                var objectSelected = tableChannel.request("get:selection");
+
+                switch(objectSelected.rows.length){
+                    case 1:
+                        var optionsContextMenu = [
+                            {
+                                className: "editRow",
+                                content: "Editar registro",
+                                action: "contextmenu:edit:row:single"
+                            },
+                            {
+                                className: "createRow",
+                                content: "Crear registro",
+                                action: "contextmenu:create:row:single"
+                            },
+                            {
+                                className: "deleteRow",
+                                content: "Eliminar registro",
+                                action: "contextmenu:delete:row:single"
+                            }
+                        ]
+                        break;
+                    default:
+                        var optionsContextMenu = [
+                            {
+                                className: "editRow",
+                                content: "Editar registros",
+                                action: "contextmenu:edit:field:multiple"
+                            },
+                            {
+                                className: "deleteRow",
+                                content: "Eliminar registros",
+                                action: "contextmenu:delete:row:multiple"
+                            }
+                        ]
+                        break;
+                }
+
+                // CONTEXTMENU START
+                Mode.optCollection = Backbone.Collection.extend();
+                var optCollection = new Mode.optCollection(optionsContextMenu);
+
+                var contextmenu = new ContextMenu("contextmenu");
+                var contextmenuChannel = contextmenu.Channel;
+
+                contextmenu.start({
+                    options : optCollection,
+                    pos: {
+                        "top": args.pos.top,
+                        "left": args.pos.left
+                    }
+                });
+
+                // SHOW CONTEXTMENU
+                var contextmenuview = contextmenuChannel.request("get:root");
+                Mode.contextmenuRegion.get("container").show(contextmenuview);
+
+                Mode.Channel.listenTo(tableChannel, "row:click", function(){
+                    contextmenuChannel.trigger("contextmenu:hide");
+                });
+            });
         });
 
         Mode.setHandlers = function(){
@@ -124,6 +189,14 @@ define([
             });
 
             Mode.RootView.on("show", function(){
+                // CONTEXTMENU REGION
+                var RM = Marionette.RegionManager.extend();
+                Mode.contextmenuRegion = new RM();
+                Mode.contextmenuRegion.addRegions({
+                  container: "#contextmenuRegion"
+                });
+
+
                 for(var key in Mode.components){
                     var component = Mode.components[key];
                     var componentView = component.Channel.request("get:component:root");
@@ -176,9 +249,15 @@ define([
 
             $(document).on("click", function(event){
                 var tableContext = tableChannel.request("get:context:selector");
+                // var contextmenuContext = contextmenuChannel.request("get:context:selector");
                 if($(event.target).not(tableContext)){
                     tableChannel.trigger("empty:selection");
                 }
+
+                // if($(event.target).not(contextmenuContext)){
+                //     contextmenuChannel.trigger("contextmenu:hide");
+                // }
+
             });
 
             // $(document).on("keyup", function(event){

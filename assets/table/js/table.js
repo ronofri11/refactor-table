@@ -57,10 +57,10 @@ define([
                 Table.Channel.trigger("row:click", {cell: $(event.target), row: this.model});
             },
             cellRightClick: function(event){
-                event.stopPropagation();
+                // event.stopPropagation();
                 event.preventDefault();
                 if($(event.target).hasClass("cell")){
-                    Table.Channel.trigger("row:contextmenu", {cell: $(event.target), row: this.model});
+                    Table.Channel.trigger("row:contextmenu", {cell: $(event.target), row: this.model, event:event});
                 }
             },
             extractCells: function(){
@@ -235,8 +235,27 @@ define([
                 }
             });
 
-            Table.Channel.on("row:contextmenu", function(){
-                console.log("contextmenu row");
+            //CONTEXTMENU
+            Table.Channel.on("row:contextmenu", function(args){
+                var row = args.row;
+                var cellKey = args.cell.data("key");
+                var selection = Table.Channel.request("get:selection");
+
+
+                if(selection.rows.indexOf(row) == -1 || selection.column.get("alias") != cellKey){
+                    Table.singleSelection(args);
+                }
+
+                var posY = args.event.pageY;
+                var posX = args.event.pageX;
+
+                Table.Channel.trigger("show:contextmenu", {
+                    pos: {
+                        left: posX,
+                        top: posY
+                    }
+                });
+
             });
 
             Table.Channel.on("print:selection:count", function(){

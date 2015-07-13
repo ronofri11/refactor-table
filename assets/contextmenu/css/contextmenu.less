@@ -1,0 +1,197 @@
+//// setting custom class ////
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.shadow(@s: 3px 3px 4px #444) {
+    -moz-box-shadow: @s;
+    -webkit-box-shadow: @s;
+    box-shadow: @s;
+}
+
+//////// STYLE ///////
+
+.contextmenu
+{
+    display: block;
+    position: fixed;
+    top: 35px;
+    width: 200px;
+    min-height: 50px;
+    background: #64859a;
+    left: 0;
+    right: 0;
+    z-index: -9;
+    -webkit-box-shadow: inset #5F7787 0 11px 11px;
+    box-shadow: inset #5F7787 0 11px 11px;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    .border-radius(10px);
+    .shadow(0px 4px 4px #576A7F);
+
+    .option
+    {
+      list-style: none !important;
+      pointer-events: all !important;
+      font-size: 10px;
+      text-indent: 0;
+      background: none !important;
+      width: 100%;
+      color: #C8E2E8;
+      text-align: left;
+      margin: 0 !important;
+      box-sizing: border-box;
+      height: auto !important;
+      border-bottom: 1px solid #8197AD;
+
+      &:last-child
+      {
+        border-bottom: none;
+      }
+
+      > div
+      {
+        padding: 10px 12px !important;
+
+        > span
+        {
+          background-size: 10px 10px;
+          background-position: center center;
+          background-repeat: no-repeat;
+          width: 10px;
+          height: 15px;
+          display: block;
+          float: left;
+          margin-right: 10px;
+        }
+
+      }
+
+      .editField{
+
+          &:hover
+          {
+              cursor: pointer;
+              color: #64859a;
+              background-color: #DFF3F7 !important;
+
+              & span
+              {
+                  background-image: url(../img/edit_h.svg);
+              }
+          }
+
+          span
+          {
+              background-image: url(../img/edit.svg);
+                margin-left: 4px;
+                margin-right: 7px;
+                width: 12px;
+                background-size: 11px 11px;
+          }
+      }
+
+      .editRow{
+
+          &:hover
+          {
+              cursor: pointer;
+              color: #64859a;
+              background-color: #DFF3F7 !important;
+
+              & span
+              {
+                  background-image: url(../img/book_h.svg);
+              }
+          }
+
+          span
+          {
+              background-image: url(../img/book.svg);
+              background-size: 16px 10px !important;
+              width: 16px !important;
+              margin-right: 7px !important;
+          }
+      }
+
+      .createRow{
+
+          &:hover
+          {
+              cursor: pointer;
+              color: #64859a;
+              background-color: #DFF3F7 !important;
+
+              & span
+              {
+                  background-image: url(../img/add_h.svg);
+              }
+          }
+
+          span
+          {
+              background-image: url(../img/add.svg);
+              background-size: 16px 10px !important;
+              width: 16px !important;
+              margin-right: 7px !important;
+          }
+      }
+
+      .deleteRow{
+
+          &:hover
+          {
+              cursor: pointer;
+              color: #64859a;
+              background-color: #DFF3F7 !important;
+
+              & span
+              {
+                  background-image: url(../img/trash_h.svg);
+              }
+          }
+
+          span
+          {
+              background-image: url(../img/trash.svg);
+              margin-left: 3px;
+              margin-right: 8px;
+              width: 12px;
+              background-size: 13px 13px;
+
+          }
+      }
+
+      .undoRow{
+
+          &:hover
+          {
+              cursor: pointer;
+              color: #64859a;
+              background-color: #DFF3F7 !important;
+
+              & span
+              {
+                  background-image: url(../img/undo_h.svg);
+              }
+          }
+
+          span
+          {
+              background-image: url(../img/undo.svg);
+              margin-left: 3px;
+              margin-right: 8px;
+              width: 12px;
+              background-size: 13px 13px;
+
+          }
+      }
+    }
+
+}

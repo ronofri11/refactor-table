@@ -593,6 +593,11 @@ define([
             App.Channel.reply("get:root", function(){
                 return App.RootView;
             });
+
+            // contextmenu
+
+
+
         });
 
         return App;
