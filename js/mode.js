@@ -178,6 +178,12 @@ define([
                 Mode.Channel.listenTo(tableChannel, "row:click", function(){
                     contextmenuChannel.trigger("contextmenu:hide");
                 });
+
+                // GET CONTEXTMENU ACTION
+                Mode.Channel.listenTo(contextmenuChannel, "get:action", function(args){
+                    console.log("action en mode: ", args.action);
+                });
+
             });
         });
 
@@ -253,27 +259,7 @@ define([
                 if($(event.target).not(tableContext)){
                     tableChannel.trigger("empty:selection");
                 }
-
-                // if($(event.target).not(contextmenuContext)){
-                //     contextmenuChannel.trigger("contextmenu:hide");
-                // }
-
             });
-
-            // $(document).on("keyup", function(event){
-            //     switch(event.which){
-            //         case 38: //UP
-            //             tableChannel.trigger("option:prev");
-            //             event.preventDefault();
-            //             break;
-            //         case 40: //DOWN
-            //             tableChannel.trigger("option:next");
-            //             event.preventDefault();
-            //             break;
-            //     }
-            //     event.stopPropagation();
-            // });
-
         };
 
         return Mode;

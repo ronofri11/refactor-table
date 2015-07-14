@@ -12,7 +12,18 @@ define([
         ContextMenu.ItemView = Marionette.ItemView.extend({
             tagname: "div",
             className: "option",
-            template: _.template(OptionsContextMenuTemplate)
+            template: _.template(OptionsContextMenuTemplate),
+            events: {
+                "click":"clicked"
+            },
+            clicked: function(event){
+                event.stopPropagation();
+                event.preventDefault();
+                var action = this.model.get("action");
+                ContextMenu.Channel.trigger("get:action", {
+                    action: action
+                });
+            }
         });
 
         ContextMenu.CollectionView = Marionette.CollectionView.extend({
@@ -74,6 +85,7 @@ define([
         });
 
         ContextMenu.on("start", function(args){
+
             ContextMenu.posX = args.pos.left;
             ContextMenu.posY = args.pos.top;
 
@@ -84,7 +96,6 @@ define([
             });
 
             ContextMenu.Channel.on("contextmenu:hide", function(){
-                console.log('okk');
                 ContextMenu.Collectionview.hide();
             });
 
