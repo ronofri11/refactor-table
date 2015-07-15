@@ -5,10 +5,11 @@ define([
     "assets/table/js/paging",
     "assets/table/js/filters",
     "assets/table/js/headers",
+    "assets/screed/js/screed",
     "text!./../templates/table.html",
     "text!./../templates/row.html",
     "text!./../templates/header.html"
-], function (Marionette, Radio, Shim, Paging, Filters, Headers, TableTemplate, RowTemplate) {
+], function (Marionette, Radio, Shim, Paging, Filters, Headers, Screed, TableTemplate, RowTemplate) {
 
     var TableConstructor = function(channelName){
 
@@ -103,7 +104,8 @@ define([
                 "headers": "div.thead .theaders",
                 "filters": "div.thead .tfilters",
                 "tbody": "div.tbody",
-                "paging": "div.paging"
+                "paging": "div.paging",
+                "screed": "div.tscreed"
             },
             onShow: function(){
                 this.headersAutoTop();
@@ -151,6 +153,8 @@ define([
             Table.Paging = new Paging(channelName + "_paging");
             Table.Filters = new Filters(channelName + "_filters");
             Table.Headers = new Headers(channelName + "_headers");
+
+            //
         });
 
         Table.on("start", function(options){
@@ -196,6 +200,16 @@ define([
                 windowSet: Table.windowSet
             });
 
+            // screed
+            Table.Screed = new Screed(channelName + "_screed");
+            var screedChannel = Table.Screed.Channel;
+
+            Table.Screed.start({
+                columns: Table.columns
+            });
+
+
+
             Table.workingColumn = null;
             Table.mode = "single";
 
@@ -207,11 +221,14 @@ define([
             Table.RootView.on("show", function(){
                 var HeadersView = Table.Headers.Channel.request("get:root");
                 var FiltersView = Table.Filters.Channel.request("get:root");
+                var ScreedView = screedChannel.request("get:root");
                 Table.RootView.getRegion("headers").show(HeadersView);
                 Table.RootView.getRegion("filters").show(FiltersView);
 
                 Table.RootView.getRegion("tbody").show(Table.TableView);
                 Table.RootView.getRegion("paging").show(Table.Paging.Channel.request("get:root"));
+
+                Table.RootView.getRegion("screed").show(ScreedView);
             });
 
             Table.Channel.reply("get:root", function(){
@@ -256,6 +273,14 @@ define([
                     }
                 });
 
+            });
+
+            // screed
+            Table.Channel.on("show:screed", function(){
+                var selection = Table.getSelectedRows();
+                screedChannel.trigger("show:screed", {
+                    cuatico: "gyuguyguy uyg uy"
+                });
             });
 
             Table.Channel.on("print:selection:count", function(){

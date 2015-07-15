@@ -1,0 +1,186 @@
+//// setting custom class ////
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
+}
+
+.noSelectText
+{
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.shadow(@s: 3px 3px 4px #444) {
+    -moz-box-shadow: @s;
+    -webkit-box-shadow: @s;
+    box-shadow: @s;
+}
+
+.translate (@x: -50%, @y: -50%)
+{
+    -webkit-transform: translate( @x, @y );
+    -moz-transform: translate( @x, @y );
+    -o-transform: translate( @x, @y );
+    transform: translate( @x, @y );
+}
+
+.center
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  .translate(-50%, -50%);
+
+}
+
+.centerVertical
+{
+    position: absolute;
+    top: 50%;
+
+    .translate(0%, -50%);
+}
+
+.brillo(@br: 1.2)
+{
+    filter: brightness(@br);
+    // Browser Specific
+    -webkit-filter: brightness(@br);
+    -moz-filter: brightness(@br);
+    -o-filter: brightness(@br);
+    -ms-filter: brightness(@br);
+}
+
+.box-sizing
+{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.animate(@a: all .2s ease-in-out)
+{
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+
+//////// STYLE ///////
+
+.tscreed
+{
+    width: 100%;
+    height: 70px;
+}
+.screed
+{
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: block;
+    background: rgb(225, 225, 225);
+    border-bottom: 3px solid yellow;
+    padding-left: 44px; // reemplaza ancho indice de tabla
+
+    .box-sizing();
+    .shadow(inset 0px 1px 15px -2px rgba(0,0,0,0.3));
+
+    > .editor
+    {
+        float: left;
+        height: 100%;
+        position: relative;
+        box-sizing: border-box;
+        margin-top: 21px;
+
+
+        > span
+        {
+            width: 100%;
+
+            > span
+            {
+                width: 90%;
+                text-align: center;
+                font-weight: 100;
+                font-size: 14px;
+                color: #8197ae;
+                display: block;
+
+                &::after {
+                    content: ":";
+                }
+            }
+
+            > select
+            {
+                width: 90%;
+                text-align: center;
+                color: #286186;
+                background: #fff;
+                border: 1px solid #ccc;
+                height: 25px;
+                padding: 0 5px;
+                font-size: 11px;
+                -webkit-appearance: none;
+                -webkit-border-radius: 0;
+                box-sizing: border-box;
+
+                &:disabled
+                {
+                    -moz-user-select: none;
+                    -khtml-user-select: none;
+                    -webkit-user-select: none;
+                    user-select: none;
+                    background: none;
+                }
+            }
+
+            > input
+            {
+                width: 90%;
+                text-align: center;
+                color: #286186;
+                background: #fff;
+                border: 1px solid #ccc;
+                height: 25px;
+                padding: 0 5px;
+                font-size: 11px;
+                -webkit-appearance: none;
+                -webkit-border-radius: 0;
+                box-sizing: border-box;
+
+                &:disabled
+                {
+                    -moz-user-select: none;
+                    -khtml-user-select: none;
+                    -webkit-user-select: none;
+                    user-select: none;
+                    background: none;
+                }
+            }
+        }
+    }
+
+    .modify
+    {
+        background: #f2ff1a !important;
+    }
+
+    .error
+    {
+        background: rgb(233, 53, 53) !important;
+        color: #FFF;
+    }
+}
