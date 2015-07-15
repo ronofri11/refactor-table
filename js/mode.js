@@ -88,6 +88,11 @@ define([
             Mode.RootView.addRegion("header", ".region.header");
             Mode.RootView.addRegion("columnLeft", ".region.columnLeft");
 
+            var Region = Marionette.Region.extend();
+            Mode.RootView.addRegion("contextmenu", new Region({
+                el: "#contextmenuRegion"
+            }));
+
             var channelName = dataMode.channelName;
             Mode.Channel = Radio.channel(channelName);
 
@@ -109,20 +114,67 @@ define([
                 Mode.components[key].start();
             }
 
-            //Mode has an empty collection to keep the selected model
+            // ContextMenu start
+            Mode.ContextMenu = new ContextMenu(channelName + "_contextmenu");
+            var contextmenuChannel = Mode.ContextMenu.Channel;
 
-            var EmptyCollection = Backbone.Collection.extend({});
-            Mode.Selection = new EmptyCollection();
+            var EmptyCollection = Backbone.Collection.extend();
+            Mode.ContextMenuOptions = new EmptyCollection();
+
+            Mode.ContextMenu.start({
+                options: Mode.ContextMenuOptions
+            });
 
             this.setHandlers();
+        });
 
-            // CONTEXTMENU OPTIONS
-            Mode.Channel.listenTo(tableChannel, "show:contextmenu", function(args){
-                var objectSelected = tableChannel.request("get:selection");
+        Mode.setHandlers = function(){
+            var tableChannel = Mode.components["table"].Channel;
+            var contextmenuChannel = Mode.ContextMenu.Channel;
 
-                switch(objectSelected.rows.length){
+            Mode.Channel.reply("get:mode:root", function(){
+                return Mode.RootView;
+            });
+
+            Mode.RootView.on("show", function(){
+                for(var key in Mode.components){
+                    var component = Mode.components[key];
+                    var componentView = component.Channel.request("get:component:root");
+                    var componentRegion = Mode.RootView.getRegion(dataMode.components[key].region);
+                    componentRegion.show(componentView);
+                }
+                var ContextMenuView = contextmenuChannel.request("get:root");
+                Mode.RootView.getRegion("contextmenu").show(ContextMenuView);
+            });
+
+            Mode.Channel.listenTo(tableChannel, "custom:control:one", function(args){
+            });
+
+            Mode.Channel.listenTo(tableChannel, "custom:control:two", function(){
+            });
+
+            Mode.Channel.comply("add:empty:model", function(args){
+                tableChannel.command("add:model", args);
+                console.log("added new model");
+            });
+
+            // ContextMenu events
+            Mode.Channel.listenTo(tableChannel, "row:click", function(){
+                contextmenuChannel.trigger("hide:contextmenu");
+            });
+
+            // get ContextMenu action
+            Mode.Channel.listenTo(contextmenuChannel, "action:selected", function(args){
+                console.log("action en mode: ", args.action);
+            });
+
+            Mode.Channel.listenTo(tableChannel, "row:right:click", function(args){
+                var selection = tableChannel.request("get:selection");
+                var optionsContextMenu;
+
+                switch(selection.rows.length){
                     case 1:
-                        var optionsContextMenu = [
+                        optionsContextMenu = [
                             {
                                 className: "editRow",
                                 content: "Editar registro",
@@ -141,7 +193,7 @@ define([
                         ]
                         break;
                     default:
-                        var optionsContextMenu = [
+                        optionsContextMenu = [
                             {
                                 className: "editRow",
                                 content: "Editar registros",
@@ -156,76 +208,15 @@ define([
                         break;
                 }
 
-                // CONTEXTMENU START
-                Mode.optCollection = Backbone.Collection.extend();
-                var optCollection = new Mode.optCollection(optionsContextMenu);
+                Mode.ContextMenuOptions.reset(optionsContextMenu);
 
-                var contextmenu = new ContextMenu("contextmenu");
-                var contextmenuChannel = contextmenu.Channel;
-
-                contextmenu.start({
-                    options : optCollection,
+                contextmenuChannel.trigger("show:contextmenu", {
+                    options : Mode.ContextMenuOptions,
                     pos: {
                         "top": args.pos.top,
                         "left": args.pos.left
                     }
                 });
-
-                // SHOW CONTEXTMENU
-                var contextmenuview = contextmenuChannel.request("get:root");
-                Mode.contextmenuRegion.get("container").show(contextmenuview);
-
-                Mode.Channel.listenTo(tableChannel, "row:click", function(){
-                    contextmenuChannel.trigger("contextmenu:hide");
-                });
-
-                // GET CONTEXTMENU ACTION
-                Mode.Channel.listenTo(contextmenuChannel, "get:action", function(args){
-                    console.log("action en mode: ", args.action);
-                });
-
-            });
-        });
-
-        Mode.setHandlers = function(){
-            var tableChannel = Mode.components["table"].Channel;
-
-            Mode.Channel.reply("get:mode:root", function(){
-                return Mode.RootView;
-            });
-
-            Mode.RootView.on("show", function(){
-                // CONTEXTMENU REGION
-                var RM = Marionette.RegionManager.extend();
-                Mode.contextmenuRegion = new RM();
-                Mode.contextmenuRegion.addRegions({
-                  container: "#contextmenuRegion"
-                });
-
-
-                for(var key in Mode.components){
-                    var component = Mode.components[key];
-                    var componentView = component.Channel.request("get:component:root");
-                    var componentRegion = Mode.RootView.getRegion(dataMode.components[key].region);
-                    componentRegion.show(componentView);
-                }
-            });
-
-            Mode.Channel.listenTo(tableChannel, "custom:control:one", function(args){
-                Mode.Channel.trigger("create:new:model", args);
-            });
-
-            Mode.Channel.listenTo(tableChannel, "custom:control:two", function(){
-                if(Mode.Selection.length > 0){
-                    Mode.Channel.trigger("delete:model", {
-                        model: Mode.Selection.at(0)
-                    });
-                }
-            });
-
-            Mode.Channel.comply("add:empty:model", function(args){
-                tableChannel.command("add:model", args);
-                console.log("added new model");
             });
 
             $(window).keydown(function(event) {
@@ -255,9 +246,9 @@ define([
 
             $(document).on("click", function(event){
                 var tableContext = tableChannel.request("get:context:selector");
-                // var contextmenuContext = contextmenuChannel.request("get:context:selector");
                 if($(event.target).not(tableContext)){
                     tableChannel.trigger("empty:selection");
+                    contextmenuChannel.trigger("hide:contextmenu");
                 }
             });
         };

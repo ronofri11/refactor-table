@@ -9,7 +9,7 @@ define([
         var ContextMenu = new Marionette.Application();
         ContextMenu.Channel = Radio.channel(channelName);
 
-        ContextMenu.ItemView = Marionette.ItemView.extend({
+        var ItemView = Marionette.ItemView.extend({
             tagname: "div",
             className: "option",
             template: _.template(OptionsContextMenuTemplate),
@@ -20,20 +20,33 @@ define([
                 event.stopPropagation();
                 event.preventDefault();
                 var action = this.model.get("action");
-                ContextMenu.Channel.trigger("get:action", {
+                ContextMenu.Channel.trigger("hide:contextmenu");
+                ContextMenu.Channel.trigger("action:selected", {
                     action: action
                 });
             }
         });
 
-        ContextMenu.CollectionView = Marionette.CollectionView.extend({
+        var CollectionView = Marionette.CollectionView.extend({
             tagName: "div",
             className: "contextmenu",
-            childView: ContextMenu.ItemView,
+            childView: ItemView,
             onShow: function(){
-                this.setposition();
-                this.clickout();
+                this.hideContextMenu();
             },
+
+            hideContextMenu: function(){
+                this.$el.css({
+                    "z-index": -9,
+                    "top": "-100%",
+                    "left": "-100%"
+                });
+            },
+
+            showContextMenu: function(){
+                this.setposition();
+            },
+
             setposition: function(){
                 var top = ContextMenu.posY;
                 var left = ContextMenu.posX;
@@ -64,45 +77,32 @@ define([
                 this.$el.css({
                     "z-index": 999
                 });
-            },
-            hide: function(){
-                this.$el.css({
-                    "z-index": -9
-                });
-            },
-            clickout: function(){
-                var self = this;
-                $(document).click(function(event) {
-                    if( $(event.target).is(".contextmenu ") ){
-
-                    }else{
-                        if ($(event.target).parents(".contextmenu").length === 0 && $(event.target).parents(".contextmenuRegion").length === 0) {
-                            self.hide();
-                        }
-                    }
-                });
             }
         });
 
         ContextMenu.on("start", function(args){
+            ContextMenu.posX = 0;
+            ContextMenu.posY = 0;
 
-            ContextMenu.posX = args.pos.left;
-            ContextMenu.posY = args.pos.top;
-
-            ContextMenu.Collectionview = new ContextMenu.CollectionView({collection:args.options});
+            ContextMenu.CollectionView = new CollectionView({collection: args.options});
 
             ContextMenu.Channel.reply("get:root", function(){
-                return ContextMenu.Collectionview;
+                return ContextMenu.CollectionView;
             });
 
-            ContextMenu.Channel.on("contextmenu:hide", function(){
-                ContextMenu.Collectionview.hide();
+            ContextMenu.Channel.on("hide:contextmenu", function(){
+                ContextMenu.CollectionView.hideContextMenu();
+            });
+
+            ContextMenu.Channel.on("show:contextmenu", function(args){
+                ContextMenu.posX = args.pos.left;
+                ContextMenu.posY = args.pos.top;
+                ContextMenu.CollectionView.showContextMenu();
             });
 
             ContextMenu.Channel.reply("get:context:selector", function(){
-                return ContextMenu.Collectionview.$el;
+                return ContextMenu.CollectionView.$el;
             });
-
         });
 
         return ContextMenu;

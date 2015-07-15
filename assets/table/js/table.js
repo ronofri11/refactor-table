@@ -249,7 +249,7 @@ define([
                 var posY = args.event.pageY;
                 var posX = args.event.pageX;
 
-                Table.Channel.trigger("show:contextmenu", {
+                Table.Channel.trigger("row:right:click", {
                     pos: {
                         left: posX,
                         top: posY
