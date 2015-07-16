@@ -193,8 +193,15 @@ define([
                                                 {
                                                     property: "carrera",
                                                     nested: true,
-                                                    displayKeys: ["codigo_cliente", "planestudio"],
+                                                    displayKeys: ["codigo_cliente", "nombre"],
                                                     alias: "carrera"
+                                                },
+                                                {
+                                                    property: "carrera",
+                                                    nested: true,
+                                                    displayKeys: ["planestudio"],
+                                                    alias: "planestudio",
+                                                    title: "PLAN DE ESTUDIO"
                                                 },
                                                 {
                                                     property: "codigo_cliente"

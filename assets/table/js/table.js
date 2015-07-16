@@ -277,9 +277,10 @@ define([
 
             // screed
             Table.Channel.on("show:screed", function(){
-                var selection = Table.getSelectedRows();
+                var selectedRows = Table.getSelectedRows();
                 screedChannel.trigger("show:screed", {
-                    cuatico: "gyuguyguy uyg uy"
+                    rows: selectedRows,
+                    column: Table.workingColumn
                 });
             });
 

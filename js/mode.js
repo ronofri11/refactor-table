@@ -166,6 +166,11 @@ define([
             // get ContextMenu action
             Mode.Channel.listenTo(contextmenuChannel, "action:selected", function(args){
                 console.log("action en mode: ", args.action);
+                switch(args.action){
+                    case "contextmenu:edit:field:multiple":
+                        tableChannel.trigger("show:screed");
+                        break;
+                }
             });
 
             Mode.Channel.listenTo(tableChannel, "row:right:click", function(args){

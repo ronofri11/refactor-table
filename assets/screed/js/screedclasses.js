@@ -18,30 +18,33 @@ define([
 
     ScreedClasses.Editor = Backbone.Model.extend({
         initialize: function(){
-            this.set({"data": "", "valid": true, "modified": false}, {silent: true});
-        },
-        setDataFromModel: function(model){
-            var originalKey = this.get("originalKey");
-            var virtualKey = this.get("key");
-
-            var virtualValue = model.get(virtualKey);
-            var originalValue = model.get(originalKey);
-
-            if(virtualValue instanceof Backbone.Model){
-                virtualValue = virtualValue.get("id");
+            if(this.get("data") === undefined){
+                this.set({"data": this.get("default")}, {silent: true});
             }
-
-            if(virtualValue != originalValue){
-                this.set({"modified": true}, {silent: true});
-            }
-            else{
-                this.set({"modified": false}, {silent: true});
-            }
-
-            this.set({"data": model.get(this.get("key"))}, {silent: true});
-
-            this.trigger("model:data:changed");
+            this.set({"valid": true, "modified": false}, {silent: true});
         }
+        // setDataFromModel: function(model){
+        //     var originalKey = this.get("originalKey");
+        //     var virtualKey = this.get("key");
+
+        //     var virtualValue = model.get(virtualKey);
+        //     var originalValue = model.get(originalKey);
+
+        //     if(virtualValue instanceof Backbone.Model){
+        //         virtualValue = virtualValue.get("id");
+        //     }
+
+        //     if(virtualValue != originalValue){
+        //         this.set({"modified": true}, {silent: true});
+        //     }
+        //     else{
+        //         this.set({"modified": false}, {silent: true});
+        //     }
+
+        //     this.set({"data": model.get(this.get("key"))}, {silent: true});
+
+        //     this.trigger("model:data:changed");
+        // }
     });
 
     ScreedClasses.Editors = Backbone.Collection.extend({
@@ -262,16 +265,13 @@ define([
             this.collection.each(function(editor){
                 editor.trigger("set:current:data");
             });
-        },
-
-        setDataFromModel: function(){
-            var model = this.Screed.Model;
-            this.collection.each(function(editor){
-                editor.setDataFromModel(model);
-            });
-        },
-
-
+        }
+        // setDataFromModel: function(){
+        //     var model = this.Screed.Model;
+        //     this.collection.each(function(editor){
+        //         editor.setDataFromModel(model);
+        //     });
+        // },
     });
 
     return ScreedClasses;
