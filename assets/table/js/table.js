@@ -105,7 +105,9 @@ define([
                 "filters": "div.thead .tfilters",
                 "tbody": "div.tbody",
                 "paging": "div.paging",
+                // "screed": "div.tscreed > .editors"
                 "screed": "div.tscreed"
+
             },
             onShow: function(){
                 this.headersAutoTop();
@@ -209,7 +211,6 @@ define([
             });
 
 
-
             Table.workingColumn = null;
             Table.mode = "single";
 
@@ -240,6 +241,7 @@ define([
             });
 
             Table.Channel.on("row:click", function(args){
+                Table.Screed.Channel.trigger("close:screed");
                 switch(Table.mode){
                     case "append":
                         Table.addToSelection(args);
@@ -282,7 +284,10 @@ define([
                     rows: selectedRows,
                     column: Table.workingColumn
                 });
+                // open
+                screedChannel.trigger("open:screed");
             });
+
 
             Table.Channel.on("print:selection:count", function(){
                 var selection = Table.getSelectedRows();

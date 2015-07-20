@@ -167,6 +167,9 @@ define([
             Mode.Channel.listenTo(contextmenuChannel, "action:selected", function(args){
                 console.log("action en mode: ", args.action);
                 switch(args.action){
+                    case "contextmenu:edit:row:single":
+                        tableChannel.trigger("show:screed");
+                        break;
                     case "contextmenu:edit:field:multiple":
                         tableChannel.trigger("show:screed");
                         break;

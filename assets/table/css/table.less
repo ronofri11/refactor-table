@@ -60,6 +60,14 @@
     -ms-filter: brightness(@br);
 }
 
+.animate(@a: all .2s ease-in-out)
+{
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
 //////// STYLE ///////
 .tablecomponent
 {
@@ -84,7 +92,7 @@
 
     .table
     {
-        background: #4f4f4f;
+        background: rgb(225, 225, 225);
         color: #fff;
         text-align: center;
         border-spacing: 0;
@@ -284,6 +292,7 @@
         {
             position: relative;
             top: 56px;
+            // .animate(all .4s swing);
 
             .rows // tbody
             {

@@ -232,6 +232,10 @@ define([
     ScreedClasses.EditorCollectionView = Marionette.CollectionView.extend({
         tagName: "div",
         className: "screed",
+        events: {
+            "click .cancel": "cancelBtn",
+            "click .ok": "okBtn"
+        },
 
         getChildView: function(model){
             switch(model.get("type")){
@@ -265,6 +269,102 @@ define([
             this.collection.each(function(editor){
                 editor.trigger("set:current:data");
             });
+        },
+
+        onShow: function(){
+            this.$el.css({
+                display:"none"
+            });
+        },
+
+        open: function(){
+            var offsetTop = 126;
+
+            if ($(window).width() <= 1366) {
+               offsetTop = 88;
+            }
+
+            this.$el.fadeIn().animate({
+                height: [ "70px", "swing" ]},
+                200,
+                function() {
+                //callback
+            });
+
+            $(".canvastable .table .tbody").css({
+                "top": "0"
+            }).animate({
+                top: [ offsetTop, "swing" ]},
+                400,
+                function() {
+                //callback
+            });
+
+            this.showButtons();
+        },
+
+        close: function(){
+
+            if ($(window).width() <= 1366) {
+                var ftop = "0px"
+            }else{
+                var ftop = "56px"
+            }
+
+            this.$el.fadeOut().css({
+                "height": "70px"
+            }).animate({
+                height: [ "0px", "swing" ]},
+                200,
+                function() {
+                //callback
+            });
+
+            $(".canvastable .table .tbody").animate({
+                top: [ ftop, "swing" ]},
+                400,
+                function() {
+                //callback
+            });
+
+            this.hideButtons();
+        },
+
+        showButtons: function(){
+            this.$el.append("<div class=\"buttons\"><div class=\"cancel\"></div><div class=\"ok\"></div></div>");
+
+            var offsetTop = this.$el.offset().top;
+            var offsetleft = $(".canvastable").offset().left + $(".canvastable").width();
+            var buttonsHeight = "67px";
+            var buttonsWidth = $(".region").css("padding");
+            console.log("btn width: ", buttonsWidth);
+            this.$el.find(".buttons").css({
+                "top": offsetTop,
+                "left": offsetleft,
+                "height": buttonsHeight,
+                "width": buttonsWidth
+            });
+            this.$el.find(".buttons").delay(400).fadeIn();
+        },
+
+        hideButtons: function(){
+            $(".tscreed > .buttons").css({
+                "top": "0px"
+            });
+            this.$el.find(".buttons").delay(400).fadeOut();
+
+        },
+
+        cancelBtn: function(){
+            alert("cancel");
+            this.close();
+            this.hideButtons();
+        },
+
+        okBtn: function(){
+            alert("ok");
+            this.close();
+            this.hideButtons();
         }
         // setDataFromModel: function(){
         //     var model = this.Screed.Model;

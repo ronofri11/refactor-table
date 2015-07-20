@@ -31,6 +31,14 @@ define([
                 Screed.getDistinctOptions();
             });
 
+            Screed.Channel.on("open:screed", function(){
+                Screed.RootView.open();
+            });
+
+            Screed.Channel.on("close:screed", function(){
+                Screed.RootView.close();
+            });
+
         });
 
         Screed.populateEditorValues = function(params){

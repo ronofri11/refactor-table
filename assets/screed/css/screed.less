@@ -80,12 +80,15 @@
 .tscreed
 {
     width: 100%;
-    height: 70px;
+    height: auto;
+
+
 }
 .screed
 {
+    // display: none;
     width: 100%;
-    height: 100%;
+    height: 70px;
     overflow-x: auto;
     overflow-y: hidden;
     display: block;
@@ -95,6 +98,7 @@
 
     .box-sizing();
     .shadow(inset 0px 1px 15px -2px rgba(0,0,0,0.3));
+    // .animate(all .4s swing);
 
     > .editor
     {
@@ -103,7 +107,6 @@
         position: relative;
         box-sizing: border-box;
         margin-top: 21px;
-
 
         > span
         {
@@ -182,5 +185,51 @@
     {
         background: rgb(233, 53, 53) !important;
         color: #FFF;
+    }
+
+    > .buttons
+    {
+        display: none;
+        width: 27px;
+        height: 65px;
+        background: #e1e1e1;
+        position: fixed;
+        right: 1%;
+
+        > .cancel
+        {
+            width: 100%;
+            height: 50%;
+            background-color: #c31b1b;
+            cursor: pointer;
+
+            background-image: url(../img/x_white.svg);
+            background-size: 9px;
+            background-position: center center;
+            background-repeat: no-repeat;
+
+            &:hover
+            {
+                .brillo();
+            }
+        }
+
+        > .ok
+        {
+            width: 100%;
+            height: 50%;
+            background-color: #4d8c56;
+            cursor: pointer;
+
+            background-image: url(../img/check_white.svg);
+            background-size: 9px;
+            background-position: center center;
+            background-repeat: no-repeat;
+
+            &:hover
+            {
+                .brillo();
+            }
+        }
     }
 }
