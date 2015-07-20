@@ -281,7 +281,7 @@ define([
             var offsetTop = 126;
 
             if ($(window).width() <= 1366) {
-               offsetTop = 88;
+               offsetTop = 70;
             }
 
             this.$el.fadeIn().animate({
