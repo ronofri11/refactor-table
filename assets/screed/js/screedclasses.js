@@ -320,7 +320,7 @@ define([
                 //callback
             });
 
-            $(".canvastable .table .tbody").animate({
+            $(".canvastable .table .tbody").delay(400).animate({
                 top: [ ftop, "swing" ]},
                 400,
                 function() {
