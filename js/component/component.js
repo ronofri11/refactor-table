@@ -9,8 +9,9 @@ define([
     "../../assets/uploadDrag/js/uploadDrag",
     "../../assets/options/js/options",
     "../../assets/download/js/download",
+    "../../assets/downloadViewer/js/downloadViewer",
     "text!component/templates/componentTemplate.html"
-], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, UploadDrag, Options, Download, ComponentTemplate) {
+], function (Marionette, Radio, Shim, Table, Schedule, CardsForm, SimpleForm, UploadDrag, Options, Download, DownloadViewer, ComponentTemplate) {
 
 var ComponentConstructor = function(dataComponent){
         var Component = new Marionette.Application();
@@ -204,6 +205,8 @@ var ComponentConstructor = function(dataComponent){
                     return Options;
                 case "download":
                     return Download;
+                case "downloadViewer":
+                    return DownloadViewer;
                 default:
                     return Table;
                 //to be continued...

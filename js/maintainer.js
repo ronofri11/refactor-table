@@ -4,9 +4,10 @@ define([
     "radio.shim",
     "mode",
     "modeimport",
+    "modeexport",
     "text!templates/maintainer.html",
     "text!templates/modeselector.html"
-], function (Marionette, Radio, Shim, Mode, ModeImport, maintainerTemplate, modeSelectorTemplate) {
+], function (Marionette, Radio, Shim, Mode, ModeImport, ModeExport, maintainerTemplate, modeSelectorTemplate) {
 
     var MaintainerConstructor = function(channelName){
         var Maintainer = new Marionette.Application();
@@ -157,6 +158,9 @@ define([
                         break;
                     case "uploadDrag":
                         Maintainer.modes[key] = new ModeImport(options.modes[key]);
+                        break;
+                    case "downloadViewer":
+                        Maintainer.modes[key] = new ModeExport(options.modes[key]);
                         break;
                 }
             }

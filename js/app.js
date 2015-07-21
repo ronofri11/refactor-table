@@ -307,6 +307,61 @@ define([
                                 }
 
                             }
+                        },
+												export1: {
+                            name:"export1",
+                            layout: "mainColumn",
+                            channelName: "mode3",
+                            iconClass: "export",
+                            type: "downloadViewer",
+                            components: {
+                                downloadViewer: {
+                                    title: "",
+                                    channelName: "mode3_downloadViewer",
+                                    region: "main",
+                                    controls: [],
+                                    asset: {
+                                        class: "downloadViewer",
+                                        initOptions: {},
+                                        startOptions:{
+                                            files: [
+																							{
+																								name:	"Cursos - 20151.xls"
+																							}
+																						]
+                                        }
+                                    }
+                                },
+                                options: {
+                                    title: "",
+                                    channelName: "mode3_options",
+                                    region: "columnRight",
+                                    controls: [],
+                                    asset: {
+                                        class: "options",
+                                        initOptions: {},
+                                        startOptions:{
+                                            options: [
+                                                {
+                                                    type: "checkbox",
+                                                    content: "opcion1",
+                                                    name: "opcion1"
+                                                },
+                                                {
+                                                    type: "checkbox",
+                                                    content: "opcion2",
+                                                    name: "opcion2"
+                                                },
+                                                {
+                                                    type: "checkbox",
+                                                    content: "opcion3",
+                                                    name: "opcion3"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
                         }
                     };
 
