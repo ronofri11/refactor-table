@@ -344,18 +344,18 @@ define([
                                             options: [
                                                 {
                                                     type: "checkbox",
-                                                    content: "opcion1",
-                                                    name: "opcion1"
+                                                    content: "sede1",
+                                                    name: "sede1"
                                                 },
                                                 {
                                                     type: "checkbox",
-                                                    content: "opcion2",
-                                                    name: "opcion2"
+                                                    content: "sede2",
+                                                    name: "sede2"
                                                 },
                                                 {
                                                     type: "checkbox",
-                                                    content: "opcion3",
-                                                    name: "opcion3"
+                                                    content: "sede3",
+                                                    name: "sede3"
                                                 }
                                             ]
                                         }

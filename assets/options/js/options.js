@@ -78,8 +78,6 @@ define([
                 return Options.Compositeview.getActiveOptions();
             });
 
-
-
         });
 
         return Options;

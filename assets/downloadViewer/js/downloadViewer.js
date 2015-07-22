@@ -2,30 +2,34 @@ define([
     "backbone.marionette",
     "backbone.radio",
     "radio.shim",
-    "text!assets/downloadViewer/templates/downloadViewer.html"
-], function (Marionette, Radio, Shim, DownloadViewerTemplate) {
+    "text!assets/downloadViewer/templates/item.html"
+], function (Marionette, Radio, Shim, DownloadViewerItemTemplate) {
     var DownloadViewerConstructor = function(channelName){
 
         var DownloadViewer = new Marionette.Application();
         DownloadViewer.Channel = Radio.channel(channelName);
 
-        DownloadViewer.LayoutView = Marionette.LayoutView.extend({
-            tagname: "div",
+        DownloadViewer.ItemView = Marionette.ItemView.extend({
+            tagName: "div",
+            className: "file",
+            template: _.template(DownloadViewerItemTemplate)
+        });
+
+        DownloadViewer.CollectionView = Marionette.CollectionView.extend({
+            tagName: "div",
             className: "downloadViewer",
-            template: _.template(DownloadViewerTemplate)
+            childView: DownloadViewer.ItemView,
         });
 
         DownloadViewer.on("start", function(args){
-            console.log("args: ", args);
 
-            // var data = args.modalStuff
-            downloadviewer = Backbone.Model.extend();
-            DownloadViewer.Model = new downloadviewer(args);
+            var downCol = Backbone.Collection.extend();
+            DownloadViewer.Collection = new downCol(args.files);
 
-            DownloadViewer.layoutView = new DownloadViewer.LayoutView({model:DownloadViewer.Model});
+            DownloadViewer.colecctionview = new DownloadViewer.CollectionView({collection:DownloadViewer.Collection});
 
             DownloadViewer.Channel.reply("get:root", function(){
-                return DownloadViewer.layoutView;
+                return DownloadViewer.colecctionview;
             });
 
         });
