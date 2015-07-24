@@ -1,7 +1,7 @@
 define([
-	"backbone.marionette",
-	"backbone.radio",
-	"radio.shim",
+    "backbone.marionette",
+    "backbone.radio",
+    "radio.shim",
     "assets/store/js/store",
     "assets/menu/js/menu",
     "assets/appbar/js/appbar",
@@ -9,7 +9,7 @@ define([
     "text!templates/apptemplate.html"
 ], function (Marionette, Radio, Shim, Store, Menu, AppBar, Maintainer, AppTemplate) {
 
-	var AppConstructor = function(channelName){
+    var AppConstructor = function(channelName){
         var App = new Marionette.Application();
         App.Channel = Radio.channel(channelName);
 
@@ -193,7 +193,7 @@ define([
                                                 {
                                                     property: "carrera",
                                                     nested: true,
-                                                    displayKeys: ["codigo_cliente", "nombre"],
+                                                    displayKeys: ["codigo_cliente"],
                                                     alias: "carrera"
                                                 },
                                                 {
@@ -308,7 +308,7 @@ define([
 
                             }
                         },
-												export1: {
+                        export1: {
                             name:"export1",
                             layout: "mainColumn",
                             channelName: "mode3",
@@ -325,10 +325,10 @@ define([
                                         initOptions: {},
                                         startOptions:{
                                             files: [
-																							{
-																								name:	"Cursos - 20151.xls"
-																							}
-																						]
+                                                {
+                                                   name:    "Cursos - 20151.xls"
+                                                }
+                                            ]
                                         }
                                     }
                                 },

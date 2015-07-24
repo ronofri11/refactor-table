@@ -253,9 +253,14 @@ define([
             });
 
             $(document).on("click", function(event){
-                var tableContext = tableChannel.request("get:context:selector");
-                if($(event.target).not(tableContext)){
-                    tableChannel.trigger("empty:selection");
+                var tableContext = tableChannel.request("get:context:selectors");
+                var outOfContext = true;
+                _.each(tableContext, function(selector){
+                    outOfContext = outOfContext && $(event.target).not(selector);
+                });
+                if(outOfContext){
+                    // tableChannel.trigger("empty:selection");
+                    // tableChannel.trigger("close:screed");
                     contextmenuChannel.trigger("hide:contextmenu");
                 }
             });

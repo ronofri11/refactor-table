@@ -2,16 +2,16 @@
     <!-- <span><%-title%></span> -->
     <select>
         <option data-value="">...</option>
-        <% _.each(options, function(option){ %>
-            <% var value = option.get(filterKey); %>
-            <% if( data != null && data != "") { %>
-            	<% if( value == data.get(filterKey)) { %>
-            		<option data-value="<%-value%>" selected><%-caption(option)%></option>
+        <% _.each(availableOptions, function(option){ %>
+            <% var value = option.get("value"); %>
+            <% if( dataValue != null && dataValue != "") { %>
+            	<% if( value == dataValue) { %>
+            		<option data-value="<%-value%>" selected><%-value%></option>
             	<% } else { %>
-            		<option data-value="<%-value%>"><%-caption(option)%></option>
+            		<option data-value="<%-value%>"><%-value%></option>
             	<% } %>
             <% } else { %>
-                <option data-value="<%-value%>"><%-caption(option)%></option>
+                <option data-value="<%-value%>"><%-value%></option>
             <% } %>
         <% }); %>
     </select>

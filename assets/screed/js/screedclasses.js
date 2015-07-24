@@ -47,6 +47,8 @@ define([
         // }
     });
 
+    ScreedClasses.EmptyCollection = Backbone.Collection.extend();
+
     ScreedClasses.Editors = Backbone.Collection.extend({
         model: ScreedClasses.Editor
     });
@@ -59,8 +61,11 @@ define([
         },
 
         initialize: function(){
+            var self = this;
             this.view.Screed = this.view.getOption("screed");
             this.view.broadcastEvent = function(event){
+                event.preventDefault();
+                event.stopPropagation();
                 var eventName = "editor:" + event.type;
                 this.Screed.Channel.trigger(eventName, {
                     eventName: eventName,
@@ -140,7 +145,7 @@ define([
 
         setCurrentData: function(){
             var data = this.getCurrentData();
-            this.model.set({"data": data});
+            this.model.set({"collectedData": data});
         },
 
         getCurrentData: function(){
@@ -161,7 +166,11 @@ define([
         },
 
         events: {
-            "change select": "broadcastEvent"
+            "change select": "optionSelected"
+        },
+
+        initialize: function(){
+            this.listenTo(this.model.get("availableOptions"), "reset", this.render);
         },
 
         getTemplate: function(){
@@ -174,27 +183,17 @@ define([
         },
 
         templateHelpers: function(){
-            var self = this;
-            var caption = function(option){
-                var text;
-                _.each(self.model.get("filterDisplay"), function(displayKey){
-                    if(text === undefined){
-                        text = "" + option.get(displayKey);
-                    }
-                    else{
-                        text = text + ":" + option.get(displayKey);
-                    }
-                });
-                return text;
-            };
+            var availableOptions = this.model.get("availableOptions").toArray();
+            var dataValue = this.model.getValue(this.model.get("data"));
             return {
-                caption: caption
+                availableOptions: availableOptions,
+                dataValue: dataValue
             };
         },
 
         setCurrentData: function(){
             var data = this.getCurrentData();
-            this.model.set({"data": data});
+            this.model.set({"collectedData": data});
         },
 
         getCurrentData: function(){
@@ -212,20 +211,31 @@ define([
         },
 
         optionlookup: function(value){
-            var filterKey = this.model.get("filterKey");
-
+            console.log("looking up options for:", value);
+            var self = this;
             var relevants = _.filter(this.model.get("options"), function(option){
-                if(option.get(filterKey) == value){
+                var optionValue = self.model.getValue(option);
+                if(optionValue == value){
                     return true;
                 }
                 return false;
             });
+
+            console.log("relevants were:", relevants);
 
             if(relevants.length > 0){
                 return relevants[0];
             }
 
             return null;
+        },
+
+        optionSelected: function(){
+            var currentOption = this.getCurrentData();
+            this.Screed.Channel.trigger("editor:nested:change", {
+                value: currentOption,
+                editor: this.model
+            });
         }
     });
 
@@ -356,15 +366,23 @@ define([
         },
 
         cancelBtn: function(){
-            alert("cancel");
-            this.close();
-            this.hideButtons();
+            console.log("cancel");
+            this.Screed.Channel.trigger("close:screed", {save: false});
         },
 
         okBtn: function(){
-            alert("ok");
-            this.close();
-            this.hideButtons();
+            console.log("ok");
+            this.Screed.Channel.trigger("close:screed", {save: true});
+        },
+
+        collectFormData: function(){
+            var formData = {};
+            this.collection.each(function(editor){
+                console.log("collecting for editor: ", editor.get("alias"));
+                var editorData = editor.trigger("set:current:data");
+                formData[editor.get("key")] = editor.get("collectedData");
+            });
+            return formData;
         }
         // setDataFromModel: function(){
         //     var model = this.Screed.Model;

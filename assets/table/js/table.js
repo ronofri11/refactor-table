@@ -241,7 +241,7 @@ define([
             });
 
             Table.Channel.on("row:click", function(args){
-                Table.Screed.Channel.trigger("close:screed");
+                screedChannel.trigger("close:screed", {save: false});
                 switch(Table.mode){
                     case "append":
                         Table.addToSelection(args);
@@ -280,12 +280,23 @@ define([
             // screed
             Table.Channel.on("show:screed", function(){
                 var selectedRows = Table.getSelectedRows();
-                screedChannel.trigger("show:screed", {
+                screedChannel.trigger("reset:screed:values", {
                     rows: selectedRows,
                     column: Table.workingColumn
                 });
                 // open
                 screedChannel.trigger("open:screed");
+            });
+
+            Table.Channel.on("close:screed", function(args){
+                var save;
+                if(args !== undefined){
+                    save = args.save;
+                }
+                else{
+                    save = false;
+                }
+                screedChannel.trigger("close:screed", {save: save});
             });
 
 
@@ -313,8 +324,9 @@ define([
                 };
             });
 
-            Table.Channel.reply("get:context:selector", function(){
-                return Table.RootView.$el;
+            Table.Channel.reply("get:context:selectors", function(){
+                var context = [Table.RootView.$el];
+                return context;
             });
 
             Table.Channel.on("empty:selection", function(){
