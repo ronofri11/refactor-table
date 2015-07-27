@@ -1,12 +1,13 @@
 define([
     "backbone.marionette",
+    "assets/typeahead/js/typeahead",
     "text!assets/screed/templates/numbertemplate.html",
     "text!assets/screed/templates/stringtemplate.html",
     "text!assets/screed/templates/booleantemplate.html",
     "text!assets/screed/templates/nestedtemplate.html",
     "text!assets/screed/templates/disabledtemplate.html",
     "text!assets/screed/templates/disablednestedtemplate.html",
-], function (Marionette, NumberTemplate, StringTemplate, BooleanTemplate, NestedTemplate, DisabledTemplate, DisabledNestedTemplate) {
+], function (Marionette, TypeAhead, NumberTemplate, StringTemplate, BooleanTemplate, NestedTemplate, DisabledTemplate, DisabledNestedTemplate) {
 
     var ScreedClasses = {};
 
@@ -160,84 +161,114 @@ define([
         },
     });
 
-    ScreedClasses.EditorNestedView = Marionette.ItemView.extend({
-        behaviors: {
-            EditorBehavior: {}
-        },
+    ScreedClasses.EditorNestedView = Marionette.LayoutView.extend({
+      behaviors: {
+          EditorBehavior: {}
+      },
+      className: "editorLayout",
+      template: _.template("<div class=\"layoutEditor\"></div>"),
+      regions: {
+        "layout": ".layoutEditor"
+      },
+      initialize: function(){
+        // data
+        var options = this.model.get("availableOptions");
+        console.log("options: ", options);
+        var arrayCollection = Backbone.Collection.extend();
+        var optionArrayCollection = new arrayCollection(options);
+        console.log("optionArrayCollection: ", optionArrayCollection);
 
-        events: {
-            "change select": "optionSelected"
-        },
+        // show typeahead
+        this.typeahead = new TypeAhead("typeahead_" + this.model.get("alias"));
+        this.typeahead.start({
+          containerHeight: this.$el.outerHeight(),
+          separator: "__",
+          displayKeys: ["value"],
+          models: optionArrayCollection
+        });
 
-        initialize: function(){
-            this.listenTo(this.model.get("availableOptions"), "reset", this.render);
-        },
+      },
+      onShow: function(){
+        var typeaheadChannel = this.typeahead.Channel;
+        var typeaheadView = typeaheadChannel.request("get:root");
+        this.getRegion("layout").show(typeaheadView);
 
-        getTemplate: function(){
-            if(!this.model.get("enabled")){
-                return _.template(DisabledNestedTemplate);
-            }
-            else{
-                return _.template(NestedTemplate);
-            }
-        },
-
-        templateHelpers: function(){
-            var availableOptions = this.model.get("availableOptions").toArray();
-            var dataValue = this.model.getValue(this.model.get("data"));
-            return {
-                availableOptions: availableOptions,
-                dataValue: dataValue
-            };
-        },
-
-        setCurrentData: function(){
-            var data = this.getCurrentData();
-            this.model.set({"collectedData": data});
-        },
-
-        getCurrentData: function(){
-            var option = this.$el.find("select option:selected");
-            var optionValue = option.attr("data-value");
-
-            if(optionValue !== ""){
-                var optionModel = this.optionlookup(optionValue);
-
-                return optionModel;
-            }
-            else{
-                return null;
-            }
-        },
-
-        optionlookup: function(value){
-            console.log("looking up options for:", value);
-            var self = this;
-            var relevants = _.filter(this.model.get("options"), function(option){
-                var optionValue = self.model.getValue(option);
-                if(optionValue == value){
-                    return true;
-                }
-                return false;
-            });
-
-            console.log("relevants were:", relevants);
-
-            if(relevants.length > 0){
-                return relevants[0];
-            }
-
-            return null;
-        },
-
-        optionSelected: function(){
-            var currentOption = this.getCurrentData();
-            this.Screed.Channel.trigger("editor:nested:change", {
-                value: currentOption,
-                editor: this.model
-            });
-        }
+      }
     });
+
+    // ScreedClasses.EditorNestedView = Marionette.ItemView.extend({
+    //     behaviors: {
+    //         EditorBehavior: {}
+    //     },
+    //
+    //     events: {
+    //         "change select": "broadcastEvent"
+    //     },
+    //
+    //     getTemplate: function(){
+    //         if(!this.model.get("enabled")){
+    //             return _.template(DisabledNestedTemplate);
+    //         }
+    //         else{
+    //             return _.template(NestedTemplate);
+    //         }
+    //     },
+    //
+    //     templateHelpers: function(){
+    //         var self = this;
+    //         var caption = function(option){
+    //             var text;
+    //             _.each(self.model.get("filterDisplay"), function(displayKey){
+    //                 if(text === undefined){
+    //                     text = "" + option.get(displayKey);
+    //                 }
+    //                 else{
+    //                     text = text + ":" + option.get(displayKey);
+    //                 }
+    //             });
+    //             return text;
+    //         };
+    //         return {
+    //             caption: caption
+    //         };
+    //     },
+    //
+    //     setCurrentData: function(){
+    //         var data = this.getCurrentData();
+    //         this.model.set({"data": data});
+    //     },
+    //
+    //     getCurrentData: function(){
+    //         var option = this.$el.find("select option:selected");
+    //         var optionValue = option.attr("data-value");
+    //
+    //         if(optionValue !== ""){
+    //             var optionModel = this.optionlookup(optionValue);
+    //
+    //             return optionModel;
+    //         }
+    //         else{
+    //             return null;
+    //         }
+    //     },
+    //
+    //     optionlookup: function(value){
+    //         var filterKey = this.model.get("filterKey");
+    //
+    //         var relevants = _.filter(this.model.get("options"), function(option){
+    //             if(option.get(filterKey) == value){
+    //                 return true;
+    //             }
+    //             return false;
+    //         });
+    //
+    //         if(relevants.length > 0){
+    //             return relevants[0];
+    //         }
+    //
+    //         return null;
+    //     }
+    // });
 
     ScreedClasses.EditorCollectionView = Marionette.CollectionView.extend({
         tagName: "div",

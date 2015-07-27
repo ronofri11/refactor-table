@@ -325,10 +325,11 @@ define([
                                         initOptions: {},
                                         startOptions:{
                                             files: [
-                                                {
-                                                   name:    "Cursos - 20151.xls"
-                                                }
-                                            ]
+																							{
+																								name:	"Cursos - 20151.xls",
+																								resume: "Descarga de planilla de cursos con todos los registros. Actualizados al 22 de Julio del 2015."
+																							}
+																						]
                                         }
                                     }
                                 },
