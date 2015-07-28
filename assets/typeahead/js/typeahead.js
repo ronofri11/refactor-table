@@ -151,6 +151,7 @@ define([
                     case 13: // enter
                       var textSelected = ActualLi.text();
                       searchboxInput.val(textSelected);
+                      this.closeOption();
                       break;
 
                     default: return this.filterOptions() ; // exit this handler for other keys
