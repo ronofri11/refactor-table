@@ -65,7 +65,8 @@ define([
                 'focusin .searchbox input': 'inOptions',
                 // 'focusout .searchbox input': 'outOptions',
                 // 'click .optionbox ul li'   : 'enterOption'
-                'keyup .searchbox input': 'keyboardAction'
+                'keyup .searchbox input': 'keyboardAction',
+                'click .cancelSelected': 'clearFilter'
             },
             childEvents: {
                 "optionClicked": "optionClicked"
@@ -172,6 +173,9 @@ define([
 
                 TypeAhead.optionArrayPool.reset(optionArray);
             },
+            clearOptions: function(){
+              alert('ok');
+            },
             updateSelected: function(model){
                 TypeAhead.optionCollection.each(function(option){
                     if(option.cid === model.cid){
@@ -198,14 +202,20 @@ define([
 
               this.$el.find(".optionbox").addClass("show");
               this.setDimensionOptionBox();
+              // show x
+              $(".searchbox .cancelSelected").removeClass("show");
+              this.$el.find(".searchbox .cancelSelected").addClass("show");
             },
             outOptions: function(event){
               event.preventDefault();
               event.stopPropagation();
-              this.$el.find(".optionbox").removeClass("show");
-              var searchinput = this.$el.find("input");
-              var optionbox = this.$el.find(".optionbox");
-              var optionboxItem = this.$el.find(".optionbox li");
+              // this.$el.find(".optionbox").removeClass("show");
+              // var searchinput = this.$el.find("input");
+              // var optionbox = this.$el.find(".optionbox");
+              // var optionboxItem = this.$el.find(".optionbox li");
+              // hide x
+              this.$el.find(".searchbox .cancelSelected").removeClass("show");
+
             },
             selectNext: function(){
                 var currentOption = this.collection.findWhere({
@@ -247,6 +257,7 @@ define([
                 var input = this.$el.find(".searchbox input");
                 input.val("");
                 this.filterOptions();
+                $(".searchbox .cancelSelected").removeClass("show");
             }
         });
 

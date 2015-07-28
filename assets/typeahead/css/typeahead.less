@@ -19,10 +19,27 @@
 
 }
 
+.centerVertical
+{
+    position: absolute;
+    top: 50%;
+
+    .translate(0%, -50%);
+}
+
 .shadow(@s: 3px 3px 4px #444) {
     -moz-box-shadow: @s;
     -webkit-box-shadow: @s;
     box-shadow: @s;
+}
+
+.border-radius(@radius: 10px)
+{
+  -webkit-border-radius: @radius;
+     -moz-border-radius: @radius;
+      -ms-border-radius: @radius;
+       -o-border-radius: @radius;
+          border-radius: @radius;
 }
 
 
@@ -72,6 +89,23 @@
         //     background-position: center center;
         //     background-repeat: no-repeat;
         // }
+
+        .cancelSelected
+        {
+          display: none;
+          width: 10px;
+          height: 10px;
+          background-color: #f6f3f3;
+          right: 10%;
+          cursor: pointer;
+          background-image: url(../img/cancel.svg);
+          background-size: 6px;
+          background-position: center center;
+          background-repeat: no-repeat;
+          // top: 8px;
+          .centerVertical;
+          .border-radius(50%);
+        }
     }
 
     > .optionbox
@@ -158,9 +192,11 @@
 
         }
 
+
+
     }
 .show
 {
-    display: block;
+    display: block !important;
 }
 }
