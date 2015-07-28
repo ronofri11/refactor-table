@@ -172,7 +172,6 @@ define([
       },
       initialize: function(){
         // data
-        console.log("this model", this.model);
         var options = this.model.get("availableOptions");
         // console.log("availableOptions: ", options);
         // var arrayCollection = Backbone.Collection.extend();

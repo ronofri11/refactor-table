@@ -38,6 +38,7 @@ define([
                 this.triggerMethod("optionClicked", {
                     model: this.model
                 });
+                TypeAhead.Channel.trigger("option:close", { event: event });
             },
             updateSelected: function(){
                 if(this.model.get("selected")){
@@ -56,12 +57,10 @@ define([
             childViewContainer: "ul",
             template: _.template(TypeAheadTemplate),
             events: {
-                'focusin .searchbox input': 'toggleMglass',
-                'focusout .searchbox input': 'outMglass',
-                'focusin .searchbox input': 'toogleOptions',
-                'focusout .searchbox input': 'outOptions',
+                'focusin .searchbox input': 'inOptions',
+                // 'focusout .searchbox input': 'outOptions',
                 // 'click .optionbox ul li'   : 'enterOption'
-                'keyup .searchbox input': 'filterOptions'
+                'keyup .searchbox input': 'keyboardAction'
             },
             childEvents: {
                 "optionClicked": "optionClicked"
@@ -72,45 +71,31 @@ define([
                     displayKeys: options.displayKeys
                 };
             },
-            onShow: function(){
-                this.setDimensionOptionBox();
-
-                // var self = this;
-
-                // click out optionbox when show
-                $("*").click(function(event){
-                    TypeAhead.Channel.trigger("option:close", { event: event });
-                });
+            onShow: function(event){
+                var self = this;
+                //click out optionbox when show
+                // $("*").click(function(event){
+                //   event.preventDefault();
+                //   event.stopPropagation();
+                //   if( $(event.target).not(".typeahead input") ){
+                //     TypeAhead.Channel.trigger("option:close", { event: event });
+                //   };
+                // });
             },
             closeOption: function(event){
                 var inputSearch = this.$el.find(".searchbox input");
-
-                if ($(event.target).hasClass('search')){
-                    // clickea en input: no hace nada
-                    this.$el.find(".optionbox").show();
-                }else{
-                    if (event.currentTarget === event.originalEvent.target){
-                        this.$el.find(".optionbox").hide();
-
-                        if(inputSearch.val() == ''){
-                            inputSearch.addClass("mglass");
-                            this.$el.find(".searchbox input").blur();
-                        }
-                    }
-                }
+                this.$el.find(".optionbox").removeClass("show");
             },
             setDimensionOptionBox: function(){
-                var parentHeight = this.$el.parent().parent().height();
-                var heightContainer = this.$el.parent().outerHeight();
+                var searchbox = this.$el.find(".searchbox input");
                 var searchboxHeight = this.$el.find(".searchbox").outerHeight();
                 if(searchboxHeight < 1){
                     searchboxHeight = 35;
                 }
-                var optionboxHeight = heightContainer - searchboxHeight;
 
-                this.$el.find(".optionbox").height(parentHeight + "px");
-                this.$el.find(".optionbox").css({ "top": searchboxHeight + "px" });
-                // this.$el.find(".optionbox ul").height(optionboxHeight + "px");
+                this.$el.find(".optionbox").css({ "top": searchboxHeight + searchbox.offset().top + "px" });
+                this.$el.find(".optionbox").css({ "left": searchbox.offset().left + "px" });
+                this.$el.find(".optionbox").css({ "width": searchbox.outerWidth() });
             },
             modelCaption: function(model){
                 var cap = "";
@@ -127,57 +112,44 @@ define([
             optionClicked: function(view, args){
                 this.updateSelected(args.model);
             },
-            updateSelected: function(model){
-                TypeAhead.optionCollection.each(function(option){
-                    if(option.cid === model.cid){
-                        option.set({"selected": true});
-                    }
-                    else{
-                        option.set({"selected": false});
-                    }
-                });
+            keyboardAction: function(event){
+                var optionbox = this.$el.find(".optionbox");
+                var searchbox = this.$el.find(".searchbox");
+                var searchboxInput = this.$el.find(".searchbox input");
+                var allLi = this.$el.find(".optionbox ul li");
+                var firstLi = this.$el.find(".optionbox ul li:nth-child(1)");
+                var lastLi = this.$el.find(".optionbox ul li:last-child");
+                var nextLi = this.$el.find(".optionbox ul .selected").next();
+                var prevLi = this.$el.find(".optionbox ul .selected").prev();
+                var ActualLi = this.$el.find(".optionbox ul .selected");
 
-                var searchinput = this.$el.find(".searchbox input");
-                var selectedItem = this.modelCaption(model);
-                searchinput.val(selectedItem);
-                this.outMglass();
+                switch(event.which) {
+                    case 40: // down
+                      if(allLi.hasClass("selected")){
+                        allLi.removeClass("selected");
+                        nextLi.addClass("selected");
+                      }else{
+                        firstLi.addClass("selected");
+                      }
+                      break;
 
-                // var index = this.collection.indexOf(model);
-                this.adjustScroll();
+                    case 38: // up
+                      if(allLi.hasClass("selected")){
+                        allLi.removeClass("selected");
+                        prevLi.addClass("selected");
+                      }else{
+                        lastLi.addClass("selected");
+                      }
+                      break;
 
-                TypeAhead.Channel.trigger("selected:model:change", {model: model});
-            },
-            toggleMglass: function(){
-                var searchinput = this.$el.find("input");
-                var items = this.$el.find(".optionbox li");
-                if( searchinput.val() != "" ){
-                }else{
-                    searchinput.removeClass("mglass");
+                    case 13: // enter
+                      var textSelected = ActualLi.text();
+                      searchboxInput.val(textSelected);
+                      break;
+
+                    default: return this.filterOptions() ; // exit this handler for other keys
                 }
-                // items.removeClass("selected");
-                searchinput.select();
-
-            },
-            outMglass: function(event){
-                var searchinput = this.$el.find("input");
-                var optionbox = this.$el.find(".optionbox");;
-                if (searchinput.val() == '') {
-                    searchinput.addClass("mglass");
-                }else{
-                    searchinput.removeClass("mglass");
-                }
-            },
-            toogleOptions: function(){
-                this.$el.find(".optionbox").toggleClass("show");
-            },
-            outOptions: function(){
-                var searchinput = this.$el.find("input");
-                var optionbox = this.$el.find(".optionbox");;
-                if (searchinput.val() == '') {
-                    optionbox.addClass("show");
-                }else{
-                    optionbox.removeClass("show");
-                }
+                event.preventDefault(); // prevent the default action (scroll / move caret)
             },
             filterOptions: function(){
                 var word = this.$el.find(".searchbox input").val();
@@ -192,6 +164,41 @@ define([
                 }, this);
 
                 TypeAhead.optionArrayPool.reset(optionArray);
+            },
+            updateSelected: function(model){
+                TypeAhead.optionCollection.each(function(option){
+                    if(option.cid === model.cid){
+                        option.set({"selected": true});
+                    }
+                    else{
+                        option.set({"selected": false});
+                    }
+                });
+
+                var searchinput = this.$el.find(".searchbox input");
+                var selectedItem = this.modelCaption(model);
+                searchinput.val(selectedItem);
+
+                // var index = this.collection.indexOf(model);
+                this.adjustScroll();
+
+                TypeAhead.Channel.trigger("selected:model:change", {model: model});
+            },
+            inOptions: function(event){
+              event.preventDefault();
+              event.stopPropagation();
+              $(".optionbox").removeClass("show");
+
+              this.$el.find(".optionbox").addClass("show");
+              this.setDimensionOptionBox();
+            },
+            outOptions: function(event){
+              event.preventDefault();
+              event.stopPropagation();
+              this.$el.find(".optionbox").removeClass("show");
+              var searchinput = this.$el.find("input");
+              var optionbox = this.$el.find(".optionbox");
+              var optionboxItem = this.$el.find(".optionbox li");
             },
             selectNext: function(){
                 var currentOption = this.collection.findWhere({
@@ -233,7 +240,6 @@ define([
                 var input = this.$el.find(".searchbox input");
                 input.val("");
                 this.filterOptions();
-                input.addClass("mglass");
             }
         });
 
@@ -279,6 +285,8 @@ define([
             TypeAhead.Channel.listenTo(TypeAhead.optionCollection, "reset", function(){
                 TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
             });
+
+
         });
 
         return TypeAhead;
