@@ -275,6 +275,10 @@ define([
             TypeAhead.Channel.on("option:close", function(args){
                 TypeAhead.RootView.closeOption.call(TypeAhead.RootView, args.event);
             });
+
+            TypeAhead.Channel.listenTo(TypeAhead.optionCollection, "reset", function(){
+                TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
+            });
         });
 
         return TypeAhead;

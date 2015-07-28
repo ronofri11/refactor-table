@@ -172,11 +172,12 @@ define([
       },
       initialize: function(){
         // data
+        console.log("this model", this.model);
         var options = this.model.get("availableOptions");
-        console.log("options: ", options);
-        var arrayCollection = Backbone.Collection.extend();
-        var optionArrayCollection = new arrayCollection(options);
-        console.log("optionArrayCollection: ", optionArrayCollection);
+        // console.log("availableOptions: ", options);
+        // var arrayCollection = Backbone.Collection.extend();
+        // var optionArrayCollection = new arrayCollection(options);
+        // console.log("optionArrayCollection: ", optionArrayCollection);
 
         // show typeahead
         this.typeahead = new TypeAhead("typeahead_" + this.model.get("alias"));
@@ -184,7 +185,7 @@ define([
           containerHeight: this.$el.outerHeight(),
           separator: "__",
           displayKeys: ["value"],
-          models: optionArrayCollection
+          models: this.model.get("availableOptions")
         });
 
       },
@@ -200,11 +201,16 @@ define([
     //     behaviors: {
     //         EditorBehavior: {}
     //     },
-    //
+
     //     events: {
-    //         "change select": "broadcastEvent"
+    //         "change select": "optionSelected",
+    //         "focusin select": "focusinSelect"
     //     },
-    //
+
+    //     initialize: function(){
+    //         this.listenTo(this.model.get("availableOptions"), "reset", this.render);
+    //     },
+
     //     getTemplate: function(){
     //         if(!this.model.get("enabled")){
     //             return _.template(DisabledNestedTemplate);
@@ -213,62 +219,70 @@ define([
     //             return _.template(NestedTemplate);
     //         }
     //     },
-    //
+
     //     templateHelpers: function(){
-    //         var self = this;
-    //         var caption = function(option){
-    //             var text;
-    //             _.each(self.model.get("filterDisplay"), function(displayKey){
-    //                 if(text === undefined){
-    //                     text = "" + option.get(displayKey);
-    //                 }
-    //                 else{
-    //                     text = text + ":" + option.get(displayKey);
-    //                 }
-    //             });
-    //             return text;
-    //         };
+    //         var availableOptions = this.model.get("availableOptions").toArray();
+    //         var dataValue = this.model.getValue(this.model.get("data"));
     //         return {
-    //             caption: caption
+    //             availableOptions: availableOptions,
+    //             dataValue: dataValue
     //         };
     //     },
-    //
+
     //     setCurrentData: function(){
     //         var data = this.getCurrentData();
     //         this.model.set({"data": data});
+    //         this.model.set({"collectedData": data});
     //     },
-    //
+
     //     getCurrentData: function(){
     //         var option = this.$el.find("select option:selected");
     //         var optionValue = option.attr("data-value");
-    //
+
     //         if(optionValue !== ""){
     //             var optionModel = this.optionlookup(optionValue);
-    //
+
     //             return optionModel;
     //         }
     //         else{
     //             return null;
     //         }
     //     },
-    //
+
     //     optionlookup: function(value){
-    //         var filterKey = this.model.get("filterKey");
-    //
+    //         console.log("looking up options for:", value);
+    //         var self = this;
     //         var relevants = _.filter(this.model.get("options"), function(option){
-    //             if(option.get(filterKey) == value){
+    //             var optionValue = self.model.getValue(option);
+    //             if(optionValue == value){
     //                 return true;
     //             }
     //             return false;
     //         });
-    //
+
+    //         console.log("relevants were:", relevants);
+
     //         if(relevants.length > 0){
     //             return relevants[0];
     //         }
-    //
+
     //         return null;
+    //     },
+
+    //     optionSelected: function(){
+    //         this.model.trigger("set:current:data");
+    //         this.model.trigger("option:selected", {editor: this.model});
+    //         // var currentOption = this.getCurrentData();
+    //         // this.Screed.Channel.trigger("editor:nested:change", {
+    //         //     value: currentOption,
+    //         //     editor: this.model
+    //         // });
+    //     },
+
+    //     focusinSelect: function(){
+    //         console.log("focus in select", this.model.get("alias"));
     //     }
-    // });
+    // };
 
     ScreedClasses.EditorCollectionView = Marionette.CollectionView.extend({
         tagName: "div",
@@ -295,6 +309,8 @@ define([
             this.childViewOptions = {
                 screed: this.Screed
             };
+
+            this.listenTo(this.collection, "option:selected", this.updateNestedOptions);
         },
 
         exportData: function(){
@@ -414,6 +430,54 @@ define([
                 formData[editor.get("key")] = editor.get("collectedData");
             });
             return formData;
+        },
+
+        updateNestedOptions: function(args){
+            console.log(args.editor);
+            var emitterEditor = args.editor;
+            var affectedEditors = this.collection.filter(function(editor){
+                return (editor.get("key") === emitterEditor.get("key"));
+            });
+
+            var optionFilters = {};
+
+            _.each(affectedEditors, function(editor){
+                optionFilters[editor.get("alias")] = {
+                    value: editor.getValue(editor.get("collectedData")),
+                    editor: editor
+                };
+            });
+
+            var filteredOptions = _.filter(emitterEditor.get("options"), function(option){
+                var relevant = true;
+                _.each(optionFilters, function(filter){
+                    var editor = filter.editor;
+                    var value = filter.value;
+
+                    if(value !== null){
+                        relevant = relevant && (editor.getValue(option) === value);
+                    }
+                });
+                return relevant;
+            });
+
+            _.each(affectedEditors, function(editor){
+                var options = _.map(filteredOptions, function(option){
+                    var id = option.get("id");
+                    var value = editor.getValue(option);
+                    return {
+                        id: id,
+                        value: value
+                    };
+                });
+                var distinctOptions = _.sortBy(_.uniq(options, function(option){
+                    return option.value;
+                }), function(option){
+                    return option.value;
+                });
+
+                editor.get("availableOptions").reset(distinctOptions);
+            });
         }
         // setDataFromModel: function(){
         //     var model = this.Screed.Model;

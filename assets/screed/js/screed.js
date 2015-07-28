@@ -62,7 +62,7 @@ define([
 
                     if(editor.getValue === undefined){
                         editor.getValue = function(model){
-                            if(model !== null){
+                            if(model !== null && model !== undefined){
                                 var filterDisplay = editor.get("filterDisplay");
                                 var count = 0;
                                 var value = "";
