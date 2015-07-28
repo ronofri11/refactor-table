@@ -26,10 +26,10 @@ define([
 
         App.startStore = function(url){
             App.urlAPI = url;
-            var store = new Store("store");
-            var storeChannel = store.Channel;
+            App.store = new Store("store");
+            var storeChannel = App.store.Channel;
 
-            store.start({url: url});
+            App.store.start({url: url});
 
             var rows;
             var modelName = "Curso";
@@ -656,6 +656,24 @@ define([
             App.Channel.reply("get:root", function(){
                 return App.RootView;
             });
+
+            var storeChannel = App.store.Channel;
+
+            App.Channel.listenTo(maintainerChannel, "send:form:data", function(args){
+                var isValid = storeChannel.request("validate:form:data", args.formData);
+
+                if(isValid){
+                    storeChannel.command("save:form:data", args.formData);
+                    args.successCallback();
+                }
+                else{
+                    args.failCallback({errorMessage: "Debe escoger una sede"});
+                }
+            });
+
+            // App.Channel.listenTo(storeChannel, "", function(args){
+
+            // });
 
             // contextmenu
 

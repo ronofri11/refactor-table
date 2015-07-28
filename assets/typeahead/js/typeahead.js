@@ -262,12 +262,12 @@ define([
         });
 
         TypeAhead.on("start", function(options){
-            console.log("TP options: ", options);
+            // console.log("TP options: ", options);
             var OptionCollection = Backbone.Collection.extend();
 
             TypeAhead.optionCollection = options.models;
 
-            console.log("TypeAhead.optionCollection: ", TypeAhead.optionCollection);
+            // console.log("TypeAhead.optionCollection: ", TypeAhead.optionCollection);
             TypeAhead.optionArrayPool = new OptionCollection();
             TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
 

@@ -37,18 +37,26 @@ define([
                 Screed.RootView.open();
             });
 
-            Screed.Channel.on("close:screed", function(args){
-                var save = args.save;
-                if(save){
-                    var formData = Screed.RootView.collectFormData();
-                    console.log("formData on screed", formData);
-                    //some other event to send formData and rows,column to Store
-                }
+            Screed.Channel.on("close:screed", function(){
                 Screed.RootView.close();
             });
 
-            Screed.Channel.on("editor:nested:change", function(args){
-                Screed.updateEditorOptions(args);         
+            Screed.Channel.on("save:form:data", function(){
+                var formData = Screed.RootView.collectFormData();
+                Screed.Channel.trigger("send:form:data", {
+                    formData: formData,
+                    successCallback: function(){
+                        //maybe display some notification
+                        Screed.Channel.trigger("close:screed");
+                    },
+                    failCallback: function(args){
+                        Screed.Channel.trigger("display:errors", args);
+                    }
+                });
+            });
+
+            Screed.Channel.on("display:errors", function(args){
+                console.log(args.errorMessage);
             });
         });
 
@@ -142,41 +150,6 @@ define([
                     }
                 });
             });
-        };
-
-        Screed.updateEditorOptions = function(args){
-            // var emitterEditor = args.editor;
-            // var value = args.value;
-
-            // if(value !== ""){
-
-            //     var affectedEditors = Screed.Editors.filter(function(editor){
-            //         return (editor.get("alias") !== emitterEditor.get("alias")) 
-            //             && (editor.get("key") === emitterEditor.get("key"));
-            //     });
-
-            //     var options = _.filter(editor.get("options"), function(option){
-            //         var id = option.get("id");
-            //         var value = editor.getValue(option) == args.value;
-            //     });
-            //     var distinctOptions = _.sortBy(_.uniq(options, function(option){
-            //         return option.value;
-            //     }), function(option){
-            //         return option.value;
-            //     });
-
-
-
-            //     _.each(affectedEditors, function(editor){
-                    
-
-            //         editor.get("availableOptions").reset(distinctOptions);
-            //     });
-            // }
-            // else{
-
-            // }
-
         };
 
         return Screed;

@@ -626,6 +626,14 @@ define([
                 };
             });
 
+            Store.Channel.reply("validate:form:data", function(args){
+                return false;
+            });
+
+            Store.Channel.comply("save:form:data", function(args){
+                console.log("saving form data");
+            });
+
         };
 
 

@@ -176,6 +176,10 @@ define([
                 }
             });
 
+            Mode.Channel.on("stop", function(){
+                tableChannel.trigger("stop");
+            });
+
             Mode.Channel.listenTo(tableChannel, "row:right:click", function(args){
                 var selection = tableChannel.request("get:selection");
                 var optionsContextMenu;
@@ -227,14 +231,21 @@ define([
                 });
             });
 
-            $(window).keydown(function(event) {
+            Mode.Channel.listenTo(tableChannel, "send:form:data", function(args){
+                console.log("in mode send form data");
+                Mode.Channel.trigger("send:form:data", args);
+            });
+
+            $(window).off();
+
+            $(window).on("keydown", function(event) {
                 if((event.ctrlKey || event.metaKey) && event.keyCode == 83) {
                     Mode.Channel.trigger("save:models", {modelName: "Asignatura"});
                     event.preventDefault();
                 }
             });
 
-            $(window).keydown(function(event) {
+            $(window).on("keydown", function(event) {
                 if(event.ctrlKey || event.metaKey){
                     tableChannel.trigger("change:mode", {mode: "append"});
                 }
@@ -243,7 +254,7 @@ define([
                 }
             });
 
-            $(window).keyup(function(event) {
+            $(window).on("keyup", function(event) {
                 if(!event.ctrlKey && !event.metaKey && !event.shiftKey){
                     tableChannel.trigger("change:mode", {mode: "single"});
                 }
@@ -252,7 +263,7 @@ define([
                 }
             });
 
-            $(document).on("click", function(event){
+            $(document).off().on("click", function(event){
                 var tableContext = tableChannel.request("get:context:selectors");
                 var outOfContext = true;
                 _.each(tableContext, function(selector){

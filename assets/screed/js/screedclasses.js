@@ -162,15 +162,15 @@ define([
     });
 
     ScreedClasses.EditorNestedView = Marionette.LayoutView.extend({
-      behaviors: {
+        behaviors: {
           EditorBehavior: {}
-      },
-      className: "editorLayout",
-      template: _.template("<div class=\"layoutEditor\"></div>"),
-      regions: {
+        },
+        className: "editorLayout",
+        template: _.template("<div class=\"layoutEditor\"></div>"),
+        regions: {
         "layout": ".layoutEditor"
-      },
-      initialize: function(){
+        },
+        initialize: function(){
         // data
         var options = this.model.get("availableOptions");
         // console.log("availableOptions: ", options);
@@ -187,13 +187,64 @@ define([
           models: this.model.get("availableOptions")
         });
 
-      },
-      onShow: function(){
+        },
+        onShow: function(){
         var typeaheadChannel = this.typeahead.Channel;
         var typeaheadView = typeaheadChannel.request("get:root");
         this.getRegion("layout").show(typeaheadView);
 
-      }
+        },
+
+        setCurrentData: function(){
+            var data = this.getCurrentData();
+            this.model.set({"data": data});
+            this.model.set({"collectedData": data});
+        },
+
+        getCurrentData: function(){
+            // var option = this.$el.find("select option:selected");
+            // var optionValue = option.attr("data-value");
+
+            // if(optionValue !== ""){
+            //     var optionModel = this.optionlookup(optionValue);
+
+            //     return optionModel;
+            // }
+            // else{
+            //     return null;
+            // }
+            return null;
+        },
+
+        optionlookup: function(value){
+            console.log("looking up options for:", value);
+            var self = this;
+            var relevants = _.filter(this.model.get("options"), function(option){
+                var optionValue = self.model.getValue(option);
+                if(optionValue == value){
+                    return true;
+                }
+                return false;
+            });
+
+            console.log("relevants were:", relevants);
+
+            if(relevants.length > 0){
+                return relevants[0];
+            }
+
+            return null;
+        },
+
+        optionSelected: function(){
+            this.model.trigger("set:current:data");
+            this.model.trigger("option:selected", {editor: this.model});
+            // var currentOption = this.getCurrentData();
+            // this.Screed.Channel.trigger("editor:nested:change", {
+            //     value: currentOption,
+            //     editor: this.model
+            // });
+        }
     });
 
     // ScreedClasses.EditorNestedView = Marionette.ItemView.extend({
@@ -413,12 +464,12 @@ define([
 
         cancelBtn: function(){
             console.log("cancel");
-            this.Screed.Channel.trigger("close:screed", {save: false});
+            this.Screed.Channel.trigger("close:screed");
         },
 
         okBtn: function(){
             console.log("ok");
-            this.Screed.Channel.trigger("close:screed", {save: true});
+            this.Screed.Channel.trigger("save:form:data");
         },
 
         collectFormData: function(){

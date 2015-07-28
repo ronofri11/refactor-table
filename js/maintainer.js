@@ -178,13 +178,20 @@ define([
                 return Maintainer.RootView;
             });
 
+            Maintainer.Channel.listenTo(Maintainer.modes[Maintainer.activeKey].Channel, "send:form:data", function(args){
+                console.log("in MAINTAINER send form data");
+                Maintainer.Channel.trigger("send:form:data", args);
+            });
+
             Maintainer.Channel.on("change:active:mode", function(args){
                 var activeKey = args.key;
                 if(Maintainer.activeKey !== activeKey){
+                    
+                    var previousMode = Maintainer.modes[Maintainer.activeKey];
+                    previousMode.Channel.trigger("stop");
+
                     Maintainer.RootView.getRegion("container").reset();
 
-                    var previousMode = Maintainer.modes[Maintainer.activeKey];
-                    previousMode.trigger("stop");
 
                     var mode = Maintainer.modes[activeKey];
                     mode.start();
@@ -207,6 +214,11 @@ define([
                                 "remove": false
                             });
                         }
+                    });
+
+                    Maintainer.Channel.listenTo(mode.Channel, "send:form:data", function(args){
+                        console.log("in MAINTAINER send form data 2");
+                        Maintainer.Channel.trigger("send:form:data", args);
                     });
                 }
             });

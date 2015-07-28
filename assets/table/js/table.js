@@ -83,6 +83,7 @@ define([
             },
             unselect: function(args){
                 var column = args.column;
+                console.log("TABLE UNSELECT:", args);
                 var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
                 cell.removeClass("selectedCell");
                 this.model.set({"selected": false});
@@ -90,6 +91,7 @@ define([
             },
             select: function(args){
                 var column = args.column;
+                console.log("TABLE SELECT:", args);
                 var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
                 cell.addClass("selectedCell");
                 this.model.set({"selected": true});
@@ -241,7 +243,9 @@ define([
             });
 
             Table.Channel.on("row:click", function(args){
-                screedChannel.trigger("close:screed", {save: false});
+                console.log("TABLE row:click");
+                screedChannel.trigger("close:screed");
+                console.log(Table.mode, args);
                 switch(Table.mode){
                     case "append":
                         Table.addToSelection(args);
@@ -289,16 +293,12 @@ define([
             });
 
             Table.Channel.on("close:screed", function(args){
-                var save;
-                if(args !== undefined){
-                    save = args.save;
-                }
-                else{
-                    save = false;
-                }
-                screedChannel.trigger("close:screed", {save: save});
+                screedChannel.trigger("close:screed");
             });
 
+            Table.Channel.listenTo(screedChannel, "send:form:data", function(args){
+                Table.Channel.trigger("send:form:data", args);
+            });
 
             Table.Channel.on("print:selection:count", function(){
                 var selection = Table.getSelectedRows();
@@ -331,6 +331,10 @@ define([
 
             Table.Channel.on("empty:selection", function(){
                 Table.emptySelection();
+            });
+
+            Table.Channel.on("stop", function(){
+                Table.Channel.trigger("empty:selection");
             });
         });
 
@@ -507,7 +511,10 @@ define([
 
             Table.emptySelection();
 
+            console.log("TABLE columns #:", Table.columns.length);
+
             var currentWorkingColumn = Table.columns.findWhere({"alias": cellKey});
+            console.log("TABLE --> currentWorkingColumn:", currentWorkingColumn);
             if(currentWorkingColumn === undefined){
                 Table.workingColumn = null;
             }
@@ -566,7 +573,9 @@ define([
         };
 
         Table.emptySelection = function(){
+            console.log("TABLE emptySelection -->", Table.workingColumn);
             var selectedRows = Table.getSelectedRows();
+            console.log("TABLE selectedRows:", selectedRows);
             _.each(selectedRows, function(row){
                 row.trigger("unselect", {column: Table.workingColumn});
             });
