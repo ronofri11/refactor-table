@@ -22,6 +22,11 @@ define([
 
                 return {caption: cap};
             },
+            attributes: function() {
+              return {
+                'data-value': this.model.get('value')
+              };
+            },
             events: {
                 "click": "enterOption"
             },
@@ -73,6 +78,7 @@ define([
             },
             onShow: function(event){
                 var self = this;
+
                 //click out optionbox when show
                 // $("*").click(function(event){
                 //   event.preventDefault();
@@ -262,9 +268,10 @@ define([
                 return TypeAhead.RootView;
             });
 
-            TypeAhead.Channel.on("option:click", function(args){
-                var option = args.option;
-            });
+            // TypeAhead.Channel.on("option:click", function(args){
+            //     var option = args.option;
+            //
+            // });
 
             TypeAhead.Channel.on("option:next", function(){
                 TypeAhead.RootView.selectNext();
