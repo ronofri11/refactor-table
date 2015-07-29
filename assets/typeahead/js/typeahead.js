@@ -77,17 +77,12 @@ define([
                     displayKeys: options.displayKeys
                 };
             },
-            onShow: function(event){
-                var self = this;
-
-                //click out optionbox when show
-                // $("*").click(function(event){
-                //   event.preventDefault();
-                //   event.stopPropagation();
-                //   if( $(event.target).not(".typeahead input") ){
-                //     TypeAhead.Channel.trigger("option:close", { event: event });
-                //   };
-                // });
+            onRender: function(){
+                console.log("TP SELECTED: ", TypeAhead.selectedOption);
+                if(TypeAhead.selectedOption !== undefined){
+                    var searchboxInput = this.$el.find(".searchbox input");
+                    searchbox.val(TypeAhead.selectedOption.get("value"));
+                }
             },
             closeOption: function(event){
                 var inputSearch = this.$el.find(".searchbox input");
@@ -276,14 +271,17 @@ define([
                 displayKeys: options.displayKeys
             });
 
+            TypeAhead.Channel.comply("reset:value", function(args){
+                console.log("TP SELECTED values", args);
+                var selectedValue = args.value;
+                TypeAhead.selectedOption = TypeAhead.optionArrayPool.findWhere({
+                    "value": selectedValue
+                });
+            });
+
             TypeAhead.Channel.reply("get:root", function(){
                 return TypeAhead.RootView;
             });
-
-            // TypeAhead.Channel.on("option:click", function(args){
-            //     var option = args.option;
-            //
-            // });
 
             TypeAhead.Channel.on("option:next", function(){
                 TypeAhead.RootView.selectNext();

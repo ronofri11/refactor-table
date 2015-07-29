@@ -64,8 +64,7 @@ define([
             Screed.Editors.each(function(editor){
                 if(editor.get("type") == "model"){
                     editor.set({
-                        "availableOptions": new Classes.EmptyCollection(),
-                        "allOptions": new Classes.EmptyCollection(),
+                        "availableOptions": new Classes.EmptyCollection()
                     });
 
                     if(editor.getValue === undefined){
@@ -145,7 +144,6 @@ define([
                             return option.value;
                         });
 
-                        editor.get("allOptions").reset(distinctOptions);
                         editor.get("availableOptions").reset(distinctOptions);
                     }
                 });
