@@ -158,17 +158,20 @@ define([
                 case "boolean":
                     return this.$el.find("input").prop("checked");
             }
-        },
+        }
     });
 
     ScreedClasses.EditorNestedView = Marionette.LayoutView.extend({
         behaviors: {
             EditorBehavior: {}
         },
-            className: "editorLayout",
-            template: _.template("<div class=\"layoutEditor\"></div>"),
-            regions: {
+        className: "editorLayout",
+        template: _.template("<div class=\"layoutEditor\"></div>"),
+        regions: {
             "layout": ".layoutEditor"
+        },
+        modelEvents: {
+            "set:selected:option": "setSelectedOption"
         },
         initialize: function(){
             // show typeahead
@@ -183,11 +186,25 @@ define([
             this.listenTo(this.typeahead.Channel, "option:click", this.optionSelected);
         },
         onShow: function(){
-            this.typeahead.Channel.command("reset:value", {
-                value: this.model.getValue(this.model.get("data"))
-            });
             var typeaheadView = this.typeahead.Channel.request("get:root");
             this.getRegion("layout").show(typeaheadView);
+        },
+
+        setSelectedOption: function(){
+            console.log("alias",this.model.get("alias"), "getValue", this.model.getValue(this.model.get("data")));
+            this.typeahead.Channel.command("set:selected:option", {
+                value: this.model.getValue(this.model.get("data"))
+            });
+        },
+
+        setCurrentData: function(){
+            var data = this.getCurrentData();
+            this.model.set({"data": data});
+            this.model.set({"collectedData": data});
+        },
+
+        getCurrentData: function(){
+            return this.typeahead.Channel.request("get:selected:option");
         },
 
         optionlookup: function(value){
@@ -374,7 +391,7 @@ define([
         },
 
         updateNestedOptions: function(args){
-            console.log(args.editor);
+            console.log("update nested options:", args);
             var emitterEditor = args.editor;
             var affectedEditors = this.collection.filter(function(editor){
                 return (editor.get("key") === emitterEditor.get("key"));

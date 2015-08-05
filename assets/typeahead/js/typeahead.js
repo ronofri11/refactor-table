@@ -23,29 +23,25 @@ define([
                 return {caption: cap};
             },
             attributes: function() {
-              return {
-                'data-value': this.model.get('value')
-              };
+                return {
+                    'data-value': this.model.get('value')
+                };
+            },
+            modelEvents:{
+                "change:selected": "styling"
             },
             events: {
-                "click": "enterOption"
-            },
-            initialize: function(){
-                this.listenTo(this.model, "change:selected", this.updateSelected);
+                "click": "selectOption"
             },
             onRender: function(){
-                this.updateSelected();
+                this.styling();
             },
-            enterOption: function(event){
-                TypeAhead.Channel.trigger("option:click", {
-                    option:this.model
-                });
-                this.triggerMethod("optionClicked", {
-                    model: this.model
-                });
-                TypeAhead.Channel.trigger("option:close", { event: event });
+            selectOption: function(event){
+                this.model.set({"selected": true});
+                this.model.trigger("option:selected", {model: this.model});
+                // TypeAhead.Channel.trigger("option:close", { event: event });
             },
-            updateSelected: function(){
+            styling: function(){
                 if(this.model.get("selected")){
                     this.$el.addClass("selected");
                 }
@@ -62,58 +58,51 @@ define([
             childViewContainer: "ul",
             template: _.template(TypeAheadTemplate),
             events: {
-                'focusin .searchbox input': 'inOptions',
-                // 'focusout .searchbox input': 'outOptions',
-                // 'click .optionbox ul li'   : 'enterOption'
+                'click .searchbox input': 'inOptions',
                 'keyup .searchbox input': 'keyboardAction',
                 'click .cancelSelected': 'clearFilter'
-            },
-            childEvents: {
-                "optionClicked": "optionClicked"
             },
             initialize: function(options){
                 this.childViewOptions = {
                     separator: options.separator,
                     displayKeys: options.displayKeys
                 };
+                this.listenTo(this.collection, "option:selected", this.updateSelected);
             },
             onRender: function(){
-                console.log("TP SELECTED: ", TypeAhead.selectedOption);
-                if(TypeAhead.selectedOption !== undefined){
-                    var searchboxInput = this.$el.find(".searchbox input");
-                    searchbox.val(TypeAhead.selectedOption.get("value"));
+                var selectedOption = TypeAhead.optionArrayPool.findWhere({
+                    "selected": true
+                });
+
+                var searchInput = this.$el.find(".searchbox input");
+                var cancelSelected = this.$el.find(".searchbox .cancelSelected");
+                var inputValue;
+                if(selectedOption !== undefined){
+                    inputValue = selectedOption.get("value");
+                    cancelSelected.addClass("show");
                 }
+                else{
+                    inputValue = "";
+                    cancelSelected.removeClass("show");
+                }
+
+                searchInput.val(inputValue);
             },
             closeOption: function(event){
-                var inputSearch = this.$el.find(".searchbox input");
                 this.$el.find(".optionbox").removeClass("show");
             },
             setDimensionOptionBox: function(){
-                var searchbox = this.$el.find(".searchbox input");
+                var searchInput = this.$el.find(".searchbox input");
                 var searchboxHeight = this.$el.find(".searchbox").outerHeight();
                 if(searchboxHeight < 1){
                     searchboxHeight = 35;
                 }
 
-                this.$el.find(".optionbox").css({ "top": searchboxHeight + searchbox.offset().top + "px" });
-                this.$el.find(".optionbox").css({ "left": searchbox.offset().left + "px" });
-                this.$el.find(".optionbox").css({ "width": searchbox.outerWidth() });
+                this.$el.find(".optionbox").css({ "top": searchboxHeight + searchInput.offset().top + "px" });
+                this.$el.find(".optionbox").css({ "left": searchInput.offset().left + "px" });
+                this.$el.find(".optionbox").css({ "width": searchInput.outerWidth() });
             },
-            modelCaption: function(model){
-                var cap = "";
-                _.each(this.options.displayKeys, function(key, i){
-                    if(i === this.options.displayKeys.length - 1){
-                        cap = cap + model.get(key);
-                    }
-                    else{
-                        cap = cap + model.get(key) + ": ";
-                    }
-                }, this);
-                return cap;
-            },
-            optionClicked: function(view, args){
-                this.updateSelected(args.model);
-            },
+            
             keyboardAction: function(event){
                 var optionbox = this.$el.find(".optionbox");
                 var searchbox = this.$el.find(".searchbox");
@@ -168,49 +157,42 @@ define([
 
                 TypeAhead.optionArrayPool.reset(optionArray);
             },
-            clearOptions: function(){
-              alert('ok');
-            },
-            updateSelected: function(model){
-                TypeAhead.optionCollection.each(function(option){
-                    if(option.cid === model.cid){
-                        option.set({"selected": true});
-                    }
-                    else{
+            updateSelected: function(args){
+                var model = args.model;
+                console.log("update selected model:", model);
+                if(model !== null){
+                    TypeAhead.optionCollection.each(function(option){
+                        if(option.get("value") !== model.get("value")){
+                            option.set({"selected": false});
+                        }
+                    });
+                }
+                else{
+                    TypeAhead.optionCollection.each(function(option){
                         option.set({"selected": false});
-                    }
-                });
+                    });
+                }
 
-                var searchinput = this.$el.find(".searchbox input");
-                var selectedItem = this.modelCaption(model);
-                searchinput.val(selectedItem);
+                TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
 
-                // var index = this.collection.indexOf(model);
-                this.adjustScroll();
+                this.render();
 
-                TypeAhead.Channel.trigger("selected:model:change", {model: model});
+                // this.adjustScroll();
+
+                // TypeAhead.Channel.trigger("selected:model:change", {model: model});
             },
             inOptions: function(event){
-              event.preventDefault();
-              event.stopPropagation();
-              $(".optionbox").removeClass("show");
+                event.preventDefault();
+                event.stopPropagation();
 
-              this.$el.find(".optionbox").addClass("show");
-              this.setDimensionOptionBox();
-              // show x
-              $(".searchbox .cancelSelected").removeClass("show");
-              this.$el.find(".searchbox .cancelSelected").addClass("show");
-            },
-            outOptions: function(event){
-              event.preventDefault();
-              event.stopPropagation();
-              // this.$el.find(".optionbox").removeClass("show");
-              // var searchinput = this.$el.find("input");
-              // var optionbox = this.$el.find(".optionbox");
-              // var optionboxItem = this.$el.find(".optionbox li");
-              // hide x
-              this.$el.find(".searchbox .cancelSelected").removeClass("show");
-
+                var optionBox = this.$el.find(".optionbox");
+                if(optionBox.hasClass("show")){
+                    optionBox.removeClass("show");
+                }
+                else{
+                    optionBox.addClass("show");
+                    this.setDimensionOptionBox();
+                }
             },
             selectNext: function(){
                 var currentOption = this.collection.findWhere({
@@ -218,6 +200,7 @@ define([
                 });
 
                 var index = this.collection.indexOf(currentOption);
+
                 if(index < this.collection.length - 1){
                     var nextOption = this.collection.at(index + 1);
                     this.updateSelected(nextOption);
@@ -228,7 +211,15 @@ define([
                     "selected": true
                 });
 
-                var index = this.collection.indexOf(currentOption);
+                var index;
+
+                if(currentOption !== undefined){
+                    index = this.collection.indexOf(currentOption);
+                }
+                else{
+                    index = this.collection.length - 1;
+                }
+
                 if(index > 0){
                     var prevOption = this.collection.at(index - 1);
                     this.updateSelected(prevOption);
@@ -249,10 +240,27 @@ define([
             },
 
             clearFilter: function(){
-                var input = this.$el.find(".searchbox input");
-                input.val("");
-                this.filterOptions();
-                $(".searchbox .cancelSelected").removeClass("show");
+                var searchInput = this.$el.find(".searchbox input");
+                searchInput.val("");
+                TypeAhead.optionArrayPool.each(function(option){
+                    option.set({"selected": false});
+                });
+
+                TypeAhead.Channel.trigger("no:selection");
+                this.render();
+            },
+
+            getSelectedOption: function(){
+                var selectedOption = TypeAhead.optionArrayPool.findWhere({
+                    "selected": true
+                });
+
+                if(selectedOption === undefined){
+                    return null;
+                }
+                else{
+                    return selectedOption;
+                }
             }
         });
 
@@ -266,17 +274,28 @@ define([
             TypeAhead.optionArrayPool = new OptionCollection();
             TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
 
+            TypeAhead.options = options;
+
             TypeAhead.RootView = new TypeAhead.OptionCompositeView({
                 collection: TypeAhead.optionArrayPool,
                 displayKeys: options.displayKeys
             });
 
-            TypeAhead.Channel.comply("reset:value", function(args){
-                console.log("TP SELECTED values", args);
+            TypeAhead.Channel.comply("set:selected:option", function(args){
                 var selectedValue = args.value;
-                TypeAhead.selectedOption = TypeAhead.optionArrayPool.findWhere({
+                var selectedOption;
+
+                selectedOption = TypeAhead.optionArrayPool.findWhere({
                     "value": selectedValue
                 });
+
+                if(selectedOption !== undefined){
+                    selectedOption.set({"selected": true});
+                }
+                else{
+                    selectedOption = null;
+                }
+                TypeAhead.RootView.updateSelected({model: selectedOption});
             });
 
             TypeAhead.Channel.reply("get:root", function(){
@@ -295,6 +314,10 @@ define([
                 TypeAhead.RootView.clearFilter();
             });
 
+            TypeAhead.Channel.reply("get:selected:option", function(){
+                return TypeAhead.RootView.getSelectedOption();
+            });
+
             TypeAhead.Channel.on("option:close", function(args){
                 TypeAhead.RootView.closeOption.call(TypeAhead.RootView, args.event);
             });
@@ -305,6 +328,19 @@ define([
 
 
         });
+
+        TypeAhead.modelCaption =  function(model){
+            var cap = "";
+            _.each(this.options.displayKeys, function(key, i){
+                if(i === this.options.displayKeys.length - 1){
+                    cap = cap + model.get(key);
+                }
+                else{
+                    cap = cap + model.get(key) + ": ";
+                }
+            }, this);
+            return cap;
+        };
 
         return TypeAhead;
     };

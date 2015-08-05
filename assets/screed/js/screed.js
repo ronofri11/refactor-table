@@ -145,6 +145,7 @@ define([
                         });
 
                         editor.get("availableOptions").reset(distinctOptions);
+                        editor.trigger("set:selected:option");
                     }
                 });
             });
