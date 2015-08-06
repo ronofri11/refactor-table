@@ -183,7 +183,8 @@ define([
                 models: this.model.get("availableOptions")
             });
 
-            this.listenTo(this.typeahead.Channel, "option:click", this.optionSelected);
+            this.listenTo(this.typeahead.Channel, "option:selected", this.optionSelected);
+            this.listenTo(this.model.get("availableOptions"), "reset", this.resetTypeaheadOptions);
         },
         onShow: function(){
             var typeaheadView = this.typeahead.Channel.request("get:root");
@@ -227,18 +228,11 @@ define([
         },
 
         optionSelected: function(args){
-            var optionModel = args.option;
-            var optionStoreModel = this.optionlookup(optionModel.get("value"));
-            // this.model.trigger("set:current:data");
-            this.model.set({"data": optionStoreModel});
-            this.model.set({"collectedData": optionStoreModel});
-
             this.model.trigger("option:selected", {editor: this.model});
-            // var currentOption = this.getCurrentData();
-            // this.Screed.Channel.trigger("editor:nested:change", {
-            //     value: currentOption,
-            //     editor: this.model
-            // });
+        },
+
+        resetTypeaheadOptions: function(){
+            this.typeahead.Channel.command("reset:options", {options: this.model.get("availableOptions")});
         }
     });
 

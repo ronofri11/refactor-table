@@ -39,7 +39,6 @@ define([
             selectOption: function(event){
                 this.model.set({"selected": true});
                 this.model.trigger("option:selected", {model: this.model});
-                // TypeAhead.Channel.trigger("option:close", { event: event });
             },
             styling: function(){
                 if(this.model.get("selected")){
@@ -173,9 +172,11 @@ define([
                     });
                 }
 
-                TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
-
                 this.render();
+                TypeAhead.Channel.trigger("option:selected", {model: model});
+
+                // TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
+
 
                 // this.adjustScroll();
 
@@ -316,6 +317,10 @@ define([
 
             TypeAhead.Channel.reply("get:selected:option", function(){
                 return TypeAhead.RootView.getSelectedOption();
+            });
+
+            TypeAhead.Channel.comply("reset:options", function(args){
+                TypeAhead.optionArrayPool.reset(args.options.toArray());
             });
 
             TypeAhead.Channel.on("option:close", function(args){
