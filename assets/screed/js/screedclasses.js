@@ -183,8 +183,8 @@ define([
                 models: this.model.get("availableOptions")
             });
 
-            this.listenTo(this.typeahead.Channel, "option:selected", this.optionSelected);
-            this.listenTo(this.model.get("availableOptions"), "reset", this.resetTypeaheadOptions);
+            this.listenTo(this.typeahead.Channel, "option:selected", this.typeaheadOptionSelected);
+            // this.listenTo(this.model.get("availableOptions"), "reset", this.resetTypeaheadOptions);
         },
         onShow: function(){
             var typeaheadView = this.typeahead.Channel.request("get:root");
@@ -192,7 +192,7 @@ define([
         },
 
         setSelectedOption: function(){
-            console.log("alias",this.model.get("alias"), "getValue", this.model.getValue(this.model.get("data")));
+            // console.log("alias",this.model.get("alias"), "getValue", this.model.getValue(this.model.get("data")));
             this.typeahead.Channel.command("set:selected:option", {
                 value: this.model.getValue(this.model.get("data"))
             });
@@ -218,7 +218,7 @@ define([
                 return false;
             });
 
-            console.log("relevants were:", relevants);
+            // console.log("relevants were:", relevants);
 
             if(relevants.length > 0){
                 return relevants[0];
@@ -227,8 +227,9 @@ define([
             return null;
         },
 
-        optionSelected: function(args){
-            this.model.trigger("option:selected", {editor: this.model});
+        typeaheadOptionSelected: function(args){
+            this.setCurrentData();
+            this.model.trigger("nested:option:selected", {editor: this.model});
         },
 
         resetTypeaheadOptions: function(){
@@ -262,7 +263,7 @@ define([
                 screed: this.Screed
             };
 
-            this.listenTo(this.collection, "option:selected", this.updateNestedOptions);
+            this.listenTo(this.collection, "nested:option:selected", this.updateNestedOptions);
         },
 
         exportData: function(){
@@ -346,7 +347,7 @@ define([
             var offsetleft = $(".canvastable").offset().left + $(".canvastable").width();
             var buttonsHeight = "67px";
             var buttonsWidth = $(".region").css("padding");
-            console.log("btn width: ", buttonsWidth);
+            // console.log("btn width: ", buttonsWidth);
             this.$el.find(".buttons").css({
                 "top": offsetTop,
                 "left": offsetleft,
@@ -365,19 +366,19 @@ define([
         },
 
         cancelBtn: function(){
-            console.log("cancel");
+            // console.log("cancel");
             this.Screed.Channel.trigger("close:screed");
         },
 
         okBtn: function(){
-            console.log("ok");
+            // console.log("ok");
             this.Screed.Channel.trigger("save:form:data");
         },
 
         collectFormData: function(){
             var formData = {};
             this.collection.each(function(editor){
-                console.log("collecting for editor: ", editor.get("alias"));
+                // console.log("collecting for editor: ", editor.get("alias"));
                 var editorData = editor.trigger("set:current:data");
                 formData[editor.get("key")] = editor.get("collectedData");
             });
@@ -385,20 +386,32 @@ define([
         },
 
         updateNestedOptions: function(args){
-            console.log("update nested options:", args);
+            // console.log("update nested options:", args);
             var emitterEditor = args.editor;
             var affectedEditors = this.collection.filter(function(editor){
                 return (editor.get("key") === emitterEditor.get("key"));
             });
 
+            // console.log("affectedEditors", affectedEditors, "length", affectedEditors.length);
+
             var optionFilters = {};
 
             _.each(affectedEditors, function(editor){
+                var value;
+                // console.log("alias:", editor.get("alias"), "data:", editor.get("data"), "collectedData:", editor.get("collectedData"));
+                if(editor.get("data") !== null && editor.get("data") !== undefined){
+                    value = editor.get("data").get("value");
+                }
+                else{
+                    value = null;
+                }
                 optionFilters[editor.get("alias")] = {
-                    value: editor.getValue(editor.get("collectedData")),
+                    value: value,
                     editor: editor
                 };
             });
+
+            // console.log("optionFilters", optionFilters);
 
             var filteredOptions = _.filter(emitterEditor.get("options"), function(option){
                 var relevant = true;

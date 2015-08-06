@@ -158,7 +158,7 @@ define([
             },
             updateSelected: function(args){
                 var model = args.model;
-                console.log("update selected model:", model);
+                // console.log("update selected model:", model);
                 if(model !== null){
                     TypeAhead.optionCollection.each(function(option){
                         if(option.get("value") !== model.get("value")){
@@ -247,7 +247,7 @@ define([
                     option.set({"selected": false});
                 });
 
-                TypeAhead.Channel.trigger("no:selection");
+                TypeAhead.Channel.trigger("option:selected", {model: null});
                 this.render();
             },
 
@@ -331,10 +331,9 @@ define([
                 TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
             });
 
-
         });
 
-        TypeAhead.modelCaption =  function(model){
+        TypeAhead.modelCaption = function(model){
             var cap = "";
             _.each(this.options.displayKeys, function(key, i){
                 if(i === this.options.displayKeys.length - 1){

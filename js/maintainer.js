@@ -179,7 +179,7 @@ define([
             });
 
             Maintainer.Channel.listenTo(Maintainer.modes[Maintainer.activeKey].Channel, "send:form:data", function(args){
-                console.log("in MAINTAINER send form data");
+                console.log("in MAINTAINER send form data", args);
                 Maintainer.Channel.trigger("send:form:data", args);
             });
 
