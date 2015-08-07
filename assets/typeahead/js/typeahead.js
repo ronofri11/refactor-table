@@ -173,6 +173,7 @@ define([
                 }
 
                 this.render();
+                TypeAhead.selectedOption = model;
                 TypeAhead.Channel.trigger("option:selected", {model: model});
 
                 // TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
@@ -247,6 +248,8 @@ define([
                     option.set({"selected": false});
                 });
 
+                TypeAhead.selectedOption = null;
+
                 TypeAhead.Channel.trigger("option:selected", {model: null});
                 this.render();
             },
@@ -281,6 +284,8 @@ define([
                 collection: TypeAhead.optionArrayPool,
                 displayKeys: options.displayKeys
             });
+
+            TypeAhead.selectedOption = TypeAhead.Channel.request("get:selected:option");
 
             TypeAhead.Channel.comply("set:selected:option", function(args){
                 var selectedValue = args.value;
@@ -328,6 +333,21 @@ define([
             });
 
             TypeAhead.Channel.listenTo(TypeAhead.optionCollection, "reset", function(){
+                var value;
+                if(TypeAhead.selectedOption === null || TypeAhead.selectedOption === undefined){
+                    value = null;
+                }
+                else{
+                    value = TypeAhead.selectedOption.get("value");
+                }
+                TypeAhead.optionCollection.each(function(option){
+                    if(option.get("value") === value){
+                        option.set({"selected": true});
+                    }
+                    else{
+                        option.set({"selected": false});
+                    }
+                });
                 TypeAhead.optionArrayPool.reset(TypeAhead.optionCollection.toArray());
             });
 

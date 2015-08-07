@@ -24,28 +24,6 @@ define([
             }
             this.set({"valid": true, "modified": false}, {silent: true});
         }
-        // setDataFromModel: function(model){
-        //     var originalKey = this.get("originalKey");
-        //     var virtualKey = this.get("key");
-
-        //     var virtualValue = model.get(virtualKey);
-        //     var originalValue = model.get(originalKey);
-
-        //     if(virtualValue instanceof Backbone.Model){
-        //         virtualValue = virtualValue.get("id");
-        //     }
-
-        //     if(virtualValue != originalValue){
-        //         this.set({"modified": true}, {silent: true});
-        //     }
-        //     else{
-        //         this.set({"modified": false}, {silent: true});
-        //     }
-
-        //     this.set({"data": model.get(this.get("key"))}, {silent: true});
-
-        //     this.trigger("model:data:changed");
-        // }
     });
 
     ScreedClasses.EmptyCollection = Backbone.Collection.extend();
@@ -376,13 +354,46 @@ define([
         },
 
         collectFormData: function(){
-            var formData = {};
-            this.collection.each(function(editor){
-                // console.log("collecting for editor: ", editor.get("alias"));
-                var editorData = editor.trigger("set:current:data");
-                formData[editor.get("key")] = editor.get("collectedData");
-            });
-            return formData;
+            // var formData = {};
+
+            // var self = this;
+            // var properties = _.uniq(this.collection.pluck("key"));
+
+            // _.each(properties, function(key){
+            //     var affectedEditors = self.collection.where({"key": key});
+            //     if(affectedEditors.at(0).get("type") == "model"){
+            //         var selectedOption;
+
+            //         _.each(affectedEditors, function(editor){
+            //             var editorData = editor.trigger("set:current:data");
+            //             optionFilters[editor.get("alias")] = editor.get("collectedData");
+            //         });
+            //     }
+            //     else{
+                    
+            //     }
+
+
+            //     var filteredOptions = _.filter(emitterEditor.get("options"), function(option){
+            //         var relevant = true;
+            //         _.each(optionFilters, function(filter){
+            //             var editor = filter.editor;
+            //             var value = filter.value;
+
+            //             if(value !== null){
+            //                 relevant = relevant && (editor.getValue(option) === value);
+            //             }
+            //         });
+            //         return relevant;
+            //     });
+            // });
+
+            // this.collection.each(function(editor){
+            //     // console.log("collecting for editor: ", editor.get("alias"));
+            //     var editorData = editor.trigger("set:current:data");
+            //     formData[editor.get("key")] = editor.get("collectedData");
+            // });
+            // return formData;
         },
 
         updateNestedOptions: function(args){
