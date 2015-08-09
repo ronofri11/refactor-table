@@ -27,7 +27,8 @@ define([
             });
 
             Screed.Channel.on("reset:screed:values", function(args){
-                // console.log("params: ", args);
+                console.log("params: SELECTION -> ", args);
+                Screed.selection = args;
                 Screed.populateEditorValues(args);
                 Screed.populateDistinctOptions();
                 console.log("SCREED EDITORS:", Screed.Editors);
@@ -51,7 +52,8 @@ define([
                     },
                     failCallback: function(args){
                         Screed.Channel.trigger("display:errors", args);
-                    }
+                    },
+                    selection: Screed.selection
                 });
             });
 

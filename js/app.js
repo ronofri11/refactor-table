@@ -660,7 +660,7 @@ define([
             var storeChannel = App.store.Channel;
 
             App.Channel.listenTo(maintainerChannel, "send:form:data", function(args){
-                var isValid = storeChannel.request("validate:form:data", args.formData);
+                var isValid = storeChannel.request("validate:form:data", args);
 
                 if(isValid){
                     storeChannel.command("save:form:data", args.formData);

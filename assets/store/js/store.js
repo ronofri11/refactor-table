@@ -627,7 +627,8 @@ define([
             });
 
             Store.Channel.reply("validate:form:data", function(args){
-                return false;
+                console.log(args);
+                return true;
             });
 
             Store.Channel.comply("save:form:data", function(args){

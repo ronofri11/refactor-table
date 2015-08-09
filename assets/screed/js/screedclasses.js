@@ -354,46 +354,51 @@ define([
         },
 
         collectFormData: function(){
-            // var formData = {};
+            var formData = {};
 
-            // var self = this;
-            // var properties = _.uniq(this.collection.pluck("key"));
+            var self = this;
+            var properties = _.uniq(this.collection.pluck("key"));
 
-            // _.each(properties, function(key){
-            //     var affectedEditors = self.collection.where({"key": key});
-            //     if(affectedEditors.at(0).get("type") == "model"){
-            //         var selectedOption;
+            _.each(properties, function(key){
+                var affectedEditors = self.collection.where({"key": key});
+                if(affectedEditors[0].get("type") == "model"){
+                    var options = affectedEditors[0].get("options");
+                    var selectedOption;
+                    var selectedOptions = _.filter(options, function(option){
+                        var relevant = true;
+                        _.each(affectedEditors, function(editor){
+                            var editorData = editor.trigger("set:current:data");
+                            var value;
+                            if(editor.get("collectedData") !== null){
+                                value = editor.get("collectedData").get("value");
+                            }
+                            else{
+                                value = null;
+                            }
+                            relevant = relevant && (editor.getValue(option) === value);
+                        });
+                        return relevant;
+                    });
 
-            //         _.each(affectedEditors, function(editor){
-            //             var editorData = editor.trigger("set:current:data");
-            //             optionFilters[editor.get("alias")] = editor.get("collectedData");
-            //         });
-            //     }
-            //     else{
-                    
-            //     }
+                    console.log(selectedOptions);
 
+                    if(selectedOptions.length > 0){
+                        selectedOption = selectedOptions[0];
+                    }
+                    else{
+                        selectedOption = null;
+                    }
 
-            //     var filteredOptions = _.filter(emitterEditor.get("options"), function(option){
-            //         var relevant = true;
-            //         _.each(optionFilters, function(filter){
-            //             var editor = filter.editor;
-            //             var value = filter.value;
+                    formData[affectedEditors[0].get("key")] = selectedOption;
+                }
+                else{
+                    var editor = affectedEditors[0];
+                    editor.trigger("set:current:data");
+                    formData[editor.get("key")] = editor.get("collectedData");
+                }
+            });
 
-            //             if(value !== null){
-            //                 relevant = relevant && (editor.getValue(option) === value);
-            //             }
-            //         });
-            //         return relevant;
-            //     });
-            // });
-
-            // this.collection.each(function(editor){
-            //     // console.log("collecting for editor: ", editor.get("alias"));
-            //     var editorData = editor.trigger("set:current:data");
-            //     formData[editor.get("key")] = editor.get("collectedData");
-            // });
-            // return formData;
+            return formData;
         },
 
         updateNestedOptions: function(args){
