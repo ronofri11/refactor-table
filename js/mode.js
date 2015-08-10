@@ -173,7 +173,26 @@ define([
                     case "contextmenu:edit:field:multiple":
                         tableChannel.trigger("show:screed");
                         break;
+                    case "contextmenu:create:row:single":
+                        Mode.Channel.trigger("get:empty:row", {
+                            successCallback: function(row){
+                                Mode.Channel.trigger("set:empty:row", {
+                                    row: row
+                                });
+                            }
+                        });
+                        break;
+                    case "contextmenu:delete:row:single":
+                    case "contextmenu:delete:row:multiple":
+                        tableChannel.trigger("delete:selection");
+                        break;
                 }
+            });
+
+            Mode.Channel.on("set:empty:row", function(args){
+                var emptyRow = args.row;
+                console.log("mode set empty row:", emptyRow);
+                tableChannel.trigger("new:row", {row: emptyRow});
             });
 
             Mode.Channel.on("stop", function(){

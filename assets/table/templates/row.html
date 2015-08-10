@@ -1,4 +1,8 @@
 <div class="cell index" data-key="index" style="width:40px"><%= index%></div>
 <% _.each(cells, function(cell){ %>
-	<div class="cell" data-key="<%= cell.key %>" style="width:<%= cell.width %>px"><%= cell.display %></div>
+    <% if(changedArray.indexOf(cell.property) > -1 && !newRow && !deletedRow) {%>
+	   <div class="cell modify" data-key="<%= cell.key %>" style="width:<%= cell.width %>px"><%= cell.display %></div>
+    <% } else{ %>
+        <div class="cell" data-key="<%= cell.key %>" style="width:<%= cell.width %>px"><%= cell.display %></div>
+    <% } %>
 <% }); %>

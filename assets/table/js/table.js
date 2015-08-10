@@ -23,9 +23,24 @@ define([
             templateHelpers: function(){
                 var index = Table.workingSet.indexOf(this.model) + 1;
                 var cells = this.extractCells();
+                var changedArray = this.model.get("changed");
+                if(changedArray === undefined){
+                    changedArray = [];
+                }
+                var newRow = this.model.get("new");
+                if(newRow === undefined){
+                    newRow = false;
+                }
+                var deletedRow = this.model.get("deleted");
+                if(deletedRow === undefined){
+                    deletedRow = false;
+                }
                 return {
                     index: index,
-                    cells: cells
+                    cells: cells,
+                    changedArray: changedArray,
+                    newRow: newRow,
+                    deletedRow: deletedRow
                 };
             },
             events: {
@@ -34,7 +49,8 @@ define([
             },
             modelEvents: {
                 "unselect": "unselect",
-                "select": "select"
+                "select": "select",
+                "model:modified": "render"
             },
             initialize: function(){
                 this.model.set({"selected": false});
@@ -50,6 +66,18 @@ define([
                 }
                 else{
                     this.$el.removeClass("selected");
+                }
+                if(this.model.get("new")){
+                    this.$el.addClass("new");
+                }
+                else{
+                    this.$el.removeClass("new");
+                }
+                if(this.model.get("deleted")){
+                    this.$el.addClass("delete");
+                }
+                else{
+                    this.$el.removeClass("delete");
                 }
             },
             cellClick: function(event){
@@ -73,6 +101,7 @@ define([
                     var cell = {};
 
                     cell["key"] = column.get("alias");
+                    cell["property"] = column.get("key");
                     cell["display"] = this.model.getCellValue(column);
                     cell["width"] = column.get("max_text_width");
 
@@ -286,7 +315,9 @@ define([
                 var selectedRows = Table.getSelectedRows();
                 screedChannel.trigger("reset:screed:values", {
                     rows: selectedRows,
-                    column: Table.workingColumn
+                    column: Table.workingColumn,
+                    successCallback: function(){},
+                    failCallback: function(){}
                 });
                 // open
                 screedChannel.trigger("open:screed");
@@ -294,6 +325,30 @@ define([
 
             Table.Channel.on("close:screed", function(args){
                 screedChannel.trigger("close:screed");
+            });
+
+            Table.Channel.on("new:row", function(args){
+                screedChannel.trigger("reset:screed:values", {
+                    rows: [args.row],
+                    //column will be removed in a future commit
+                    column: Table.workingColumn,
+                    successCallback: function(){
+                        console.log("success called");
+                        args.row.set({
+                            "new": true,
+                            "changed": []
+                        });
+                        Table.extendRowMethods(args.row);
+                        Table.rows.add(args.row);
+                        Table.allowedSet.add(args.row);
+                    },
+                    failCallback: function(){
+                        console.log("fail called");
+                        args.row.destroy();
+                    }
+                });
+                Table.Channel.trigger("empty:selection");
+                screedChannel.trigger("open:screed");
             });
 
             Table.Channel.listenTo(screedChannel, "send:form:data", function(args){
@@ -316,6 +371,10 @@ define([
             Table.Channel.listenTo(Table.windowSet, "reset", function(){
                 Table.emptySelection();
             });
+
+            // Table.Channel.listenTo(Table.allowedSet, "reset", function(){
+            //     Table.emptySelection();
+            // });
 
             Table.Channel.reply("get:selection", function(){
                 return {
@@ -449,30 +508,7 @@ define([
             var max_text_width = 10;
             Table.rows.each(function(row){
                 if(row.getCellValue === undefined){
-                    _.extend(row, {
-                        getCellValue: function(column){
-                            var display;
-                            if(column.get("type") === "model"){
-                                var nestedModel = column.get("key");
-                                var displayKeys = column.get("filterDisplay");
-                                var dkCount = 1;
-                                display = "";
-                                _.each(displayKeys, function(dk){
-                                    if(dkCount === displayKeys.length){
-                                        display += this.get(nestedModel).get(dk);
-                                    }
-                                    else{
-                                        display += (this.get(nestedModel).get(dk) + " - ");
-                                    }
-                                    dkCount += 1;
-                                }, this);
-                            }
-                            else{
-                                display = "" + this.get(column.get("key"));
-                            }
-                            return display;
-                        }
-                    });
+                    Table.extendRowMethods(row);
                 }
                 var text = row.getCellValue(schemaCounterpart);
                 var width = text.length;
@@ -580,6 +616,33 @@ define([
                 row.trigger("unselect", {column: Table.workingColumn});
             });
             Table.workingColumn = null;
+        };
+
+        Table.extendRowMethods = function(row){
+            _.extend(row, {
+                getCellValue: function(column){
+                    var display;
+                    if(column.get("type") === "model"){
+                        var nestedModel = column.get("key");
+                        var displayKeys = column.get("filterDisplay");
+                        var dkCount = 1;
+                        display = "";
+                        _.each(displayKeys, function(dk){
+                            if(dkCount === displayKeys.length){
+                                display += this.get(nestedModel).get(dk);
+                            }
+                            else{
+                                display += (this.get(nestedModel).get(dk) + " - ");
+                            }
+                            dkCount += 1;
+                        }, this);
+                    }
+                    else{
+                        display = "" + this.get(column.get("key"));
+                    }
+                    return display;
+                }
+            });
         };
 
         return Table;

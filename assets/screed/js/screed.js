@@ -14,6 +14,9 @@ define([
             var columns = options.columns.map(function(col){
                 return col.toJSON();
             });
+            Screed.successCallback = function(){};
+            Screed.failCallback = function(){};
+
             Screed.Editors = new Classes.Editors(columns);
             Screed.initEditors();
 
@@ -28,6 +31,8 @@ define([
 
             Screed.Channel.on("reset:screed:values", function(args){
                 console.log("params: SELECTION -> ", args);
+                Screed.successCallback = args.successCallback;
+                Screed.failCallback = args.failCallback;
                 Screed.selection = args;
                 Screed.populateEditorValues(args);
                 Screed.populateDistinctOptions();
@@ -49,9 +54,11 @@ define([
                     successCallback: function(){
                         //maybe display some notification
                         Screed.Channel.trigger("close:screed");
+                        Screed.successCallback();
                     },
                     failCallback: function(args){
                         Screed.Channel.trigger("display:errors", args);
+                        // Screed.failCallback();
                     },
                     selection: Screed.selection
                 });

@@ -183,6 +183,10 @@ define([
                 Maintainer.Channel.trigger("send:form:data", args);
             });
 
+            Maintainer.Channel.listenTo(Maintainer.modes[Maintainer.activeKey].Channel, "get:empty:row", function(args){
+                Maintainer.Channel.trigger("get:empty:row", args);
+            });
+
             Maintainer.Channel.on("change:active:mode", function(args){
                 var activeKey = args.key;
                 if(Maintainer.activeKey !== activeKey){

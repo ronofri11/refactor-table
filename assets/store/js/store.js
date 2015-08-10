@@ -627,12 +627,93 @@ define([
             });
 
             Store.Channel.reply("validate:form:data", function(args){
-                console.log(args);
-                return true;
+                var formData = args.formData;
+                var models = args.selection.rows;
+                var column = args.selection.column;
+
+                var value = formData[column.get("key")];
+                var type = column.get("type");
+
+                var isValid;
+                switch(type){
+                    case "model":
+                        isValid = value !== null;
+                        break;
+                    case "number":
+                        isValid = !isNaN(value);
+                        break;
+                    case "string":
+                        isValid = typeof value === "string" && value !== "";
+                        break;
+                    case "boolean":
+                        isValid = typeof value === "boolean";
+                        break;
+                }
+                return isValid;
             });
 
             Store.Channel.comply("save:form:data", function(args){
-                console.log("saving form data");
+                var formData = args.formData;
+                var models = args.selection.rows;
+                var column = args.selection.column;
+                var modelName = args.modelName;
+
+                // var key = column.get("key");
+                // var value = formData[key];
+
+                // var changed = [];
+                // changed.push(key);
+
+                // var changes = {};
+                // changes["changed"] = changed;
+                // changes[key] = value;
+
+                _.each(models, function(model){
+                    // var previousChanges = model.get("changed");
+                    // if(previousChanges !== undefined){
+                    //     changes["changed"] = _.uniq(changes["changed"].concat(previousChanges));
+                    // }
+
+                    var changed = Store.Channel.request("get:changed:properties", {
+                        modelName: modelName,
+                        model: model,
+                        formData: formData
+                    });
+                    if(changed.length > 0){
+                        model.set("changed", changed);
+                        model.trigger("model:modified");
+                    }
+                });
+            });
+
+            Store.Channel.reply("get:changed:properties", function(args){
+                var model = args.model;
+                var modelName = args.modelName;
+                var formData = args.formData;
+
+                var changed = [];
+
+                var schema = Store.Channel.request("get:schema:for", {modelName: modelName});
+                
+                _.each(schema, function(property){
+                    var value = formData[property.key];
+                    var modelValue = model.get(property.key);
+                    var type = property.type;
+
+                    var hasChanges = value !== modelValue;
+
+                    if(hasChanges){
+                        model.set(property.key, value);
+                        changed.push(property.key);
+                    }
+                });
+
+                var previousChanges = model.get("changed");
+                if(previousChanges !== undefined){
+                    changed = _.uniq(changed.concat(previousChanges));
+                }
+
+                return changed;
             });
 
         };

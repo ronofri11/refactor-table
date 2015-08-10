@@ -33,6 +33,7 @@ define([
 
             var rows;
             var modelName = "Curso";
+            App.modelName = modelName;
 
             App.Channel.listenTo(storeChannel, "end:configuration", function(){
                 storeChannel.command("fetch:chain:for", {modelName: modelName});
@@ -660,15 +661,26 @@ define([
             var storeChannel = App.store.Channel;
 
             App.Channel.listenTo(maintainerChannel, "send:form:data", function(args){
-                var isValid = storeChannel.request("validate:form:data", args);
+                var params = _.extend(args, {modelName: App.modelName});
+                var isValid = storeChannel.request("validate:form:data", params);
 
                 if(isValid){
-                    storeChannel.command("save:form:data", args.formData);
+                    storeChannel.command("save:form:data", params);
                     args.successCallback();
                 }
                 else{
-                    args.failCallback({errorMessage: "Debe escoger una sede"});
+                    args.failCallback({errorMessage: "Algunos campos del formulario contienen errores."});
                 }
+            });
+
+            App.Channel.listenTo(maintainerChannel, "get:empty:row", function(args){
+                var successCallback = args.successCallback;
+                var emptyModel = storeChannel.request("get:empty:model", {
+                    modelName: App.modelName
+                });
+                console.log("app empty model", emptyModel);
+
+                successCallback(emptyModel);
             });
 
             // App.Channel.listenTo(storeChannel, "", function(args){
