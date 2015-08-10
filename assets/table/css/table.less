@@ -326,91 +326,7 @@
                         }
                     }
 
-                    .new
-                    {
-                        // background: #9CE193 !important;
-                        border: none !important;
-                        text-align: center;
-                        font-size: 12px;
-                        // color: #8297ac;
-                        cursor: pointer !important;
 
-                        &:hover
-                        {
-                            background: #78D26C !important
-                        }
-
-                        td
-                        {
-                            background: #9aec8f !important;
-                            border: none !important;
-                            text-align: center;
-                            font-size: 12px;
-                            // color: #8297ac !important;
-                            cursor: pointer !important;
-
-                            &:hover
-                            {
-                                background: #5BCA4D !important
-                            }
-                        }
-
-                        &.selected
-                        {
-                            td
-                            {
-                                background: #81D576 !important;
-
-                                &:hover
-                                {
-                                    background: #5BCA4D !important;
-                                    // color: #fff !important;
-                                }
-                            }
-                        }
-                    }
-
-                    .delete
-                    {
-                        // background: #e45353 !important;
-                        border: none !important;
-                        text-align: center;
-                        font-size: 12px;
-                        // color: #EFF9FA;
-
-                        &:hover
-                        {
-                            background: #C73D3D !important;
-                        }
-
-                        td
-                        {
-                            background: #DC9090 !important;
-                            border: none !important;
-                            text-align: center;
-                            font-size: 12px;
-                            // color: #EFF9FA !important;
-
-                            &:hover
-                            {
-                                background: #C73D3D !important;
-                                // color: #fff !important;
-                            }
-                        }
-                        &.selected
-                        {
-                            td
-                            {
-                                background: #CA7777 !important;
-
-                                &:hover
-                                {
-                                    background: #C73D3D !important;
-                                    // color: #fff !important;
-                                }
-                            }
-                        }
-                    }
 
                 > .row
                 {
@@ -429,7 +345,8 @@
 
                     &:hover
                     {
-                        background: #D6E7EB !important;
+                        // background: #D6E7EB !important;
+                        background: #D6E7EB;
                     }
 
                     &.selected
@@ -626,6 +543,92 @@
                     }
 
 
+                }
+
+                .new
+                {
+                    background: #9CE193 !important;
+                    border: none !important;
+                    text-align: center;
+                    font-size: 12px;
+                    // color: #8297ac;
+                    cursor: pointer !important;
+
+                    &:hover
+                    {
+                        background: #78D26C !important
+                    }
+
+                    > .cell
+                    {
+                        background: #9aec8f !important;
+                        border: none !important;
+                        text-align: center;
+                        font-size: 12px;
+                        // color: #8297ac !important;
+                        cursor: pointer !important;
+
+                        &:hover
+                        {
+                            background: #5BCA4D !important
+                        }
+                    }
+
+                    &.selected
+                    {
+                        td
+                        {
+                            background: #81D576 !important;
+
+                            &:hover
+                            {
+                                background: #5BCA4D !important;
+                                // color: #fff !important;
+                            }
+                        }
+                    }
+                }
+
+                .delete
+                {
+                    background: #e45353 !important;
+                    border: none !important;
+                    text-align: center;
+                    font-size: 12px;
+                    // color: #EFF9FA;
+
+                    &:hover
+                    {
+                        background: #C73D3D !important;
+                    }
+
+                    .cell
+                    {
+                        background: #DC9090 !important;
+                        border: none !important;
+                        text-align: center;
+                        font-size: 12px;
+                        // color: #EFF9FA !important;
+
+                        &:hover
+                        {
+                            background: #C73D3D !important;
+                            // color: #fff !important;
+                        }
+                    }
+                    &.selected
+                    {
+                        td
+                        {
+                            background: #CA7777 !important;
+
+                            &:hover
+                            {
+                                background: #C73D3D !important;
+                                // color: #fff !important;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -977,4 +980,3 @@ ul.listEditor
     }
 
 }
-
