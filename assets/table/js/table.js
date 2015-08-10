@@ -50,7 +50,8 @@ define([
             modelEvents: {
                 "unselect": "unselect",
                 "select": "select",
-                "model:modified": "render"
+                "model:modified": "render",
+                "change:deleted": "styling"
             },
             initialize: function(){
                 this.model.set({"selected": false});
@@ -390,6 +391,13 @@ define([
 
             Table.Channel.on("empty:selection", function(){
                 Table.emptySelection();
+            });
+
+            Table.Channel.on("delete:selection", function(){
+                var selectedRows = Table.getSelectedRows();
+                _.each(selectedRows, function(row){
+                    row.set({"deleted": true});
+                });
             });
 
             Table.Channel.on("stop", function(){
