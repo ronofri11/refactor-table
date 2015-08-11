@@ -174,18 +174,14 @@ define([
                         tableChannel.trigger("show:screed");
                         break;
                     case "contextmenu:create:row:single":
-                        Mode.Channel.trigger("get:empty:row", {
-                            successCallback: function(row){
-                                Mode.Channel.trigger("set:empty:row", {
-                                    row: row
-                                });
-                            }
-                        });
+                        Mode.Channel.trigger("create:new:row");
                         break;
                     case "contextmenu:delete:row:single":
                     case "contextmenu:delete:row:multiple":
                         tableChannel.trigger("delete:selection");
                         break;
+                    case "contextmenu:undo:changes":
+                        Mode.Channel.trigger("undo:changes:for:selection");
                 }
             });
 
@@ -203,39 +199,71 @@ define([
                 var selection = tableChannel.request("get:selection");
                 var optionsContextMenu;
 
+                var allDeleted = true;
+                _.each(selection.rows, function(row){
+                    allDeleted = allDeleted && row.get("deleted");
+                });
+
                 switch(selection.rows.length){
                     case 1:
-                        optionsContextMenu = [
-                            {
-                                className: "editRow",
-                                content: "Editar registro",
-                                action: "contextmenu:edit:row:single"
-                            },
-                            {
-                                className: "createRow",
-                                content: "Crear registro",
-                                action: "contextmenu:create:row:single"
-                            },
-                            {
-                                className: "deleteRow",
-                                content: "Eliminar registro",
-                                action: "contextmenu:delete:row:single"
-                            }
-                        ]
+                        if(allDeleted){
+                            optionsContextMenu = [
+                                {
+                                    className: "createRow",
+                                    content: "Crear registro",
+                                    action: "contextmenu:create:row:single"
+                                },
+                                {
+                                    className: "undoRow",
+                                    content: "Deshacer eliminar",
+                                    action: "contextmenu:undo:changes"
+                                }
+                            ]
+                        }
+                        else{
+                            optionsContextMenu = [
+                                {
+                                    className: "editRow",
+                                    content: "Editar registro",
+                                    action: "contextmenu:edit:row:single"
+                                },
+                                {
+                                    className: "createRow",
+                                    content: "Crear registro",
+                                    action: "contextmenu:create:row:single"
+                                },
+                                {
+                                    className: "deleteRow",
+                                    content: "Eliminar registro",
+                                    action: "contextmenu:delete:row:single"
+                                }
+                            ]
+                        }
                         break;
                     default:
-                        optionsContextMenu = [
-                            {
-                                className: "editRow",
-                                content: "Editar registros",
-                                action: "contextmenu:edit:field:multiple"
-                            },
-                            {
-                                className: "deleteRow",
-                                content: "Eliminar registros",
-                                action: "contextmenu:delete:row:multiple"
-                            }
-                        ]
+                        if(allDeleted){
+                            optionsContextMenu = [
+                                {
+                                    className: "undoRow",
+                                    content: "Deshacer eliminar",
+                                    action: "contextmenu:undo:changes"
+                                }
+                            ]
+                        }
+                        else{
+                            optionsContextMenu = [
+                                {
+                                    className: "editRow",
+                                    content: "Editar registros",
+                                    action: "contextmenu:edit:field:multiple"
+                                },
+                                {
+                                    className: "deleteRow",
+                                    content: "Eliminar registros",
+                                    action: "contextmenu:delete:row:multiple"
+                                }
+                            ]
+                        }
                         break;
                 }
 
@@ -253,6 +281,29 @@ define([
             Mode.Channel.listenTo(tableChannel, "send:form:data", function(args){
                 console.log("in mode send form data");
                 Mode.Channel.trigger("send:form:data", args);
+            });
+
+            Mode.Channel.listenTo(tableChannel, "create:new:row", function(){
+                Mode.Channel.trigger("create:new:row");
+            });
+
+            Mode.Channel.on("create:new:row", function(){
+                Mode.Channel.trigger("get:empty:row", {
+                    successCallback: function(row){
+                        Mode.Channel.trigger("set:empty:row", {
+                            row: row
+                        });
+                    }
+                });
+            });
+
+            Mode.Channel.listenTo(tableChannel, "undo:changes", function(){
+                Mode.Channel.trigger("undo:changes:for:selection");
+            });
+
+            Mode.Channel.on("undo:changes:for:selection", function(){
+                var selection = tableChannel.request("get:selection");
+                Mode.Channel.trigger("undo:changes", selection);
             });
 
             $(window).off();

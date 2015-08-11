@@ -65,7 +65,14 @@ define([
             });
 
             Screed.Channel.on("display:errors", function(args){
-                console.log(args.errorMessage);
+                var errorKeys = args.errorKeys;
+
+                if(errorKeys.length > 0){
+                    Screed.Editors.each(function(editor){
+                        var hasErrors = errorKeys.indexOf(editor.get("key")) > -1;
+                        editor.set("hasErrors", hasErrors);
+                    });
+                }
             });
         });
 

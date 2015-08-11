@@ -36,7 +36,8 @@ define([
         modelEvents: {
             "change:enabled": "editorRender",
             "set:current:data": "editorSetData",
-            "model:data:changed": "editorRender"
+            "model:data:changed": "editorRender",
+            "change:hasErrors": "styling"
         },
 
         initialize: function(){
@@ -79,13 +80,7 @@ define([
             else{
                 this.$el.addClass("activeEditor");
             }
-            if(!this.view.model.get("modified")){
-                this.$el.removeClass("modify");
-            }
-            else{
-                this.$el.addClass("modify");
-            }
-            if(this.view.model.get("valid")){
+            if(!this.view.model.get("hasErrors")){
                 this.$el.removeClass("error");
             }
             else{

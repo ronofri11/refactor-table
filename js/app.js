@@ -77,7 +77,7 @@ define([
                                                     transition: "default"
                                                 }
                                             },
-                                            title: "Agregar nuevo curso"
+                                            title: "Crear nuevo registro"
                                         },
                                         {
                                             align: "left",
@@ -88,7 +88,7 @@ define([
                                                     transition: "default"
                                                 }
                                             },
-                                            title: "Eliminar curso seleccionado"
+                                            title: "Eliminar registro(s) seleccionado(s)"
                                         },
                                         {
                                             align: "left",
@@ -99,7 +99,7 @@ define([
                                                     transition: "default"
                                                 }
                                             },
-                                            title: "Deshacer"
+                                            title: "Deshacer cambios"
                                         },
                                         {
                                             align: "right",
@@ -662,14 +662,17 @@ define([
 
             App.Channel.listenTo(maintainerChannel, "send:form:data", function(args){
                 var params = _.extend(args, {modelName: App.modelName});
-                var isValid = storeChannel.request("validate:form:data", params);
+                var validationResponse = storeChannel.request("validate:form:data", params);
+                var isValid = validationResponse.isValid;
 
                 if(isValid){
                     storeChannel.command("save:form:data", params);
                     args.successCallback();
                 }
                 else{
-                    args.failCallback({errorMessage: "Algunos campos del formulario contienen errores."});
+                    args.failCallback({
+                        errorKeys: validationResponse.errorKeys
+                    });
                 }
             });
 
@@ -681,6 +684,13 @@ define([
                 console.log("app empty model", emptyModel);
 
                 successCallback(emptyModel);
+            });
+
+            App.Channel.listenTo(maintainerChannel, "undo:changes", function(args){
+                storeChannel.command("undo:changes:for:selection", {
+                    selection: args,
+                    modelName: App.modelName
+                });
             });
 
             // App.Channel.listenTo(storeChannel, "", function(args){

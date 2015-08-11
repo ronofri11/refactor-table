@@ -187,6 +187,10 @@ define([
                 Maintainer.Channel.trigger("get:empty:row", args);
             });
 
+            Maintainer.Channel.listenTo(Maintainer.modes[Maintainer.activeKey].Channel, "undo:changes", function(args){
+                Maintainer.Channel.trigger("undo:changes", args);
+            });
+
             Maintainer.Channel.on("change:active:mode", function(args){
                 var activeKey = args.key;
                 if(Maintainer.activeKey !== activeKey){

@@ -411,6 +411,45 @@ define([
                 model.trigger("model:modified");
             });
 
+            Store.Channel.comply("undo:changes:for:row", function(args){
+                var model = args.model;
+                var modelName = args.modelName;
+
+                if(!model.get("new")){
+                    var undoers = Store.Channel.request("get:undoers:for", {
+                        model: model,
+                        modelName: modelName
+                    });
+
+                    _.each(undoers, function(undoer){
+                        undoer(model);
+                    });
+                }
+
+                if(model.get("changed")){
+                    if(model.get("changed").length > 0){
+                        model.set({"changed": []}, {silent: true});
+                    }
+                }
+                if(model.get("deleted")){
+                    model.set({"deleted": false}, {silent: true});
+                }
+
+                model.trigger("model:modified");
+            });
+
+            Store.Channel.comply("undo:changes:for:selection", function(args){
+                var models = args.selection.rows;
+                var modelName = args.modelName;
+
+                _.each(models, function(model){
+                    Store.Channel.command("undo:changes:for:row", {
+                        model: model,
+                        modelName: modelName
+                    });
+                });
+            });
+
             Store.Channel.reply("get:new:models", function(args){
                 return Store.models[args.modelName].filter(function(model){
                     return model.get("new") === true;
@@ -628,28 +667,46 @@ define([
 
             Store.Channel.reply("validate:form:data", function(args){
                 var formData = args.formData;
-                var models = args.selection.rows;
-                var column = args.selection.column;
+                var modelName = args.modelName;
+                // var models = args.selection.rows;
+                // var column = args.selection.column;
 
-                var value = formData[column.get("key")];
-                var type = column.get("type");
+                // var value = formData[column.get("key")];
+                // var type = column.get("type");
 
-                var isValid;
-                switch(type){
-                    case "model":
-                        isValid = value !== null;
-                        break;
-                    case "number":
-                        isValid = !isNaN(value);
-                        break;
-                    case "string":
-                        isValid = typeof value === "string" && value !== "";
-                        break;
-                    case "boolean":
-                        isValid = typeof value === "boolean";
-                        break;
-                }
-                return isValid;
+                var schema = Store.Channel.request("get:schema:for", {modelName: modelName});
+                
+                var isValid = true;
+                var errorKeys = [];
+                _.each(schema, function(property){
+                    var value = formData[property.key];
+                    var type = property.type;
+                    var isFieldValid;
+                    switch(type){
+                        case "model":
+                            isFieldValid = value !== null;
+                            break;
+                        case "number":
+                            isFieldValid = !isNaN(value);
+                            break;
+                        case "string":
+                            isFieldValid = typeof value === "string" && value !== "";
+                            break;
+                        case "boolean":
+                            isFieldValid = typeof value === "boolean";
+                            break;
+                    }
+
+                    if(!isFieldValid){
+                        errorKeys.push(property.key);
+                    }
+                    isValid = isValid && isFieldValid;
+                });
+
+                return {
+                    isValid: isValid,
+                    errorKeys: errorKeys
+                };
             });
 
             Store.Channel.comply("save:form:data", function(args){

@@ -113,7 +113,7 @@ define([
             },
             unselect: function(args){
                 var column = args.column;
-                console.log("TABLE UNSELECT:", args);
+                // console.log("TABLE UNSELECT:", args);
                 var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
                 cell.removeClass("selectedCell");
                 this.model.set({"selected": false});
@@ -121,7 +121,7 @@ define([
             },
             select: function(args){
                 var column = args.column;
-                console.log("TABLE SELECT:", args);
+                // console.log("TABLE SELECT:", args);
                 var cell = this.$el.find('[data-key="' + column.get("alias") + '"]');
                 cell.addClass("selectedCell");
                 this.model.set({"selected": true});
@@ -246,7 +246,7 @@ define([
             Table.workingColumn = null;
             Table.mode = "single";
 
-            console.log("table in window rows:", Table.windowSet.length);
+            // console.log("table in window rows:", Table.windowSet.length);
 
             Table.RootView = new LayoutView();
 
@@ -273,9 +273,9 @@ define([
             });
 
             Table.Channel.on("row:click", function(args){
-                console.log("TABLE row:click");
+                // console.log("TABLE row:click");
                 screedChannel.trigger("close:screed");
-                console.log(Table.mode, args);
+                // console.log(Table.mode, args);
                 switch(Table.mode){
                     case "append":
                         Table.addToSelection(args);
@@ -334,7 +334,7 @@ define([
                     //column will be removed in a future commit
                     column: Table.workingColumn,
                     successCallback: function(){
-                        console.log("success called");
+                        // console.log("success called");
                         args.row.set({
                             "new": true,
                             "changed": []
@@ -344,7 +344,7 @@ define([
                         Table.allowedSet.add(args.row);
                     },
                     failCallback: function(){
-                        console.log("fail called");
+                        // console.log("fail called");
                         args.row.destroy();
                     }
                 });
@@ -393,7 +393,19 @@ define([
             Table.Channel.on("delete:selection", function(){
                 var selectedRows = Table.getSelectedRows();
                 _.each(selectedRows, function(row){
-                    row.set({"deleted": true});
+                    if(row.get("new")){
+                        Table.rows.remove(row);
+                        Table.allowedSet.remove(row);
+                        if(Table.workingSet.indexOf(row) > -1){
+                            Table.workingSet.remove(row);
+                        }
+                        if(Table.windowSet.indexOf(row) > -1){
+                            Table.windowSet.remove(row);
+                        }
+                    }
+                    else{
+                        row.set({"deleted": true});
+                    }
                 });
             });
 
@@ -437,6 +449,18 @@ define([
 
             Table.Channel.on("stop", function(){
                 Table.Channel.trigger("empty:selection");
+            });
+
+            Table.Channel.on("custom:control:one", function(args){
+                Table.Channel.trigger("create:new:row");
+            });
+
+            Table.Channel.on("custom:control:two", function(args){
+                Table.Channel.trigger("delete:selection");
+            });
+
+            Table.Channel.on("custom:control:three", function(args){
+                Table.Channel.trigger("undo:changes");
             });
         });
 
@@ -590,10 +614,10 @@ define([
 
             Table.emptySelection();
 
-            console.log("TABLE columns #:", Table.columns.length);
+            // console.log("TABLE columns #:", Table.columns.length);
 
             var currentWorkingColumn = Table.columns.findWhere({"alias": cellKey});
-            console.log("TABLE --> currentWorkingColumn:", currentWorkingColumn);
+            // console.log("TABLE --> currentWorkingColumn:", currentWorkingColumn);
             if(currentWorkingColumn === undefined){
                 Table.workingColumn = null;
             }
