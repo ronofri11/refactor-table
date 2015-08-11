@@ -106,7 +106,7 @@ define([
                                             class: "btn removeFilters",
                                             states: {
                                                 default: {
-                                                    event: "remove:active:filters",
+                                                    event: "clean:filters",
                                                     transition: "default"
                                                 }
                                             },

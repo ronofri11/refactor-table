@@ -361,9 +361,6 @@ define([
                 console.log("selection count:", selection.length);
             });
 
-            Table.Channel.on("remove:active:filters", function(){
-                Table.Filters.Channel.trigger("clean:filters");
-            });
 
             Table.Channel.listenTo(Table.Headers.Channel, "sort:column", function(args){
                 Table.Filters.Channel.trigger("run:filters");
@@ -398,6 +395,44 @@ define([
                 _.each(selectedRows, function(row){
                     row.set({"deleted": true});
                 });
+            });
+
+            Table.Channel.on("filter:modified", function(){
+                var modifiedRows = Table.rows.filter(function(row){
+                    var changed = row.get("changed");
+                    if(changed !== undefined){
+                        return row.get("changed").length > 0;
+                    }
+                    return false;
+                });
+
+                Table.allowedSet.reset(modifiedRows);
+            });
+
+            Table.Channel.on("filter:deleted", function(){
+                var modifiedRows = Table.rows.filter(function(row){
+                    return row.get("deleted");
+                });
+                Table.allowedSet.reset(modifiedRows);
+            });
+
+            Table.Channel.on("filter:new", function(){
+                var deletedRows = Table.rows.filter(function(row){
+                    return row.get("new");
+                });
+                Table.allowedSet.reset(deletedRows);
+            });
+
+            Table.Channel.on("remove:active:filters", function(){
+                Table.allowedSet.reset(Table.rows.toArray());
+            });
+
+            Table.Channel.on("clean:filters", function(){
+                Table.Filters.Channel.trigger("clean:filters");
+            });
+
+            Table.Channel.listenTo(Table.allowedSet, "reset", function(){
+                Table.workingSet.reset(Table.allowedSet.toArray());
             });
 
             Table.Channel.on("stop", function(){
@@ -617,9 +652,9 @@ define([
         };
 
         Table.emptySelection = function(){
-            console.log("TABLE emptySelection -->", Table.workingColumn);
+            // console.log("TABLE emptySelection -->", Table.workingColumn);
             var selectedRows = Table.getSelectedRows();
-            console.log("TABLE selectedRows:", selectedRows);
+            // console.log("TABLE selectedRows:", selectedRows);
             _.each(selectedRows, function(row){
                 row.trigger("unselect", {column: Table.workingColumn});
             });
