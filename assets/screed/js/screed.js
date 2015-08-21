@@ -19,6 +19,7 @@ define([
 
             Screed.Editors = new Classes.Editors(columns);
             Screed.initEditors();
+            // Screed.populateDistinctOptions();
 
             Screed.RootView = new Classes.EditorCollectionView({
                 collection: Screed.Editors,
@@ -107,9 +108,14 @@ define([
             });
         };
 
+        Screed.
+
         Screed.populateEditorValues = function(params){
+            console.log("populate Editor Values");
             var rows = params.rows;
-            var column = params.column;
+            var columns = params.columns;
+
+            var enabledKeys = _.uniq(columns.pluck("key"));
 
             Screed.Editors.each(function(editor){
                 var value;
@@ -140,6 +146,7 @@ define([
         };
 
         Screed.populateDistinctOptions = function(){
+            console.log("populate Distinct Options");
             var properties = _.uniq(Screed.Editors.pluck("key"));
 
             _.each(properties, function(key){

@@ -37,7 +37,8 @@ define([
             "change:enabled": "editorRender",
             "set:current:data": "editorSetData",
             "model:data:changed": "editorRender",
-            "change:hasErrors": "styling"
+            "change:hasErrors": "styling",
+            "change:enabled": "editorRender"
         },
 
         initialize: function(){

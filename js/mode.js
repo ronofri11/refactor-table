@@ -168,10 +168,10 @@ define([
                 console.log("action en mode: ", args.action);
                 switch(args.action){
                     case "contextmenu:edit:row:single":
-                        tableChannel.trigger("show:screed");
+                        tableChannel.trigger("show:screed", {mode: "multiple"});
                         break;
                     case "contextmenu:edit:field:multiple":
-                        tableChannel.trigger("show:screed");
+                        tableChannel.trigger("show:screed", {mode: "single"});
                         break;
                     case "contextmenu:create:row:single":
                         Mode.Channel.trigger("create:new:row");

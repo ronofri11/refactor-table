@@ -312,11 +312,21 @@ define([
             });
 
             // screed
-            Table.Channel.on("show:screed", function(){
+            Table.Channel.on("show:screed", function(args){
+                var mode = args.mode;
+                var columns;
+                switch(mode){
+                    case "single":
+                        columns = [Table.workingColumn];
+                        break;
+                    case "multiple":
+                    default:
+                        columns = Table.columns.toArray();
+                }
                 var selectedRows = Table.getSelectedRows();
                 screedChannel.trigger("reset:screed:values", {
                     rows: selectedRows,
-                    column: Table.workingColumn,
+                    columns: columns,
                     successCallback: function(){},
                     failCallback: function(){}
                 });
@@ -331,10 +341,8 @@ define([
             Table.Channel.on("new:row", function(args){
                 screedChannel.trigger("reset:screed:values", {
                     rows: [args.row],
-                    //column will be removed in a future commit
-                    column: Table.workingColumn,
+                    columns: Table.columns.toArray(),
                     successCallback: function(){
-                        // console.log("success called");
                         args.row.set({
                             "new": true,
                             "changed": []
