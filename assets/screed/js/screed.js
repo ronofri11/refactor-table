@@ -108,14 +108,14 @@ define([
             });
         };
 
-        Screed.
+        
 
         Screed.populateEditorValues = function(params){
             console.log("populate Editor Values");
             var rows = params.rows;
             var columns = params.columns;
 
-            var enabledKeys = _.uniq(columns.pluck("key"));
+            var enabledKeys = _.uniq(_.pluck(columns, "key"));
 
             Screed.Editors.each(function(editor){
                 var value;
